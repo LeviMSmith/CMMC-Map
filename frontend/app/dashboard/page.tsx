@@ -22,7 +22,7 @@ export default async function Dashboard() {
       </main>
     )
   } catch (error) {
-    console.error('Couldn\' read nist standards:', error);
+    console.error('Couldn\'t read nist standards:', error);
     return (
       <div className="flex items-center justify-center h-full w-full">
         <h1>Something has gone horribly wrong displaying this data.</h1>
