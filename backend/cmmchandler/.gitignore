@@ -1,0 +1,4 @@
+/dbcreds.cnf
+
+venv/
+__pycache__/
