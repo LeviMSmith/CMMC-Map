@@ -1,0 +1,41 @@
+.major_sections_container {
+  width: 300px;
+}
+
+.major_sections_container ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.major_sections_container li {
+  cursor: pointer;
+  padding: 5px;
+  border-bottom: 1px solid #ddd;
+}
+
+.minor_sections {
+  display: none;
+  padding-left: 20px;
+}
+
+.minor_sections.show {
+  display: block;
+}
+
+/* Styling for minor sections */
+.minor_sections li {
+  padding: 3px;
+  cursor: default;
+}
+
+.header {
+    background-color: #f4f4f4;
+    padding: 10px;
+    text-align: center;
+    display: flex;
+}
+
+.header select {
+    padding: 5px;
+    margin: 5px;
+}
