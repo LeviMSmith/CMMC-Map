@@ -1,22 +1,27 @@
-import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
-import './globals.css'
+import type { Metadata } from "next";
+import "./globals.css";
+import "@mantine/core/styles.css";
 
-const inter = Inter({ subsets: ['latin'] })
+import { ColorSchemeScript, MantineProvider } from "@mantine/core";
 
 export const metadata: Metadata = {
-  title: 'CMMC Handler',
-  description: 'Handle CMMC Policies and Compliance',
-}
+  title: "CMMC Handler",
+  description: "Web app to handle CMMC Policy",
+};
 
 export default function RootLayout({
   children,
-}: {
-  children: React.ReactNode
-}) {
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <head>
+        <ColorSchemeScript />
+      </head>
+      <body>
+        <MantineProvider>{children}</MantineProvider>
+      </body>
     </html>
-  )
+  );
 }
