@@ -81,15 +81,3 @@ class Assessment_Objective_Form(models.Model):
         Assessment_Objective, on_delete=models.CASCADE)
     complete = models.BooleanField(default=False)
     modified_date = models.DateTimeField(null=True)
-
-
-# Create all the objective forms when an assessment is created
-@receiver(post_save, sender=Assessment)
-def create_default_objectives(sender, instance, created, **kwargs):
-    if created:
-        assessment_objectives = Assessment_Objective.objects.all()
-        for objective in assessment_objectives:
-            Assessment_Objective_Form.objects.create(
-                assessment=instance,
-                assessment_objective=objective,
-            )
