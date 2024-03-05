@@ -13,7 +13,6 @@ import {
   rem,
 } from "@mantine/core";
 import {
-  IconNotes,
   IconCalendarStats,
   IconGauge,
   IconPresentationAnalytics,
@@ -21,12 +20,28 @@ import {
   IconAdjustments,
   IconLock,
   IconChevronRight,
+  IconLockAccess,
+  IconBarbell,
+  IconNotes,
+  IconSettings,
+  IconUser,
+  IconVolcano,
+  IconTool,
+  IconDeviceTv,
+  IconBadgeAd,
+  IconFence,
+  IconFingerprint,
+  IconBomb,
+  IconShieldLock,
+  IconWifi,
+  IconDatabase,
 } from "@tabler/icons-react";
 import { useState } from "react";
 import { MajorSection, MinorSection } from "@/lib/db";
 import classes from "./dash-client.module.css";
 
 interface LinksGroupProps {
+  icon: React.FC<any>;
   label: string;
   initiallyOpened?: boolean;
   links?: { label: string; link: string }[];
@@ -37,8 +52,28 @@ function formatSections({
 }: {
   sections: MajorSection[];
 }): LinksGroupProps[] {
-  return sections.map((section) => {
+  const icons = [
+    IconLockAccess,
+    IconBarbell,
+    IconNotes,
+    IconSettings,
+    IconFingerprint,
+    IconVolcano,
+    IconTool,
+    IconDeviceTv,
+    IconUser,
+    IconFence,
+    IconBomb,
+    IconShieldLock,
+    IconWifi,
+    IconDatabase,
+  ];
+
+  return sections.map((section, index) => {
+    const icon = icons[index % icons.length];
+
     return {
+      icon: icon,
       label: `${section.section} ${section.title}`,
       initiallyOpened: false,
       links: section.minorSections.map((minorSection) => {
@@ -51,7 +86,12 @@ function formatSections({
   });
 }
 
-function LinksGroup({ label, initiallyOpened, links }: LinksGroupProps) {
+function LinksGroup({
+  icon: Icon,
+  label,
+  initiallyOpened,
+  links,
+}: LinksGroupProps) {
   const hasLinks = Array.isArray(links);
   const [opened, setOpened] = useState(initiallyOpened || false);
   const items = (hasLinks ? links : []).map((link) => (
@@ -74,6 +114,9 @@ function LinksGroup({ label, initiallyOpened, links }: LinksGroupProps) {
       >
         <Group justify="space-between" gap={0}>
           <Box style={{ display: "flex", alignItems: "center" }}>
+            <ThemeIcon variant="light" size={30}>
+              <Icon style={{ width: rem(18), height: rem(18) }} />
+            </ThemeIcon>
             <Box ml="md">{label}</Box>
           </Box>
           {hasLinks && (
