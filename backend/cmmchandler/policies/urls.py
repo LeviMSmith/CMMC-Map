@@ -1,6 +1,7 @@
 from django.urls import path
-from .views import policies_portal
+from .views import SectionListAPIView
 
 urlpatterns = [
-    path("", policies_portal, name="index")
+    path('api/sections/', SectionListAPIView.as_view(),
+         name='major-sections-list'),
 ]
