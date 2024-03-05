@@ -8,6 +8,8 @@ import {
   UnstyledButton,
   Group,
   ScrollArea,
+  TextInput,
+  Title,
   rem,
 } from "@mantine/core";
 import {
@@ -100,14 +102,31 @@ export default function Dashboard({ sections }: { sections: MajorSection[] }) {
   ));
 
   return (
-    <nav className={classes.navbar}>
-      <div className={classes.header}>
-        <Group justify="space-between"></Group>
-      </div>
+    <div className="flex">
+      <nav className={classes.navbar}>
+        <div className={classes.header}>
+          <Title>CMMC Policies</Title>
+          <TextInput
+            label="Search policies"
+            description="Search still in development"
+            placeholder="Monitoring strategies..."
+          />
+        </div>
 
-      <ScrollArea className={classes.links}>
-        <div className={classes.linksInner}>{links}</div>
-      </ScrollArea>
-    </nav>
+        <ScrollArea className={classes.links}>
+          <div className={classes.linksInner}>{links}</div>
+        </ScrollArea>
+      </nav>
+      <div className="w-full">
+        <header>
+          <Group justify="center" className="border-solid border-0 border-b-2">
+            <Text fw={700}>Revision:</Text>
+            <Text>0.1.0 (Draft)</Text>
+            <Text fw={700}>Assessment:</Text>
+            <Text> Continuous</Text>
+          </Group>
+        </header>
+      </div>
+    </div>
   );
 }
