@@ -4,7 +4,7 @@
     var(--mantine-color-dark-6)
   );
   height: 100vh;
-  width: rem(375px);
+  max-width: 33%;
   padding: var(--mantine-spacing-md);
   padding-bottom: 0;
   display: flex;
@@ -85,4 +85,29 @@
 
 .chevron {
   transition: transform 200ms ease;
+}
+
+.icon {
+  width: rem(22px);
+  height: rem(22px);
+}
+
+.dark {
+  @mixin dark {
+    display: none;
+  }
+
+  @mixin light {
+    display: block;
+  }
+}
+
+.light {
+  @mixin light {
+    display: none;
+  }
+
+  @mixin dark {
+    display: block;
+  }
 }

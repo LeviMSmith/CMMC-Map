@@ -1,5 +1,6 @@
 "use client";
 
+import cx from "clsx";
 import {
   Box,
   Collapse,
@@ -10,6 +11,12 @@ import {
   ScrollArea,
   TextInput,
   Title,
+  ActionIcon,
+  Stack,
+  Button,
+  Paper,
+  useMantineColorScheme,
+  useComputedColorScheme,
   rem,
 } from "@mantine/core";
 import {
@@ -35,6 +42,8 @@ import {
   IconShieldLock,
   IconWifi,
   IconDatabase,
+  IconSun,
+  IconMoon,
 } from "@tabler/icons-react";
 import { useState } from "react";
 import { MajorSection, MinorSection } from "@/lib/db";
@@ -86,40 +95,61 @@ function formatSections({
   });
 }
 
-function LinksGroup({
-  icon: Icon,
-  label,
-  initiallyOpened,
-  links,
-}: LinksGroupProps) {
-  const hasLinks = Array.isArray(links);
-  const [opened, setOpened] = useState(initiallyOpened || false);
-  const items = (hasLinks ? links : []).map((link) => (
-    <Text<"a">
-      component="a"
-      className={classes.link}
-      href={link.link}
-      key={link.label}
-      onClick={(event) => event.preventDefault()}
-    >
-      {link.label}
-    </Text>
-  ));
+const icons = [
+  IconLockAccess,
+  IconBarbell,
+  IconNotes,
+  IconSettings,
+  IconFingerprint,
+  IconVolcano,
+  IconTool,
+  IconDeviceTv,
+  IconUser,
+  IconFence,
+  IconBomb,
+  IconShieldLock,
+  IconWifi,
+  IconDatabase,
+];
 
-  return (
-    <>
+export default function Dashboard({ sections }: { sections: MajorSection[] }) {
+  const { setColorScheme } = useMantineColorScheme();
+  const computedColorScheme = useComputedColorScheme("light", {
+    getInitialValueInEffect: true,
+  });
+
+  const [selectedSection, setSelectedSection] = useState<MinorSection | null>(
+    null,
+  );
+
+  const links = sections.map((section, sectionIndex) => {
+    const [opened, setOpened] = useState(false);
+    const items = section.minorSections.map((minorSection) => (
       <UnstyledButton
-        onClick={() => setOpened((o) => !o)}
-        className={classes.control}
+        component="a"
+        className={classes.link}
+        key={minorSection.section}
+        onClick={() => setSelectedSection(minorSection)}
       >
-        <Group justify="space-between" gap={0}>
-          <Box style={{ display: "flex", alignItems: "center" }}>
-            <ThemeIcon variant="light" size={30}>
-              <Icon style={{ width: rem(18), height: rem(18) }} />
-            </ThemeIcon>
-            <Box ml="md">{label}</Box>
-          </Box>
-          {hasLinks && (
+        {`${minorSection.section} ${minorSection.brief_description}`}
+      </UnstyledButton>
+    ));
+
+    const Icon = icons[sectionIndex];
+
+    return (
+      <>
+        <UnstyledButton
+          onClick={() => setOpened((o) => !o)}
+          className={classes.control}
+        >
+          <Group justify="space-between" gap={0}>
+            <Box style={{ display: "flex", alignItems: "center" }}>
+              <ThemeIcon variant="light" size={30}>
+                <Icon style={{ width: rem(18), height: rem(18) }} />
+              </ThemeIcon>
+              <Box ml="md">{`${section.section} ${section.title}`}</Box>
+            </Box>
             <IconChevronRight
               className={classes.chevron}
               stroke={1.5}
@@ -129,20 +159,12 @@ function LinksGroup({
                 transform: opened ? "rotate(-90deg)" : "none",
               }}
             />
-          )}
-        </Group>
-      </UnstyledButton>
-      {hasLinks ? <Collapse in={opened}>{items}</Collapse> : null}
-    </>
-  );
-}
-
-export default function Dashboard({ sections }: { sections: MajorSection[] }) {
-  const formatedSections = formatSections({ sections: sections });
-
-  const links = formatedSections.map((item) => (
-    <LinksGroup {...item} key={item.section} />
-  ));
+          </Group>
+        </UnstyledButton>
+        <Collapse in={opened}>{items}</Collapse>
+      </>
+    );
+  });
 
   return (
     <div className="flex">
@@ -162,13 +184,58 @@ export default function Dashboard({ sections }: { sections: MajorSection[] }) {
       </nav>
       <div className="w-full">
         <header>
-          <Group justify="center" className="border-solid border-0 border-b-2">
-            <Text fw={700}>Revision:</Text>
-            <Text>0.1.0 (Draft)</Text>
-            <Text fw={700}>Assessment:</Text>
-            <Text> Continuous</Text>
+          <Group
+            justify="space-between"
+            className="px-8 py-2 border-solid border-0 border-b-2"
+          >
+            <Group>
+              <Text fw={700}>Revision:</Text>
+              <Text>0.1.0 (Draft)</Text>
+              <Text fw={700}>Assessment:</Text>
+              <Text> Continuous</Text>
+            </Group>
+            <Group>
+              <ActionIcon
+                onClick={() =>
+                  setColorScheme(
+                    computedColorScheme === "light" ? "dark" : "light",
+                  )
+                }
+                variant="filled"
+                size="lg"
+                aria-label="Toggle color scheme"
+              >
+                <IconSun
+                  className={cx(classes.icon, classes.light)}
+                  stroke={1.5}
+                />
+                <IconMoon
+                  className={cx(classes.icon, classes.dark)}
+                  stroke={1.5}
+                />
+              </ActionIcon>
+            </Group>
           </Group>
         </header>
+        {selectedSection ? (
+          <div className="flex w-full p-4 items-start justify-between">
+            <Paper p="8" className="w-full">
+              <Title ta="center">{selectedSection.section}</Title>
+              <Text size="lg" px="32">
+                {selectedSection.brief_description}
+              </Text>
+            </Paper>
+            <Stack className="w-1/4">
+              <Button variant="filled">Examples</Button>
+              <Button variant="filled">Interview</Button>
+              <Button variant="filled">Test</Button>
+            </Stack>
+          </div>
+        ) : (
+          <div className="w-full h-full flex items-center justify-center">
+            <Text size="xl">Select a section to see its details</Text>
+          </div>
+        )}
       </div>
     </div>
   );
