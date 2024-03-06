@@ -68,7 +68,7 @@ const icons = [
 
 export default function Dashboard({ sections }: { sections: MajorSection[] }) {
   const { setColorScheme } = useMantineColorScheme();
-  const computedColorScheme = useComputedColorScheme("light", {
+  const computedColorScheme = useComputedColorScheme("auto", {
     getInitialValueInEffect: true,
   });
 
