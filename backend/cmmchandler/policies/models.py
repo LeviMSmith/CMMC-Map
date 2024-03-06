@@ -1,7 +1,5 @@
 from django.db import models
 from django.conf import settings
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 
 User = settings.AUTH_USER_MODEL
 
@@ -38,10 +36,9 @@ class Policy(models.Model):
     def __str__(self):
         return (f"${self.minor_section} {self.id}")
     description = models.TextField()
+    implementation_status = models.CharField(max_length=2, default="N")
     minor_section = models.ForeignKey(
         Minor_Section, on_delete=models.SET_NULL, null=True)
-    modified_date = models.DateTimeField(null=True)
-    modified_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     revision = models.ForeignKey(Revision, on_delete=models.CASCADE)
 
 
@@ -50,9 +47,6 @@ class Evidence(models.Model):
     file = models.FileField(null=True)
     link = models.URLField(null=True)
     description = models.TextField()
-    added_date = models.DateTimeField()
-    modified_date = models.DateTimeField(null=True)
-    modified_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     policy = models.ForeignKey(Policy, on_delete=models.CASCADE)
 
 
@@ -63,11 +57,12 @@ class Assessment(models.Model):
     name = models.CharField(max_length=255)
     started = models.DateTimeField(null=True)
     finished = models.DateTimeField(null=True, blank=True)
+    revision = models.ForeignKey(Revision, on_delete=models.CASCADE)
 
 
 class Assessment_Objective(models.Model):
     def __str__(self):
-        return (f"{self.minor_section} {self.id}")
+        return (f"{self.minor_section} {self.letter}")
 
     letter = models.CharField(max_length=3)
     description = models.TextField()
@@ -80,4 +75,3 @@ class Assessment_Objective_Form(models.Model):
     assessment_objective = models.ForeignKey(
         Assessment_Objective, on_delete=models.CASCADE)
     complete = models.BooleanField(default=False)
-    modified_date = models.DateTimeField(null=True)
