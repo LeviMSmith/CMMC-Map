@@ -49,52 +49,6 @@ import { useState } from "react";
 import { MajorSection, MinorSection } from "@/lib/db";
 import classes from "./dash-client.module.css";
 
-interface LinksGroupProps {
-  icon: React.FC<any>;
-  label: string;
-  initiallyOpened?: boolean;
-  links?: { label: string; link: string }[];
-}
-
-function formatSections({
-  sections,
-}: {
-  sections: MajorSection[];
-}): LinksGroupProps[] {
-  const icons = [
-    IconLockAccess,
-    IconBarbell,
-    IconNotes,
-    IconSettings,
-    IconFingerprint,
-    IconVolcano,
-    IconTool,
-    IconDeviceTv,
-    IconUser,
-    IconFence,
-    IconBomb,
-    IconShieldLock,
-    IconWifi,
-    IconDatabase,
-  ];
-
-  return sections.map((section, index) => {
-    const icon = icons[index % icons.length];
-
-    return {
-      icon: icon,
-      label: `${section.section} ${section.title}`,
-      initiallyOpened: false,
-      links: section.minorSections.map((minorSection) => {
-        return {
-          label: `${minorSection.section} ${minorSection.brief_description}`,
-          link: "#",
-        };
-      }),
-    };
-  });
-}
-
 const icons = [
   IconLockAccess,
   IconBarbell,
@@ -126,6 +80,7 @@ export default function Dashboard({ sections }: { sections: MajorSection[] }) {
     const [opened, setOpened] = useState(false);
     const items = section.minorSections.map((minorSection) => (
       <UnstyledButton
+        fw={minorSection == selectedSection ? 700 : 400}
         component="a"
         className={classes.link}
         key={minorSection.section}
@@ -138,7 +93,7 @@ export default function Dashboard({ sections }: { sections: MajorSection[] }) {
     const Icon = icons[sectionIndex];
 
     return (
-      <>
+      <div key={section.section}>
         <UnstyledButton
           onClick={() => setOpened((o) => !o)}
           className={classes.control}
@@ -162,7 +117,7 @@ export default function Dashboard({ sections }: { sections: MajorSection[] }) {
           </Group>
         </UnstyledButton>
         <Collapse in={opened}>{items}</Collapse>
-      </>
+      </div>
     );
   });
 
@@ -221,6 +176,7 @@ export default function Dashboard({ sections }: { sections: MajorSection[] }) {
           <div className="flex w-full p-4 items-start justify-between">
             <Paper p="8" className="w-full">
               <Title ta="center">{selectedSection.section}</Title>
+              <div className={classes.colored_underline} />
               <Text size="lg" px="32">
                 {selectedSection.brief_description}
               </Text>

@@ -111,3 +111,9 @@
     display: block;
   }
 }
+
+.colored_underline {
+  height: rem(2px);
+  margin: rem(8px) rem(64px);
+  background-color: var(--mantine-color-blue-6);
+}
