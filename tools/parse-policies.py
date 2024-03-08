@@ -24,11 +24,6 @@ def extract_text_from_pdf(pdf_path):
         return str(e)
 
 
-def remove_text_by_regex(text, pattern):
-    """Remove text that matches the given regex pattern."""
-    return re.sub(pattern, "", text)
-
-
 def main(pdf_path, pure_text):
     text = extract_text_from_pdf(pdf_path)
 
