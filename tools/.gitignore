@@ -1,4 +1,5 @@
 /*.pdf
-/extracted-text.txt
+/*.txt
+/*.json
 
 venv/

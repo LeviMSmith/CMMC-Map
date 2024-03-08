@@ -2,6 +2,7 @@ import sys
 import fitz  # PyMuPDF
 import re  # Regular expression module
 import json
+import argparse
 
 
 def extract_text_from_pdf(pdf_path):
@@ -28,12 +29,7 @@ def remove_text_by_regex(text, pattern):
     return re.sub(pattern, "", text)
 
 
-if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("Usage: python script.py <path_to_pdf>")
-        sys.exit(1)
-
-    pdf_path = sys.argv[1]
+def main(pdf_path, pure_text):
     text = extract_text_from_pdf(pdf_path)
 
     # Remove the table of contents
@@ -52,7 +48,7 @@ if __name__ == "__main__":
         pattern, "\n", text, flags=re.DOTALL)
 
     # Remove page header pattern
-    pattern = r"\s+[A-Z]{1,2}\.L[1-2]-3\.[0-9]{1,2}\.[0-9]{1,2} [\s\S]{1,3} (?:[[A-Z][a-z]*[ &]+)+[A-Z][a-z]*\n*"
+    pattern = r"\s+[A-Z]{1,2}\.L[1-2]-3\.[0-9]{1,2}\.[0-9]{1,2} [\s\S]{1,3} (?:[A-Z][a-z]*[ &]+)+[A-Z][a-z]*\n*"
     text = re.sub(pattern, "", text)
 
     # Remove Level indicators
@@ -61,7 +57,7 @@ if __name__ == "__main__":
 
     ## Now we can search for the things we need ##
 
-    oh_yee_great_and_mighty_all_knowing_regex_pattern = r"\s*[A-Z]{2}\.L([1-2])-(3\.[0-9]{1,2}\.[0-9]{1,2}) [\s\S]{1,3} ([A-Z &-]{2,})\s*(.*?)ASSESSMENT OBJECTIVES \[NIST SP 800\-171A\]\s*Determine if:\s*((?:\[[a-z]\] [a-z ().;\n]+)+)\s*POTENTIAL ASSESSMENT METHODS AND OBJECTS \[NIST SP 800-171A\]\s*Examine\s*(\[SELECT FROM:.*?\]).\s*Interview\s*(\[SELECT FROM:.*?\]).\s*Test\s*(\[SELECT FROM:.*?\]).\s*DISCUSSION \[NIST SP 800-171 R2\]\s*(.*?)\s*FURTHER DISCUSSION\s*(.*?)KEY REFERENCES\s*((?:.*?\n)+)"
+    oh_yee_great_and_mighty_all_knowing_regex_pattern = r"\s*[A-Z]{2}\.L([1-2])-(3\.[0-9]{1,2}\.[0-9]{1,2}) [\s\S]{1,3} ([A-Z &-]{2,})\s*(.*?)ASSESSMENT OBJECTIVES \[NIST SP 800\-171A\]\s*Determine if:\s*((?:\[[a-z]\] [\S \n]+?)+)\s*POTENTIAL ASSESSMENT METHODS AND OBJECTS \[NIST SP 800-171A\]\s*Examine\s*(\[SELECT\s{1,3}FROM:.*?\]).\s*Interview\s*(\[SELECT FROM:.*?\]).\s*Test\s*(\[SELECT FROM:.*?\]).\s*DISCUSSION \[NIST SP 800-171 R2\]\s*(.*?)\s*FURTHER DISCUSSION\s*(.*?)KEY REFERENCES\s*((?:.*?\n)+)"
     objectives_pattern = re.compile(
         r'(?<=\[[a-z]\])\s*(.*?)(?=\s*\[[a-z]\]|$)', flags=re.DOTALL)
     key_references_pattern = re.compile(
@@ -97,6 +93,22 @@ if __name__ == "__main__":
     # Convert the list of dictionaries to a JSON string
     json_data = json.dumps(data, indent=2)
 
-    print(json_data, file=sys.stdout)
+    if pure_text:
+        print(text, file=sys.stdout)
+    else:
+        print(json_data, file=sys.stdout)
 
-    # print(text, file=sys.stdout)
+
+if __name__ == "__main__":
+    # Initialize the parser
+    parser = argparse.ArgumentParser(description="Process a PDF file.")
+    # Positional argument for the PDF path
+    parser.add_argument("pdf_path", help="Path to the PDF file")
+    # Optional flag (default False). Include '-p' or '--pure-text' to set this to True.
+    parser.add_argument("-p", "--pure-text", action="store_true", help="Output in pure text instead of JSON")
+
+    # Parse the arguments
+    args = parser.parse_args()
+
+    # Call the main function with the processed arguments
+    main(args.pdf_path, args.pure_text)
