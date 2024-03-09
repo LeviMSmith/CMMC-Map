@@ -42,7 +42,9 @@ def parse_pdf(pdf_path, pure_text):
     text = re.sub(pattern, "\n", text, flags=re.DOTALL)
 
     # Remove page header pattern
-    pattern = r"\s+[A-Z]{1,2}\.L[1-2]-3\.[0-9]{1,2}\.[0-9]{1,2} [\s\S]{1,3} (?:[A-Z][a-z]*[ &]+)+[A-Z][a-z]*\n*"
+    pattern = (
+        r"\s+[A-Z]{1,2}\.L[1-2]-3\.[0-9]{1,2}\.[0-9]{1,2} – [A-Z][a-z]+(?: [A-Za-z]+)*"
+    )
     text = re.sub(pattern, "", text)
 
     # Remove Level indicators
@@ -60,6 +62,12 @@ def parse_pdf(pdf_path, pure_text):
     key_references_pattern = re.compile(
         r"(?<=\uf0b7)\s*(.*?)(?=\s*\uf0b7|$)", flags=re.DOTALL
     )
+
+    example_pattern = re.compile(
+        r"(Example\s+\d*)\s*([\s\S]+?)(?=(?:Example\s+\d+|Potential Assessment Considerations|$))"
+    )
+
+    pac_pattern = re.compile(r"\s+((?:.(?!))+.)", flags=re.DOTALL)
 
     data = []
 
@@ -83,6 +91,15 @@ def parse_pdf(pdf_path, pure_text):
             for match in re.findall(key_references_pattern, key_references_text)
         ]
 
+        # Process Example
+        example_text = match.group(10)
+        example_matches = re.findall(example_pattern, example_text)
+        examples = {m[0].strip(): m[1].strip() for m in example_matches}
+
+        # Process Potential Assessment Considerations
+        pac_text = match.group(10)
+        pac_matches = [match.strip() for match in re.findall(pac_pattern, pac_text)]
+
         data.append(
             {
                 "id": id,
@@ -96,6 +113,8 @@ def parse_pdf(pdf_path, pure_text):
                 "test": match.group(8),
                 "discussion": match.group(9),
                 "further_discussion": match.group(10),
+                "fd_pac": pac_matches,
+                "fd_examples": examples,
                 "key_references": key_references,
             }
         )
