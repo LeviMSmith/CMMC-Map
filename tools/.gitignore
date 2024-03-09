@@ -1,5 +1,6 @@
 /*.pdf
 /*.txt
+!/requirements.txt
 /*.json
 
 /.env

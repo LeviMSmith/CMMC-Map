@@ -1,0 +1,5 @@
+mariadb==1.1.10
+packaging==23.2
+PyMuPDF==1.23.26
+PyMuPDFb==1.23.22
+python-dotenv==1.0.1
