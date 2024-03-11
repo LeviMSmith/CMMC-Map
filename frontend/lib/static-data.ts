@@ -1,14 +1,21 @@
 import fsPromises from "fs/promises";
 
-export interface MinorSection {
+interface Control {
+  id: number;
+  level: number;
   section: string;
   brief_description: string;
-}
-
-export interface MajorSection {
-  section: string;
-  title: string;
-  minorSections: MinorSection[];
+  assessment_objects: {
+    [key: string]: string;
+  };
+  examine: string;
+  interview: string;
+  test: string;
+  discussion: string;
+  further_discussion: string;
+  fd_pac: string[];
+  fd_examples: string[];
+  key_references: string[];
 }
 
 export async function listSections(): Promise<MajorSection[]> {
