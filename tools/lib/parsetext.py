@@ -67,6 +67,11 @@ def parse_pdf(pdf_path, pure_text):
         r"(Example\s+\d*)\s*([\s\S]+?)(?=(?:Example\s+\d+|Potential Assessment Considerations|$))"
     )
 
+    fd_pattern = re.compile(
+        r"(.*?)(?=\s+Example)", flags=re.DOTALL)
+
+    pac_section_pattern = re.compile(
+        r"Potential Assessment Considerations\s+(.*)", flags=re.DOTALL)
     pac_pattern = re.compile(r"\s+((?:.(?!))+.)", flags=re.DOTALL)
 
     data = []
@@ -97,8 +102,12 @@ def parse_pdf(pdf_path, pure_text):
         examples = {m[0].strip(): m[1].strip() for m in example_matches}
 
         # Process Potential Assessment Considerations
-        pac_text = match.group(10)
-        pac_matches = [match.strip() for match in re.findall(pac_pattern, pac_text)]
+        pac_section_search = re.search(pac_section_pattern, match.group(10))
+        pac_text = pac_section_search.group(1)
+        pac_matches = [match.strip()
+                       for match in re.findall(pac_pattern, pac_text)]
+
+        further_discussion_match = re.search(fd_pattern, match.group(10))
 
         data.append(
             {
@@ -112,9 +121,9 @@ def parse_pdf(pdf_path, pure_text):
                 "interview": match.group(7),
                 "test": match.group(8),
                 "discussion": match.group(9),
-                "further_discussion": match.group(10),
-                "fd_pac": pac_matches,
+                "further_discussion": further_discussion_match.group(1),
                 "fd_examples": examples,
+                "fd_pac": pac_matches,
                 "key_references": key_references,
             }
         )
