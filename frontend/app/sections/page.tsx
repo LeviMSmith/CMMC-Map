@@ -1,6 +1,6 @@
 "use server";
 
-import Dashboard from "./dashboard-client.tsx";
+import Dashboard from "./dashboard-client";
 
 export default async function Home() {
   return (

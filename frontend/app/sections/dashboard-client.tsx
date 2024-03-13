@@ -54,14 +54,14 @@ const sectionIcons = [
 
 export default function Dashboard() {
   return (
-    <Container>
+    <Container className="pb-16">
       <Text ta="center" className={styles.bigtitle}>
         CMMC Map
       </Text>
       <Space h="lg" />
       <TextInput placeholder="AI powered search" />
       <div className="h-16" />
-      <SimpleGrid cols={3}>
+      <SimpleGrid cols={{ base: 1, md: 2 }}>
         {sections.map((section, index) => {
           const Icon = sectionIcons[index];
 
@@ -72,7 +72,10 @@ export default function Dashboard() {
               key={section.section}
               className={styles.sectioncard}
             >
-              <Link href="#" className="text-inherit no-underline">
+              <Link
+                href={`/sections/${section.section}`}
+                className="text-inherit no-underline"
+              >
                 <Stack justify="space-between" className="h-full">
                   <Group wrap="nowrap">
                     <ActionIcon variant="light">
