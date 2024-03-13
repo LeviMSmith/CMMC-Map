@@ -1,13 +1,11 @@
-import { listSections, MajorSection, MinorSection } from "@/lib/db";
+"use server";
 
-import Dashboard from "./dash-client.tsx";
+import Dashboard from "./dashboard-client.tsx";
 
 export default async function Home() {
-  const sections: MajorSection[] = await listSections();
-
   return (
     <main>
-      <Dashboard sections={sections} />
+      <Dashboard />
     </main>
   );
 }
