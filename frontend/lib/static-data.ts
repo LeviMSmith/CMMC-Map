@@ -1,20 +1,3 @@
-import {
-  IconLockAccess,
-  IconBarbell,
-  IconNotes,
-  IconSettings,
-  IconFingerprint,
-  IconVolcano,
-  IconTool,
-  IconDeviceTv,
-  IconUser,
-  IconFence,
-  IconBomb,
-  IconShieldLock,
-  IconWifi,
-  IconDatabase,
-} from "@tabler/icons-react";
-
 export interface Control {
   id: number;
   level: number;
@@ -60,38 +43,18 @@ export interface Section {
   section: string;
   description: string;
   abreviation: string;
-  icon?: React.fd;
 }
-
-const sectionIcons = [
-  IconLockAccess,
-  IconBarbell,
-  IconNotes,
-  IconSettings,
-  IconFingerprint,
-  IconVolcano,
-  IconTool,
-  IconDeviceTv,
-  IconUser,
-  IconFence,
-  IconBomb,
-  IconShieldLock,
-  IconWifi,
-  IconDatabase,
-];
 
 export const sections: Section[] = [
   {
     section: "3.1",
     description: "Access Control",
     abreviation: "AC",
-    Icon: IconLockAccess,
   },
   {
     section: "3.2",
     description: "Awareness and Training",
     abreviation: "AT",
-    Icon: IconBarbell,
   },
   {
     section: "3.3",
@@ -3737,7 +3700,7 @@ export const controls: Control[] = [
     discussion:
       "System monitoring includes external and internal monitoring. System monitoring can detect \nunauthorized use of organizational systems. System monitoring is an integral part of \ncontinuous monitoring and incident response programs. Monitoring is achieved through a \nvariety of tools and techniques (e.g., intrusion detection systems, intrusion prevention \nsystems, malicious code protection software, scanning tools, audit record monitoring \nsoftware, network monitoring software). Output from system monitoring serves as input to \ncontinuous monitoring and incident response programs. \nUnusual/unauthorized activities or conditions related to inbound and outbound \ncommunications traffic include internal traffic that indicates the presence of malicious code \nin systems or propagating among system components, the unauthorized exporting of \ninformation, or signaling to external systems. Evidence of malicious code is used to identify \npotentially compromised systems or system components. System monitoring requirements, \nincluding the need for specific types of system monitoring, may be referenced in other \nrequirements. \nNIST SP 800-94 provides guidance on intrusion detection and prevention systems.",
     further_discussion:
-      "Define authorized use of your systems. Create an acceptable use policy to establish the \nbaseline for how users access devices, internal network services, and the internet. Define \nauthorized use by specific roles such as: user, administrator, and technician. After authorized \nuse is defined, identify unauthorized use of systems. \nMonitor systems by observing audit activities from the system logs. This can be \naccomplished in real time using automated solutions or by manual means. To identify \nunauthorized use, leverage existing tools and techniques, such as: \n intrusion detection systems; \n������������ intrusion prevention systems; \n malicious code protection software; \n scanning tools; \n audit record monitoring software; and \n network monitoring software. \nThis practice, SI.L2-3.14.7, which deals with identifying unauthorized use of organizational \nsystems, is related to practices: AC.L1-3.1.1, AU.L2-3.3.1, IA.L1-3.5.1, and IA.L1-3.5.2. All of \nthese practices help create the building blocks that support SI.L2-3.14.7. \nExample 1 \nYou are in charge of IT operations. You need to ensure that everyone using an organizational \nsystem is authorized to do so and conforms to the written authorized use policy. To do this, \nyou deploy an application that monitors user activity and records the information for later \nanalysis. You review the data from this application for signs of activity that does not conform \nto the acceptable use policy [a,b]. \nExample 2 \nYou are alerted through your Intrusion Detection System (IDS) that one of your users is \nconnecting to a server that is from a high-risk domain (based on your commercial domain \nreputation service). You investigate and determine that it’s not the user, but instead an \nunauthorized connection attempt [b]. You add the domain to your list of blocked domains \nto prevent connections in the future.  \nPotential Assessment Considerations \n Is authorized use of systems defined (e.g., data types permitted for storage or processing, \npersonnel authorized to access, times or days of permitted use, permitted software) [a]? \n Is unauthorized use of systems defined (e.g., not authorized to use systems for bitcoin \nmining, not authorized for pornographic content, not authorized to access gambling \ngames/content) [b]? \n",
+      "Define authorized use of your systems. Create an acceptable use policy to establish the \nbaseline for how users access devices, internal network services, and the internet. Define \nauthorized use by specific roles such as: user, administrator, and technician. After authorized \nuse is defined, identify unauthorized use of systems. \nMonitor systems by observing audit activities from the system logs. This can be \naccomplished in real time using automated solutions or by manual means. To identify \nunauthorized use, leverage existing tools and techniques, such as: \n intrusion detection systems; \n������������������������ intrusion prevention systems; \n malicious code protection software; \n scanning tools; \n audit record monitoring software; and \n network monitoring software. \nThis practice, SI.L2-3.14.7, which deals with identifying unauthorized use of organizational \nsystems, is related to practices: AC.L1-3.1.1, AU.L2-3.3.1, IA.L1-3.5.1, and IA.L1-3.5.2. All of \nthese practices help create the building blocks that support SI.L2-3.14.7. \nExample 1 \nYou are in charge of IT operations. You need to ensure that everyone using an organizational \nsystem is authorized to do so and conforms to the written authorized use policy. To do this, \nyou deploy an application that monitors user activity and records the information for later \nanalysis. You review the data from this application for signs of activity that does not conform \nto the acceptable use policy [a,b]. \nExample 2 \nYou are alerted through your Intrusion Detection System (IDS) that one of your users is \nconnecting to a server that is from a high-risk domain (based on your commercial domain \nreputation service). You investigate and determine that it’s not the user, but instead an \nunauthorized connection attempt [b]. You add the domain to your list of blocked domains \nto prevent connections in the future.  \nPotential Assessment Considerations \n Is authorized use of systems defined (e.g., data types permitted for storage or processing, \npersonnel authorized to access, times or days of permitted use, permitted software) [a]? \n Is unauthorized use of systems defined (e.g., not authorized to use systems for bitcoin \nmining, not authorized for pornographic content, not authorized to access gambling \ngames/content) [b]? \n",
     fd_pac: [
       "intrusion detection systems;",
       "intrusion prevention systems;",
