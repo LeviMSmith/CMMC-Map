@@ -1,0 +1,13 @@
+.bigtitle {
+  font-size: rem(100px);
+}
+
+.sectioncard {
+  transition: all 0.3s ease; /* Smooth transition for all changes */
+  box-shadow: 0 0 0px rgba(0, 0, 0, 0); /* Initial box shadow, transparent */
+}
+
+.sectioncard:hover {
+  transform: scale(1.03); /* Make the div 10% larger */
+  box-shadow: 0 5px 15px var(--mantine-color-green-2); /* Add a drop shadow */
+}

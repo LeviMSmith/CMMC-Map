@@ -5,6 +5,8 @@ import "@mantine/core/styles.css";
 
 import { ColorSchemeScript, MantineProvider } from "@mantine/core";
 
+import Header from "@/components/header";
+
 export const metadata: Metadata = {
   title: "CMMC Handler",
   description: "Web app to handle CMMC Policy",
@@ -21,7 +23,10 @@ export default function RootLayout({
         <ColorSchemeScript />
       </head>
       <body>
-        <MantineProvider theme={theme}>{children}</MantineProvider>
+        <MantineProvider theme={theme}>
+          <Header />
+          {children}
+        </MantineProvider>
       </body>
     </html>
   );
