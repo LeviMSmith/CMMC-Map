@@ -1,6 +1,16 @@
 "use client";
 
-import { Text, Button, Group, Drawer, Title, ActionIcon } from "@mantine/core";
+import {
+  Stack,
+  Text,
+  Button,
+  Group,
+  Drawer,
+  Title,
+  ActionIcon,
+  TextInput,
+  Select,
+} from "@mantine/core";
 import {
   IconSearch,
   IconFileDescription,
@@ -57,7 +67,22 @@ export default function Header() {
         onClose={() => {
           setMenuOpen(false);
         }}
-      ></Drawer>
+        title="Menu"
+      >
+        <Stack className={styles.headersection}>
+          <Text fw={700}>Search</Text>
+          <TextInput placeholder="AI powered search" />
+        </Stack>
+        <Stack className={styles.headersection}>
+          <Text fw={700}>Export Report</Text>
+          <Button variant="light">System Security Plan</Button>
+          <Button variant="light">Plan of Action and Milestones</Button>
+        </Stack>
+        <Stack className={styles.headersection}>
+          <Select label="Revision" placeholder="0.1.0" />
+          <Select label="Assessment" placeholder="Self assessment 1" />
+        </Stack>
+      </Drawer>
       <Group>
         <ActionIcon
           variant="transparent"

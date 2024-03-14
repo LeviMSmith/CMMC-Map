@@ -33,8 +33,6 @@ import Link from "next/link";
 
 import { Control, controls, sections } from "@/lib/static-data";
 
-import styles from "./dashboard-client.module.css";
-
 const sectionIcons = [
   IconLockAccess,
   IconBarbell,
@@ -55,9 +53,7 @@ const sectionIcons = [
 export default function Dashboard() {
   return (
     <Container className="pb-16">
-      <Text ta="center" className={styles.bigtitle}>
-        CMMC Map
-      </Text>
+      <h1 className="bigtitle">CMMC Map</h1>
       <Space h="lg" />
       <TextInput placeholder="AI powered search" />
       <div className="h-16" />
@@ -70,7 +66,7 @@ export default function Dashboard() {
               withBorder
               p="8"
               key={section.section}
-              className={styles.sectioncard}
+              className="sectioncard"
             >
               <Link
                 href={`/sections/${section.section}`}

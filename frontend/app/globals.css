@@ -1,2 +1,22 @@
 @tailwind components;
 @tailwind utilities;
+
+.bigtitle {
+  font-size: 6rem;
+  text-align: center;
+}
+
+.lessbigtitle {
+  font-size: 4rem;
+  text-align: center;
+}
+
+.sectioncard {
+  transition: all 0.3s ease; /* Smooth transition for all changes */
+  box-shadow: 0 0 0px rgba(0, 0, 0, 0); /* Initial box shadow, transparent */
+}
+
+.sectioncard:hover {
+  transform: scale(1.03); /* Make the div 10% larger */
+  box-shadow: 0 5px 15px var(--mantine-color-green-2); /* Add a drop shadow */
+}

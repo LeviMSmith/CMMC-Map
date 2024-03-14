@@ -49,7 +49,12 @@ export default async function Section({
 
   return (
     <div>
-      <SectionDash controls={sectionData} />
+      <SectionDash
+        section={sections.find((sectionsSection) => {
+          return sectionsSection.section === params.section;
+        })}
+        controls={sectionData}
+      />
     </div>
   );
 }
