@@ -53,7 +53,7 @@ def parse_pdf(pdf_path, pure_text):
 
     ## Now we can search for the things we need ##
 
-    oh_yee_great_and_mighty_all_knowing_regex_pattern = r"\s*[A-Z]{2}\.L([1-2])-(3\.[0-9]{1,2}\.[0-9]{1,2}) [\s\S]{1,3} ([A-Z &-]{2,})\s*(.*?)ASSESSMENT OBJECTIVES \[NIST SP 800\-171A\]\s*Determine if:\s*((?:\[[a-z]\] [\S \n]+?)+)\s*POTENTIAL ASSESSMENT METHODS AND OBJECTS \[NIST SP 800-171A\]\s*Examine\s*(\[SELECT\s{1,3}FROM:.*?\]).\s*Interview\s*(\[SELECT FROM:.*?\]).\s*Test\s*(\[SELECT FROM:.*?\]).\s*DISCUSSION \[NIST SP 800-171 R2\]\s*(.*?)\s*FURTHER DISCUSSION\s*(.*?)KEY REFERENCES\s*((?:.*?\n)+)"
+    oh_yee_great_and_mighty_all_knowing_regex_pattern = r"\s*[A-Z]{2}\.L([1-2])-(3\.[0-9]{1,2}\.[0-9]{1,2}) [\s\S]{1,3} ([A-Z &-]{2,})\s*(.*?)ASSESSMENT OBJECTIVES \[NIST SP 800\-171A\]\s*Determine if:\s*((?:\[[a-z]\] [\S \n]+?)+)\s*POTENTIAL ASSESSMENT METHODS AND OBJECTS \[NIST SP 800-171A\]\s*Examine\s*(\[SELECT\s{1,3}FROM:.*?\]).\s*Interview\s*(\[SELECT FROM:.*?\]).\s*Test\s*(\[SELECT FROM:.*?\]).\s*DISCUSSION \[NIST SP 800-171 R2\]\s*(.*?)\s*FURTHER DISCUSSION\s*(.*?)KEY REFERENCES?\s*((?:.*?\n)+)"
 
     objectives_pattern = re.compile(
         r"\[([a-z])\]\s*(.*?)(?=\s*\[[a-z]\]|$)", flags=re.DOTALL
@@ -67,11 +67,11 @@ def parse_pdf(pdf_path, pure_text):
         r"(Example\s+\d*)\s*([\s\S]+?)(?=(?:Example\s+\d+|Potential Assessment Considerations|$))"
     )
 
-    fd_pattern = re.compile(
-        r"(.*?)(?=\s+Example)", flags=re.DOTALL)
+    fd_pattern = re.compile(r"(.*?)(?=\s+Example)", flags=re.DOTALL)
 
     pac_section_pattern = re.compile(
-        r"Potential Assessment Considerations\s+(.*)", flags=re.DOTALL)
+        r"Potential Assessment Considerations\s+(.*)", flags=re.DOTALL
+    )
     pac_pattern = re.compile(r"\s+((?:.(?!))+.)", flags=re.DOTALL)
 
     data = []
@@ -104,8 +104,7 @@ def parse_pdf(pdf_path, pure_text):
         # Process Potential Assessment Considerations
         pac_section_search = re.search(pac_section_pattern, match.group(10))
         pac_text = pac_section_search.group(1)
-        pac_matches = [match.strip()
-                       for match in re.findall(pac_pattern, pac_text)]
+        pac_matches = [match.strip() for match in re.findall(pac_pattern, pac_text)]
 
         further_discussion_match = re.search(fd_pattern, match.group(10))
 
