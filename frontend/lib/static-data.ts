@@ -1,3 +1,9 @@
+export interface Revision {
+  id: number;
+  version: string;
+  date_completed?: Date;
+}
+
 export interface Control {
   id: number;
   level: number;

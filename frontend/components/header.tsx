@@ -10,6 +10,7 @@ import {
   ActionIcon,
   TextInput,
   Select,
+  Loader,
 } from "@mantine/core";
 import {
   IconSearch,
@@ -18,8 +19,10 @@ import {
 } from "@tabler/icons-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect, useContext } from "react";
 
+import { StateContext, State } from "@/components/state-provider";
+import { Revision } from "@/lib/static-data";
 import styles from "./header.module.css";
 
 const CurrentUrlSections = () => {
@@ -58,7 +61,65 @@ const CurrentUrlSections = () => {
 };
 
 export default function Header() {
+  const { sharedState, setSharedState } = useContext(StateContext);
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
+
+  const [revisions, setRevisions] = useState<Revision[], undefined>();
+
+  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
+  if (!backendUrl) {
+    throw new Error("BACKEND_URL is not set!");
+  }
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await fetch(`${backendUrl}/api/revisions`);
+        const data = await res.json();
+
+        const revisions: Revision[] = data.map((revision) => {
+          // Check if date_completed is not null before converting
+          const dateCompleted = revision.date_completed
+            ? new Date(revision.date_completed)
+            : null;
+
+          return {
+            id: revision.id.toString(),
+            version: revision.version,
+            date_completed: dateCompleted,
+          };
+        });
+
+        setRevisions(revisions);
+        if (!sharedState) {
+          setSharedState({
+            revision_id: revisions[revisions.length - 1].id,
+          });
+        } else {
+          if (!sharedState.revision_id) {
+            setSharedState((prevState) => ({
+              ...prevState,
+              revision_id: revisions[revisions.length - 1].id,
+            }));
+          }
+        }
+      } catch (error) {
+        console.error("Failed to fetch revisions", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  var revisionOptions;
+  if (revisions) {
+    revisionOptions = revisions.map((revision) => {
+      return {
+        value: revision.id,
+        label: revision.version,
+      };
+    });
+  }
 
   return (
     <header className={styles.header}>
@@ -78,21 +139,45 @@ export default function Header() {
           <Button variant="light">System Security Plan</Button>
           <Button variant="light">Plan of Action and Milestones</Button>
         </Stack>
-        <Stack className={styles.headersection}>
-          <Select label="Revision" placeholder="0.1.0" />
-          <Select label="Assessment" placeholder="Self assessment 1" />
-        </Stack>
       </Drawer>
-      <Group>
-        <ActionIcon
-          variant="transparent"
-          onClick={() => {
-            setMenuOpen(true);
-          }}
+      <Group justify="space-between">
+        <Group>
+          <ActionIcon
+            variant="transparent"
+            onClick={() => {
+              setMenuOpen(true);
+            }}
+          >
+            <IconMenu2 />
+          </ActionIcon>
+          <CurrentUrlSections />
+        </Group>
+        <Group
+          wrap="no-wrap"
+          justify="space-around"
+          p="8"
+          className="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 min-w-24"
         >
-          <IconMenu2 />
-        </ActionIcon>
-        <CurrentUrlSections />
+          {revisionOptions && sharedState.revision_id ? (
+            <Select
+              description="Revision"
+              value={sharedState.revision_id}
+              data={revisionOptions}
+              onChange={(value, option) => {
+                setSharedState((prevState) => {
+                  return {
+                    ...prevState,
+                    revision_id: value,
+                  };
+                });
+              }}
+              allowDeselect={false}
+            />
+          ) : (
+            <Loader type="dots" />
+          )}
+          <Select description="Assessment" placeholder="Self assessment 1" />
+        </Group>
       </Group>
     </header>
   );

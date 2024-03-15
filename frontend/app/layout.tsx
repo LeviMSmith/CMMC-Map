@@ -5,6 +5,7 @@ import "@mantine/core/styles.css";
 
 import { ColorSchemeScript, MantineProvider } from "@mantine/core";
 
+import { StateProvider } from "@/components/state-provider";
 import Header from "@/components/header";
 
 export const metadata: Metadata = {
@@ -24,8 +25,10 @@ export default function RootLayout({
       </head>
       <body>
         <MantineProvider theme={theme}>
-          <Header />
-          {children}
+          <StateProvider>
+            <Header />
+            {children}
+          </StateProvider>
         </MantineProvider>
       </body>
     </html>
