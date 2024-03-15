@@ -20,19 +20,79 @@ def read_json():
         sys.exit(1)
 
 
-def insert_data(data, cur):
+def insert_data(data, cur, conn):
+    print("Reseting static tables")
+
+    cur.execute("SET FOREIGN_KEY_CHECKS = 0;")
+    print("Disabled foreign key checks")
+
+    sql = """
+        DROP TABLE IF EXISTS `policies_assessment_objective`;
+    """
+    cur.execute(sql)
+    print("Deleted old policies_assessment_objective")
+
+    sql = """
+        DROP TABLE IF EXISTS `policies_control`;
+    """
+    cur.execute(sql)
+    print("Deleted old policies_control")
+
+    sql = """
+        DROP TABLE IF EXISTS `policies_section`;
+    """
+    cur.execute(sql)
+    print("Deleted old policies_section")
+
+    sql = """
+        CREATE TABLE `policies_section` (
+          `id` smallint(5) unsigned NOT NULL CHECK (`id` >= 0),
+          PRIMARY KEY (`id`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+    """
+    cur.execute(sql)
+    print("Created new policies_section")
+
+    sql = """
+        CREATE TABLE `policies_assessment_objective` (
+          `id` bigint(20) NOT NULL AUTO_INCREMENT,
+          `letter` varchar(2) NOT NULL,
+          `control_id` smallint(5) unsigned NOT NULL,
+          PRIMARY KEY (`id`),
+          KEY `policies_assessment__control_id_a2a9ed04_fk_policies_` (`control_id`),
+          CONSTRAINT `policies_assessment__control_id_a2a9ed04_fk_policies_` FOREIGN KEY (`control_id`) REFERENCES `policies_control` (`id`)
+        ) ENGINE=InnoDB AUTO_INCREMENT=1206 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+    """
+    cur.execute(sql)
+    print("Created new policies_assessment_objective")
+
+    sql = """
+        CREATE TABLE `policies_control` (
+          `id` smallint(5) unsigned NOT NULL CHECK (`id` >= 0),
+          `section_id` smallint(5) unsigned DEFAULT NULL,
+          PRIMARY KEY (`id`),
+          KEY `policies_control_section_id_7832e062_fk_policies_section_id` (`section_id`),
+          CONSTRAINT `policies_control_section_id_7832e062_fk_policies_section_id` FOREIGN KEY (`section_id`) REFERENCES `policies_section` (`id`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+    """
+    cur.execute(sql)
+    print("Created new policies_control")
+
+    cur.execute("SET FOREIGN_KEY_CHECKS = 1;")
+    print("Foreign key checks re-enabled")
+
     section_insert_sql = """
         INSERT IGNORE INTO policies_section (id)
         VALUES (?);
     """
 
     control_insert_sql = """
-        REPLACE INTO policies_control (id,section_id)
+        INSERT INTO policies_control (id,section_id)
         VALUES (?,?);
     """
 
     assessment_objective_insert_sql = """
-        REPLACE INTO policies_assessment_objective (letter,control_id)
+        INSERT INTO policies_assessment_objective (letter,control_id)
         VALUES (?,?);
     """
 
@@ -80,7 +140,7 @@ def jsontodb():
 
         data = read_json()
 
-        insert_data(data, cursor)
+        insert_data(data, cursor, conn)
 
         conn.commit()
 
@@ -91,4 +151,5 @@ def jsontodb():
 
     except mariadb.Error as e:
         print(f"Failed to insert into MariaDB: {e}")
+        conn.rollback()
         sys.exit(1)
