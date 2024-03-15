@@ -16,6 +16,7 @@ import {
   IconSearch,
   IconFileDescription,
   IconMenu2,
+  IconPlus,
 } from "@tabler/icons-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -72,6 +73,55 @@ function CurrentUrlSections() {
   );
 }
 
+const AssessmentSelect = ({
+  assessmentOptions,
+  sharedState,
+  setSharedState,
+}) => {
+  // Scenario 1: assessmentOptions is undefined
+  if (assessmentOptions === undefined) {
+    return <Loader type="dots" />;
+  }
+
+  // Scenario 2: assessmentOptions is an empty array
+  // if (assessmentOptions.length === 0) {
+  //   return <Button variant="light">Create new assessment</Button>;
+  // }
+  if (assessmentOptions.length === 0) {
+    return <Select description="Assessment" />;
+  }
+
+  const addIcon = () => {
+    return (
+      <ActionIcon
+        onClick={() => {
+          console.log("assessment button");
+        }}
+      >
+        <IconPlus />
+      </ActionIcon>
+    );
+  };
+  // Scenario 3: assessmentOptions is a populated array
+  return sharedState?.assessment_id ? (
+    <Select
+      description="Assessment"
+      value={sharedState.assessment_id}
+      data={assessmentOptions}
+      onChange={(value, option) => {
+        setSharedState({
+          ...sharedState,
+          assessment_id: value,
+        });
+      }}
+      rightSectionPointerEvents={() => {}}
+      rightSection={addIcon()}
+      allowDeselect={false}
+    />
+  ) : (
+    <Loader type="dots" />
+  );
+};
 export default function Header() {
   const { sharedState, setSharedState } =
     useContext<StateContextType>(StateContext);
@@ -162,7 +212,7 @@ export default function Header() {
     if (sharedState && sharedState.revision_id) {
       fetchAssessments(sharedState.revision_id);
     }
-  }, [sharedState, sharedState?.revision_id]);
+  }, [sharedState?.revision_id]);
 
   var revisionOptions;
   if (revisions) {
@@ -237,22 +287,11 @@ export default function Header() {
           ) : (
             <Loader type="dots" />
           )}
-          {assessmentOptions && sharedState?.assessment_id ? (
-            <Select
-              description="Assessment"
-              value={sharedState.assessment_id}
-              data={assessmentOptions}
-              onChange={(value, option) => {
-                setSharedState({
-                  ...sharedState,
-                  assessment_id: value,
-                });
-              }}
-              allowDeselect={false}
-            />
-          ) : (
-            <Loader type="dots" />
-          )}
+          <AssessmentSelect
+            assessmentOptions={assessmentOptions}
+            sharedState={sharedState}
+            setSharedState={setSharedState}
+          />
         </Group>
       </Group>
     </header>
