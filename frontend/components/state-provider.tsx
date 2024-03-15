@@ -2,14 +2,24 @@
 
 import React from "react";
 
-export const StateContext = React.createContext();
-
 export interface State {
-  revision_id?: string;
-  assessment_id?: string;
+  revision_id?: string | undefined | null;
+  assessment_id?: string | undefined | null;
 }
 
-export const StateProvider = ({ children }) => {
+export interface StateContextType {
+  sharedState?: State;
+  setSharedState: (newState: State) => void;
+}
+
+const defaultState: StateContextType = {
+  sharedState: undefined,
+  setSharedState: () => {},
+};
+
+export const StateContext = React.createContext<StateContextType>(defaultState);
+
+export const StateProvider = ({ children }: { children: any }) => {
   const [sharedState, setSharedState] = React.useState<State | undefined>();
 
   return (

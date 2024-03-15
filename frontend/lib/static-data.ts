@@ -1,7 +1,14 @@
 export interface Revision {
-  id: number;
+  id: string;
   version: string;
   date_completed?: Date;
+}
+
+export interface Assessment {
+  id: string;
+  name: string;
+  started: Date;
+  finished?: Date;
 }
 
 export interface Control {

@@ -21,11 +21,15 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useEffect, useContext } from "react";
 
-import { StateContext, State } from "@/components/state-provider";
-import { Revision } from "@/lib/static-data";
+import {
+  StateContext,
+  State,
+  StateContextType,
+} from "@/components/state-provider";
+import { Revision, Assessment } from "@/lib/static-data";
 import styles from "./header.module.css";
 
-const CurrentUrlSections = () => {
+function CurrentUrlSections() {
   const router = useRouter();
   const pathname = usePathname();
 
@@ -33,19 +37,27 @@ const CurrentUrlSections = () => {
 
   const sections = path.split("/").filter(Boolean);
 
-  const navigateTo = (path) => () => {
+  const navigateTo = (path: string) => () => {
     router.push(path);
   };
 
-  const pathsAndLabels = sections.reduce((acc, curr, index) => {
-    const pathSoFar = "/" + sections.slice(0, index + 1).join("/");
-    const label = curr;
-    acc.push({ path: pathSoFar, label });
-    return acc;
-  }, []);
+  type PathAndLabel = {
+    path: string;
+    label: string;
+  };
+
+  const pathsAndLabels: PathAndLabel[] = sections.reduce<PathAndLabel[]>(
+    (acc, curr, index) => {
+      const pathSoFar = "/" + sections.slice(0, index + 1).join("/");
+      const label = curr;
+      acc.push({ path: pathSoFar, label });
+      return acc;
+    },
+    [],
+  );
 
   return (
-    <Group spacing="xs" p="8">
+    <Group>
       {pathsAndLabels.map(({ path, label }, index) => (
         <Button
           key={index}
@@ -58,13 +70,15 @@ const CurrentUrlSections = () => {
       ))}
     </Group>
   );
-};
+}
 
 export default function Header() {
-  const { sharedState, setSharedState } = useContext(StateContext);
+  const { sharedState, setSharedState } =
+    useContext<StateContextType>(StateContext);
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
 
-  const [revisions, setRevisions] = useState<Revision[], undefined>();
+  const [revisions, setRevisions] = useState<Revision[] | undefined>();
+  const [assessments, setAssessments] = useState<Assessment[] | undefined>();
 
   const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
   if (!backendUrl) {
@@ -77,7 +91,7 @@ export default function Header() {
         const res = await fetch(`${backendUrl}/api/revisions`);
         const data = await res.json();
 
-        const revisions: Revision[] = data.map((revision) => {
+        const revisions: Revision[] = data.map((revision: Revision) => {
           // Check if date_completed is not null before converting
           const dateCompleted = revision.date_completed
             ? new Date(revision.date_completed)
@@ -97,10 +111,10 @@ export default function Header() {
           });
         } else {
           if (!sharedState.revision_id) {
-            setSharedState((prevState) => ({
-              ...prevState,
+            setSharedState({
+              ...sharedState,
               revision_id: revisions[revisions.length - 1].id,
-            }));
+            });
           }
         }
       } catch (error) {
@@ -111,12 +125,61 @@ export default function Header() {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    const fetchAssessments = async (revisionId: string) => {
+      try {
+        const res = await fetch(
+          `${backendUrl}/api/revisions/${revisionId}/assessments`,
+        );
+        const data = await res.json();
+        const assessments = data.map((assessment: Assessment) => {
+          const dateCompleted = assessment.finished
+            ? new Date(assessment.finished)
+            : null;
+
+          return {
+            id: assessment.id.toString(),
+            name: assessment.name,
+            started: new Date(assessment.started),
+            finished: dateCompleted,
+          };
+        });
+
+        setAssessments(assessments);
+        setSharedState({
+          ...sharedState,
+          assessment_id: assessments[assessments.length - 1].id,
+        });
+      } catch (error) {
+        console.error(
+          `Failed to fetch assessments for revision ${revisionId}`,
+          error,
+        );
+        setAssessments([]);
+      }
+    };
+
+    if (sharedState && sharedState.revision_id) {
+      fetchAssessments(sharedState.revision_id);
+    }
+  }, [sharedState, sharedState?.revision_id]);
+
   var revisionOptions;
   if (revisions) {
-    revisionOptions = revisions.map((revision) => {
+    revisionOptions = revisions.map((revision: Revision) => {
       return {
         value: revision.id,
         label: revision.version,
+      };
+    });
+  }
+
+  var assessmentOptions;
+  if (assessments) {
+    assessmentOptions = assessments.map((assessment: Assessment) => {
+      return {
+        value: assessment.id,
+        label: assessment.name,
       };
     });
   }
@@ -153,22 +216,20 @@ export default function Header() {
           <CurrentUrlSections />
         </Group>
         <Group
-          wrap="no-wrap"
+          wrap="nowrap"
           justify="space-around"
-          p="8"
-          className="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 min-w-24"
+          p={8}
+          className="w-full md:w-1/2 lg:w-1/3 xl:w-1/3 min-w-24"
         >
-          {revisionOptions && sharedState.revision_id ? (
+          {revisionOptions && sharedState?.revision_id ? (
             <Select
               description="Revision"
               value={sharedState.revision_id}
               data={revisionOptions}
               onChange={(value, option) => {
-                setSharedState((prevState) => {
-                  return {
-                    ...prevState,
-                    revision_id: value,
-                  };
+                setSharedState({
+                  ...sharedState,
+                  revision_id: value,
                 });
               }}
               allowDeselect={false}
@@ -176,7 +237,22 @@ export default function Header() {
           ) : (
             <Loader type="dots" />
           )}
-          <Select description="Assessment" placeholder="Self assessment 1" />
+          {assessmentOptions && sharedState?.assessment_id ? (
+            <Select
+              description="Assessment"
+              value={sharedState.assessment_id}
+              data={assessmentOptions}
+              onChange={(value, option) => {
+                setSharedState({
+                  ...sharedState,
+                  assessment_id: value,
+                });
+              }}
+              allowDeselect={false}
+            />
+          ) : (
+            <Loader type="dots" />
+          )}
         </Group>
       </Group>
     </header>

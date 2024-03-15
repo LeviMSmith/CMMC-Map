@@ -47,14 +47,15 @@ export default async function Section({
       return 0; // If equal
     });
 
+  const foundSection = sections.find(
+    (sectionsSection) => sectionsSection.section === params.section,
+  );
+
   return (
     <div>
-      <SectionDash
-        section={sections.find((sectionsSection) => {
-          return sectionsSection.section === params.section;
-        })}
-        controls={sectionData}
-      />
+      {foundSection && (
+        <SectionDash section={foundSection} controls={sectionData} />
+      )}
     </div>
   );
 }
