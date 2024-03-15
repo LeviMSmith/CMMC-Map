@@ -3,5 +3,9 @@ from .views import RevisionListView, AssessmentListView
 
 urlpatterns = [
     path("revisions/", RevisionListView.as_view(), name="revision-list"),
-    path("assessments/", AssessmentListView.as_view(), name="assessment-list"),
+    path(
+        "revisions/<int:revision>/assessments/",
+        AssessmentListView.as_view(),
+        name="assessment-list-for-revision",
+    ),
 ]

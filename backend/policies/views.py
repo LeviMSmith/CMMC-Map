@@ -9,5 +9,8 @@ class RevisionListView(generics.ListAPIView):
 
 
 class AssessmentListView(generics.ListAPIView):
-    queryset = Assessment.objects.all()
     serializer_class = AssessmentSerializer
+
+    def get_queryset(self):
+        revision_id = self.kwargs["revision"]
+        return Assessment.objects.filter(revision_id=revision_id)
