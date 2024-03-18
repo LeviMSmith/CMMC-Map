@@ -11,6 +11,7 @@ import {
   TextInput,
   Select,
   Loader,
+  Tooltip,
 } from "@mantine/core";
 import {
   IconSearch,
@@ -73,25 +74,73 @@ function CurrentUrlSections() {
   );
 }
 
+const RevisionSelect = ({ revisionOptions, sharedState, setSharedState }) => {
+  const addIcon = () => {
+    return (
+      <ActionIcon
+        onClick={() => {
+          console.log("revision button");
+        }}
+      >
+        <IconPlus />
+      </ActionIcon>
+    );
+  };
+
+  const AddIcon = addIcon;
+
+  // Scenario 1: revisionOptions is undefined
+  if (revisionOptions === undefined) {
+    return <Loader type="dots" />;
+  }
+
+  // Scenario 2: revisionOptions is an empty array
+  if (revisionOptions.length === 0) {
+    return (
+      <Group>
+        <Text>Add revision</Text>
+        <AddIcon />
+      </Group>
+    );
+  }
+
+  // Scenario 3: revisionOptions is a populated array
+  return sharedState?.revision_id ? (
+    <Select
+      description="Assessment"
+      value={sharedState.revision_id}
+      data={revisionOptions}
+      onChange={(value, option) => {
+        setSharedState({
+          ...sharedState,
+          revision_id: value,
+        });
+      }}
+      rightSectionPointerEvents={() => {}}
+      rightSection={addIcon()}
+      allowDeselect={false}
+    />
+  ) : (
+    <Loader type="dots" />
+  );
+};
+
 const AssessmentSelect = ({
   assessmentOptions,
   sharedState,
   setSharedState,
 }) => {
-  // Scenario 1: assessmentOptions is undefined
-  if (assessmentOptions === undefined) {
-    return <Loader type="dots" />;
-  }
+  const AddIcon = ({ disableText }) => {
+    if (disableText) {
+      return (
+        <Tooltip label={disableText}>
+          <ActionIcon disabled onClick={(event) => event.preventDefault()}>
+            <IconPlus />
+          </ActionIcon>
+        </Tooltip>
+      );
+    }
 
-  // Scenario 2: assessmentOptions is an empty array
-  // if (assessmentOptions.length === 0) {
-  //   return <Button variant="light">Create new assessment</Button>;
-  // }
-  if (assessmentOptions.length === 0) {
-    return <Select description="Assessment" />;
-  }
-
-  const addIcon = () => {
     return (
       <ActionIcon
         onClick={() => {
@@ -102,6 +151,32 @@ const AssessmentSelect = ({
       </ActionIcon>
     );
   };
+
+  //Scenario 0: There is no selected revision
+  if (!sharedState?.revision_id) {
+    return (
+      <Group>
+        <Text>Add assessment</Text>
+        <AddIcon disableText="Please select a revision first" />
+      </Group>
+    );
+  }
+
+  // Scenario 1: assessmentOptions is undefined
+  if (assessmentOptions === undefined) {
+    return <Loader type="dots" />;
+  }
+
+  // Scenario 2: assessmentOptions is an empty array
+  if (assessmentOptions.length === 0) {
+    return (
+      <Group>
+        <Text>Add assessment</Text>
+        <AddIcon />
+      </Group>
+    );
+  }
+
   // Scenario 3: assessmentOptions is a populated array
   return sharedState?.assessment_id ? (
     <Select
@@ -122,6 +197,7 @@ const AssessmentSelect = ({
     <Loader type="dots" />
   );
 };
+
 export default function Header() {
   const { sharedState, setSharedState } =
     useContext<StateContextType>(StateContext);
@@ -138,7 +214,7 @@ export default function Header() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetch(`${backendUrl}/api/revisions`);
+        const res = await fetch(`${backendUrl}/api/revisions/`);
         const data = await res.json();
 
         const revisions: Revision[] = data.map((revision: Revision) => {
@@ -155,6 +231,9 @@ export default function Header() {
         });
 
         setRevisions(revisions);
+        if (revisions.length === 0) {
+          return;
+        }
         if (!sharedState) {
           setSharedState({
             revision_id: revisions[revisions.length - 1].id,
@@ -179,7 +258,7 @@ export default function Header() {
     const fetchAssessments = async (revisionId: string) => {
       try {
         const res = await fetch(
-          `${backendUrl}/api/revisions/${revisionId}/assessments`,
+          `${backendUrl}/api/revisions/${revisionId}/assessments/`,
         );
         const data = await res.json();
         const assessments = data.map((assessment: Assessment) => {
@@ -215,13 +294,15 @@ export default function Header() {
   }, [sharedState?.revision_id]);
 
   var revisionOptions;
-  if (revisions) {
+  if (revisions !== undefined && revisions.length > 0) {
     revisionOptions = revisions.map((revision: Revision) => {
       return {
         value: revision.id,
         label: revision.version,
       };
     });
+  } else if (revisions !== undefined && revisions.length === 0) {
+    revisionOptions = [];
   }
 
   var assessmentOptions;
@@ -271,22 +352,11 @@ export default function Header() {
           p={8}
           className="w-full md:w-1/2 lg:w-1/3 xl:w-1/3 min-w-24"
         >
-          {revisionOptions && sharedState?.revision_id ? (
-            <Select
-              description="Revision"
-              value={sharedState.revision_id}
-              data={revisionOptions}
-              onChange={(value, option) => {
-                setSharedState({
-                  ...sharedState,
-                  revision_id: value,
-                });
-              }}
-              allowDeselect={false}
-            />
-          ) : (
-            <Loader type="dots" />
-          )}
+          <RevisionSelect
+            revisionOptions={revisionOptions}
+            sharedState={sharedState}
+            setSharedState={setSharedState}
+          />
           <AssessmentSelect
             assessmentOptions={assessmentOptions}
             sharedState={sharedState}
