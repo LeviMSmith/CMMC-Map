@@ -1,16 +1,18 @@
 "use client";
 
 import {
-  Text,
-  SimpleGrid,
   ActionIcon,
-  Group,
-  Space,
-  TextInput,
-  Title,
+  Center,
   Container,
+  Group,
+  Loader,
   Paper,
   Progress,
+  Text,
+  TextInput,
+  Title,
+  SimpleGrid,
+  Space,
   Stack,
 } from "@mantine/core";
 import {
@@ -30,7 +32,13 @@ import {
   IconDatabase,
 } from "@tabler/icons-react";
 import Link from "next/link";
+import { useContext } from "react";
 
+import {
+  StateContextType,
+  StateContext,
+  SectionProgress,
+} from "@/components/state-provider";
 import { Control, controls, sections } from "@/lib/static-data";
 
 const sectionIcons = [
@@ -51,6 +59,9 @@ const sectionIcons = [
 ];
 
 export default function Dashboard() {
+  const { sharedState, setSharedState } =
+    useContext<StateContextType>(StateContext);
+
   return (
     <Container className="pb-16">
       <h1 className="bigtitle">CMMC Map</h1>
@@ -83,7 +94,15 @@ export default function Dashboard() {
                     </Text>
                   </Group>
                   <div className="mb-4">
-                    <Progress value={50} />
+                    {sharedState?.sectionProgress ? (
+                      <Progress
+                        value={sharedState?.sectionProgress[section.section]}
+                      />
+                    ) : (
+                      <Center>
+                        <Loader type="dots" />
+                      </Center>
+                    )}
                   </div>
                 </Stack>
               </Link>

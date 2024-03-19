@@ -25,7 +25,7 @@ class Revision(models.Model):
     def __str__(self):
         return f"{self.version}"
 
-    version = models.CharField(max_length=36)
+    version = models.CharField(max_length=36, unique=True)
     date_completed = models.DateTimeField(null=True, blank=True)
 
 
@@ -55,6 +55,9 @@ class Assessment(models.Model):
     started = models.DateTimeField(null=True)
     finished = models.DateTimeField(null=True, blank=True)
     revision = models.ForeignKey(Revision, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = [["name", "revision"]]
 
 
 class Assessment_Objective(models.Model):

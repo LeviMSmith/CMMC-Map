@@ -74,21 +74,33 @@ function CurrentUrlSections() {
   );
 }
 
-const RevisionSelect = ({ revisionOptions, sharedState, setSharedState }) => {
-  const addIcon = () => {
+interface AddIconProps {
+  disableText?: string; // Marking disableText as optional with '?'
+}
+
+const AddIcon: React.FC<AddIconProps> = ({ disableText }) => {
+  if (disableText) {
     return (
-      <ActionIcon
-        onClick={() => {
-          console.log("revision button");
-        }}
-      >
-        <IconPlus />
-      </ActionIcon>
+      <Tooltip label={disableText}>
+        <ActionIcon disabled onClick={(event) => event.preventDefault()}>
+          <IconPlus />
+        </ActionIcon>
+      </Tooltip>
     );
-  };
+  }
 
-  const AddIcon = addIcon;
+  return (
+    <ActionIcon
+      onClick={() => {
+        console.log("add button");
+      }}
+    >
+      <IconPlus />
+    </ActionIcon>
+  );
+};
 
+const RevisionSelect = ({ revisionOptions, sharedState, setSharedState }) => {
   // Scenario 1: revisionOptions is undefined
   if (revisionOptions === undefined) {
     return <Loader type="dots" />;
@@ -117,7 +129,7 @@ const RevisionSelect = ({ revisionOptions, sharedState, setSharedState }) => {
         });
       }}
       rightSectionPointerEvents={() => {}}
-      rightSection={addIcon()}
+      rightSection={AddIcon({})}
       allowDeselect={false}
     />
   ) : (
@@ -130,28 +142,6 @@ const AssessmentSelect = ({
   sharedState,
   setSharedState,
 }) => {
-  const AddIcon = ({ disableText }) => {
-    if (disableText) {
-      return (
-        <Tooltip label={disableText}>
-          <ActionIcon disabled onClick={(event) => event.preventDefault()}>
-            <IconPlus />
-          </ActionIcon>
-        </Tooltip>
-      );
-    }
-
-    return (
-      <ActionIcon
-        onClick={() => {
-          console.log("assessment button");
-        }}
-      >
-        <IconPlus />
-      </ActionIcon>
-    );
-  };
-
   //Scenario 0: There is no selected revision
   if (!sharedState?.revision_id) {
     return (
@@ -190,7 +180,7 @@ const AssessmentSelect = ({
         });
       }}
       rightSectionPointerEvents={() => {}}
-      rightSection={addIcon()}
+      rightSection={AddIcon({})}
       allowDeselect={false}
     />
   ) : (
