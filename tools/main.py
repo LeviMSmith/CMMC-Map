@@ -3,6 +3,7 @@ import sys
 
 from lib.parsetext import parse_pdf
 from lib.jsontodb import jsontodb
+from lib.cleardb import cleardb
 
 if __name__ == "__main__":
     # Initialize the parser
@@ -17,6 +18,9 @@ if __name__ == "__main__":
     )
     jsontodb_parser = subparsers.add_parser(
         "jsontodb", help="Takes json via stdin and puts the info into a mysql databse."
+    )
+    cleardb_parser = subparsers.add_parser(
+        "cleardb", help="Drops all tables in the database for development purposes"
     )
     # Positional argument for the PDF path
     parse_pdf_parser.add_argument("pdf_path", help="Path to the PDF file")
@@ -35,5 +39,7 @@ if __name__ == "__main__":
         parse_pdf(args.pdf_path, args.pure_text)
     elif args.command == "jsontodb":
         jsontodb()
+    elif args.command == "cleardb":
+        cleardb()
     else:
         args.help()

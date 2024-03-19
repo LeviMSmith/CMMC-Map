@@ -224,17 +224,12 @@ export default function Header() {
         if (revisions.length === 0) {
           return;
         }
-        if (!sharedState) {
+
+        if (!sharedState.revision_id) {
           setSharedState({
+            ...sharedState,
             revision_id: revisions[revisions.length - 1].id,
           });
-        } else {
-          if (!sharedState.revision_id) {
-            setSharedState({
-              ...sharedState,
-              revision_id: revisions[revisions.length - 1].id,
-            });
-          }
         }
       } catch (error) {
         console.error("Failed to fetch revisions", error);
@@ -281,7 +276,7 @@ export default function Header() {
     if (sharedState && sharedState.revision_id) {
       fetchAssessments(sharedState.revision_id);
     }
-  }, [sharedState?.revision_id]);
+  }, [sharedState.revision_id]);
 
   var revisionOptions;
   if (revisions !== undefined && revisions.length > 0) {

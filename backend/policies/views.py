@@ -1,6 +1,17 @@
 from rest_framework import generics
-from .models import Revision, Assessment
-from .serializers import RevisionSerializer, AssessmentSerializer
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
+from .models import Revision, Assessment, Section
+from .serializers import RevisionSerializer, AssessmentSerializer, SectionSerializer
+
+
+@api_view(["GET"])
+def policy_status_by_section(request, revision):
+    sections = Section.objects.all()
+    serializer = SectionSerializer(
+        sections, many=True, context={"revision_id": revision}
+    )
+    return Response(serializer.data)
 
 
 class RevisionListView(generics.ListAPIView):

@@ -31,9 +31,9 @@ class Revision(models.Model):
 
 class Policy(models.Model):
     def __str__(self):
-        return f"${self.minor_section} {self.id}"
+        return f"${self.control} {self.revision} {self.id}"
 
-    description = models.TextField()
+    description = models.TextField(null=True)
     implementation_status = models.PositiveSmallIntegerField(default=0)
     control = models.ForeignKey(Control, on_delete=models.CASCADE)
     revision = models.ForeignKey(Revision, on_delete=models.CASCADE)
@@ -62,7 +62,7 @@ class Assessment(models.Model):
 
 class Assessment_Objective(models.Model):
     def __str__(self):
-        return f"{self.minor_section} {self.letter}"
+        return f"{self.control} {self.letter}"
 
     control = models.ForeignKey(Control, on_delete=models.CASCADE)
     letter = models.CharField(max_length=2)

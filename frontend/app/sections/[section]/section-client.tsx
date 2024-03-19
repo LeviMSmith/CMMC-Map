@@ -1,15 +1,16 @@
 "use client";
 
 import {
-  SimpleGrid,
-  Text,
-  Title,
   Center,
   Container,
   Group,
+  Loader,
   Paper,
   Progress,
-  Loader,
+  Text,
+  Title,
+  Tooltip,
+  SimpleGrid,
 } from "@mantine/core";
 import { useContext } from "react";
 
@@ -34,10 +35,12 @@ export default function SectionDash({
     <Container className="pb-16">
       <h2 className="lessbigtitle">{section.description}</h2>
       {sharedState.sectionProgress ? (
-        <Progress
-          value={sharedState?.sectionProgress[section.section]}
-          className="mb-8 mx-8"
-        />
+        <Tooltip label={sharedState.sectionProgress[section.section]}>
+          <Progress
+            value={sharedState.sectionProgress[section.section]}
+            className="mb-8 mx-8"
+          />
+        </Tooltip>
       ) : (
         <Center>
           <Loader type="dots" />

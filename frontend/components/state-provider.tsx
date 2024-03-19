@@ -71,7 +71,7 @@ export const StateProvider = ({ children }: { children: React.ReactNode }) => {
     };
 
     fetchData();
-  }, []); // Empty dependency array to run only once on mount
+  }, [sharedState.revision_id]);
 
   const updateSharedState = (newState: Partial<State>) => {
     setSharedState((prevState = {}) => ({
