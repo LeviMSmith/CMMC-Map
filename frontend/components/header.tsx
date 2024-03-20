@@ -82,7 +82,11 @@ const AddIcon: React.FC<AddIconProps> = ({ disableText }) => {
   if (disableText) {
     return (
       <Tooltip label={disableText}>
-        <ActionIcon disabled onClick={(event) => event.preventDefault()}>
+        <ActionIcon
+          variant="subtle"
+          disabled
+          onClick={(event) => event.preventDefault()}
+        >
           <IconPlus />
         </ActionIcon>
       </Tooltip>
@@ -91,6 +95,7 @@ const AddIcon: React.FC<AddIconProps> = ({ disableText }) => {
 
   return (
     <ActionIcon
+      variant="subtle"
       onClick={() => {
         console.log("add button");
       }}
@@ -100,7 +105,20 @@ const AddIcon: React.FC<AddIconProps> = ({ disableText }) => {
   );
 };
 
-const RevisionSelect = ({ revisionOptions, sharedState, setSharedState }) => {
+interface SelectOption {
+  value: string;
+  label: string;
+}
+
+const RevisionSelect = ({
+  revisionOptions,
+  sharedState,
+  setSharedState,
+}: {
+  revisionOptions: SelectOption[] | undefined;
+  sharedState: State;
+  setSharedState: (newState: State) => void;
+}) => {
   // Scenario 1: revisionOptions is undefined
   if (revisionOptions === undefined) {
     return <Loader type="dots" />;
@@ -128,7 +146,7 @@ const RevisionSelect = ({ revisionOptions, sharedState, setSharedState }) => {
           revision_id: value,
         });
       }}
-      rightSectionPointerEvents={() => {}}
+      rightSectionPointerEvents="auto"
       rightSection={AddIcon({})}
       allowDeselect={false}
     />
@@ -141,6 +159,10 @@ const AssessmentSelect = ({
   assessmentOptions,
   sharedState,
   setSharedState,
+}: {
+  assessmentOptions: SelectOption[] | undefined;
+  sharedState: State;
+  setSharedState: (newState: State) => void;
 }) => {
   //Scenario 0: There is no selected revision
   if (!sharedState?.revision_id) {
@@ -179,7 +201,7 @@ const AssessmentSelect = ({
           assessment_id: value,
         });
       }}
-      rightSectionPointerEvents={() => {}}
+      rightSectionPointerEvents="auto"
       rightSection={AddIcon({})}
       allowDeselect={false}
     />
@@ -278,7 +300,7 @@ export default function Header() {
     }
   }, [sharedState.revision_id]);
 
-  var revisionOptions;
+  var revisionOptions: SelectOption[] | undefined;
   if (revisions !== undefined && revisions.length > 0) {
     revisionOptions = revisions.map((revision: Revision) => {
       return {
@@ -290,7 +312,7 @@ export default function Header() {
     revisionOptions = [];
   }
 
-  var assessmentOptions;
+  var assessmentOptions: SelectOption[] | undefined;
   if (assessments) {
     assessmentOptions = assessments.map((assessment: Assessment) => {
       return {

@@ -38,6 +38,7 @@ import {
   StateContextType,
   StateContext,
   SectionProgress,
+  isKeyOfSectionProgress,
 } from "@/components/state-provider";
 import { Control, controls, sections } from "@/lib/static-data";
 
@@ -94,15 +95,16 @@ export default function Dashboard() {
                     </Text>
                   </Group>
                   <div className="mb-4">
-                    {sharedState?.sectionProgress ? (
-                      <Progress
-                        value={sharedState?.sectionProgress[section.section]}
-                      />
-                    ) : (
-                      <Center>
-                        <Loader type="dots" />
-                      </Center>
-                    )}
+                    {sharedState.sectionProgress &&
+                      (isKeyOfSectionProgress(section.section) ? (
+                        <Progress
+                          value={sharedState.sectionProgress[section.section]}
+                        />
+                      ) : (
+                        <Center>
+                          <Loader type="dots" />
+                        </Center>
+                      ))}
                   </div>
                 </Stack>
               </Link>

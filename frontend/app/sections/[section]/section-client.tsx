@@ -12,9 +12,15 @@ import {
   Tooltip,
   SimpleGrid,
 } from "@mantine/core";
+import { IconCheck, IconMinus, IconQuestionMark } from "@tabler/icons-react";
 import { useContext } from "react";
 
-import { StateContextType, StateContext } from "@/components/state-provider";
+import {
+  StateContextType,
+  StateContext,
+  ControlProgress,
+  isKeyOfSectionProgress,
+} from "@/components/state-provider";
 import { Control, Section } from "@/lib/static-data";
 
 import styles from "./section-cient.module.css";
@@ -29,17 +35,17 @@ export default function SectionDash({
   const { sharedState, setSharedState } =
     useContext<StateContextType>(StateContext);
 
-  console.log(JSON.stringify(sharedState.sectionProgress));
+  const progressValue =
+    sharedState.sectionProgress && isKeyOfSectionProgress(section.section)
+      ? sharedState.sectionProgress[section.section]
+      : null;
 
   return (
     <Container className="pb-16">
       <h2 className="lessbigtitle">{section.description}</h2>
-      {sharedState.sectionProgress ? (
-        <Tooltip label={`${sharedState.sectionProgress[section.section]}%`}>
-          <Progress
-            value={sharedState.sectionProgress[section.section]}
-            className="mb-8 mx-8"
-          />
+      {sharedState.sectionProgress && progressValue ? (
+        <Tooltip label={`${progressValue.toFixed(2)}%`}>
+          <Progress value={progressValue} className="mb-8 mx-8" />
         </Tooltip>
       ) : (
         <Center>
@@ -48,6 +54,12 @@ export default function SectionDash({
       )}
       <SimpleGrid cols={{ base: 1, md: 2 }}>
         {controls.map((control, index) => {
+          let controlProgress: ControlProgress | undefined;
+          if (sharedState.controlProgress) {
+            controlProgress = sharedState.controlProgress.find(
+              (cp) => cp.control === control.id,
+            );
+          }
           return (
             <Paper
               withBorder
@@ -55,9 +67,28 @@ export default function SectionDash({
               key={control.section}
               className="sectioncard"
             >
-              <Group wrap="nowrap">
-                <Text fw={700}>{control.section}</Text>
-                <Text className="line-clamp-1">{control.section_name}</Text>
+              <Group wrap="nowrap" justify="space-between">
+                <Group wrap="nowrap">
+                  <Text fw={700}>{control.section}</Text>
+                  <Text className="line-clamp-1">{control.section_name}</Text>
+                </Group>
+                {sharedState.controlProgress &&
+                  (() => {
+                    return controlProgress ? (
+                      controlProgress.implementation_status ===
+                      0 ? null : controlProgress.implementation_status === 1 ? (
+                        <Tooltip label="Implemented">
+                          <IconCheck className="text-green-500" />
+                        </Tooltip>
+                      ) : controlProgress.implementation_status === 2 ? (
+                        <Tooltip label="Planned to be implemented">
+                          <IconMinus className="text-green-400" />
+                        </Tooltip>
+                      ) : (
+                        <IconQuestionMark />
+                      )
+                    ) : null;
+                  })()}
               </Group>
             </Paper>
           );
