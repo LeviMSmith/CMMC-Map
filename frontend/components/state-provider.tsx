@@ -57,21 +57,43 @@ export const StateContext = createContext<StateContextType>(defaultState);
 export const StateProvider = ({ children }: { children: React.ReactNode }) => {
   const [sharedState, setSharedState] = useState<State>({});
 
+  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
+  if (!backendUrl) {
+    throw new Error("BACKEND_URL is not set!");
+  }
+
   useEffect(() => {
-    // Simulate fetching data
     const fetchData = async () => {
-      // If you're fetching data from an API, you would use fetch() or another method here.
-      // For demonstration, we'll use the mockProgress directly.
-      // const data = await fetchYourData();
+      if (sharedState.revision_id) {
+        try {
+          const res = await fetch(
+            `${backendUrl}/api/revisions/${sharedState.revision_id}/implementation_status/`,
+          );
 
-      // Simulate an async operation, e.g., fetching from an API
-      const data = mockProgress; // Replace with actual fetch call if needed
+          const data = await res.json();
+          let istat: SectionProgress = {};
+          data.forEach((section) => {
+            var implementTotal = 0;
+            var implementStatus = 0;
+            section.policies.forEach((policy) => {
+              implementTotal += 1;
+              if (policy.implementation_status !== 0) {
+                implementStatus += 1;
+              }
+            });
 
-      updateSharedState({ sectionProgress: data });
+            istat[`3.${section.id}`] = (implementStatus / implementTotal) * 100;
+          });
+
+          updateSharedState({ sectionProgress: istat });
+        } catch (error) {
+          console.error("Failed to fetch implementation status", error);
+        }
+      }
     };
 
     fetchData();
-  }, [sharedState.revision_id]);
+  }, [sharedState.revision_id, backendUrl]);
 
   const updateSharedState = (newState: Partial<State>) => {
     setSharedState((prevState = {}) => ({

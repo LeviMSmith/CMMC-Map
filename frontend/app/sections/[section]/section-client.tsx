@@ -35,7 +35,7 @@ export default function SectionDash({
     <Container className="pb-16">
       <h2 className="lessbigtitle">{section.description}</h2>
       {sharedState.sectionProgress ? (
-        <Tooltip label={sharedState.sectionProgress[section.section]}>
+        <Tooltip label={`${sharedState.sectionProgress[section.section]}%`}>
           <Progress
             value={sharedState.sectionProgress[section.section]}
             className="mb-8 mx-8"
