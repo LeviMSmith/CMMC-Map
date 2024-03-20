@@ -14,6 +14,7 @@ import {
 } from "@mantine/core";
 import { IconCheck, IconMinus, IconQuestionMark } from "@tabler/icons-react";
 import { useContext } from "react";
+import Link from "next/link";
 
 import {
   StateContextType,
@@ -43,7 +44,7 @@ export default function SectionDash({
   return (
     <Container className="pb-16">
       <h2 className="lessbigtitle">{section.description}</h2>
-      {sharedState.sectionProgress && progressValue ? (
+      {sharedState.sectionProgress && progressValue !== null ? (
         <Tooltip label={`${progressValue.toFixed(2)}%`}>
           <Progress value={progressValue} className="mb-8 mx-8" />
         </Tooltip>
@@ -67,29 +68,35 @@ export default function SectionDash({
               key={control.section}
               className="sectioncard"
             >
-              <Group wrap="nowrap" justify="space-between">
-                <Group wrap="nowrap">
-                  <Text fw={700}>{control.section}</Text>
-                  <Text className="line-clamp-1">{control.section_name}</Text>
+              <Link
+                href={`/sections/${section.section}/${control.section}`}
+                className="text-inherit no-underline"
+              >
+                <Group wrap="nowrap" justify="space-between">
+                  <Group wrap="nowrap">
+                    <Text fw={700}>{control.section}</Text>
+                    <Text className="line-clamp-1">{control.section_name}</Text>
+                  </Group>
+                  {sharedState.controlProgress &&
+                    (() => {
+                      return controlProgress ? (
+                        controlProgress.implementation_status ===
+                        0 ? null : controlProgress.implementation_status ===
+                          1 ? (
+                          <Tooltip label="Implemented">
+                            <IconCheck className="text-green-500" />
+                          </Tooltip>
+                        ) : controlProgress.implementation_status === 2 ? (
+                          <Tooltip label="Planned to be implemented">
+                            <IconMinus className="text-teal-400" />
+                          </Tooltip>
+                        ) : (
+                          <IconQuestionMark />
+                        )
+                      ) : null;
+                    })()}
                 </Group>
-                {sharedState.controlProgress &&
-                  (() => {
-                    return controlProgress ? (
-                      controlProgress.implementation_status ===
-                      0 ? null : controlProgress.implementation_status === 1 ? (
-                        <Tooltip label="Implemented">
-                          <IconCheck className="text-green-500" />
-                        </Tooltip>
-                      ) : controlProgress.implementation_status === 2 ? (
-                        <Tooltip label="Planned to be implemented">
-                          <IconMinus className="text-green-400" />
-                        </Tooltip>
-                      ) : (
-                        <IconQuestionMark />
-                      )
-                    ) : null;
-                  })()}
-              </Group>
+              </Link>
             </Paper>
           );
         })}

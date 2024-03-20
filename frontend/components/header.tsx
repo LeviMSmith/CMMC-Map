@@ -137,7 +137,7 @@ const RevisionSelect = ({
   // Scenario 3: revisionOptions is a populated array
   return sharedState?.revision_id ? (
     <Select
-      description="Assessment"
+      description="Revision"
       value={sharedState.revision_id}
       data={revisionOptions}
       onChange={(value, option) => {
