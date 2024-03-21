@@ -28,5 +28,13 @@ export default async function Control({
     redirect("/not-found");
   }
 
-  return <ControlDash control={params.control} controls={controls} />;
+  const fullControl: Control | undefined = controls.find(
+    (controlsControl) => controlsControl.section === params.control,
+  );
+
+  if (fullControl === undefined) {
+    redirect("/not-found");
+  }
+
+  return <ControlDash control={fullControl} controls={controls} />;
 }
