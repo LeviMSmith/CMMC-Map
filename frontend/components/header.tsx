@@ -210,7 +210,11 @@ const AssessmentSelect = ({
   );
 };
 
-export default function Header() {
+export default function Header({
+  backendUrl,
+}: {
+  backendUrl: string | undefined;
+}) {
   const { sharedState, setSharedState } =
     useContext<StateContextType>(StateContext);
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
@@ -218,9 +222,8 @@ export default function Header() {
   const [revisions, setRevisions] = useState<Revision[] | undefined>();
   const [assessments, setAssessments] = useState<Assessment[] | undefined>();
 
-  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
   if (!backendUrl) {
-    throw new Error("BACKEND_URL is not set!");
+    console.error("BACKEND_URL is not set!");
   }
 
   useEffect(() => {

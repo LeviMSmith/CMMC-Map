@@ -84,12 +84,17 @@ const defaultState: StateContextType = {
 
 export const StateContext = createContext<StateContextType>(defaultState);
 
-export const StateProvider = ({ children }: { children: React.ReactNode }) => {
+export const StateProvider = ({
+  children,
+  backendUrl,
+}: {
+  children: React.ReactNode;
+  backendUrl: string | undefined;
+}) => {
   const [sharedState, setSharedState] = useState<State>({});
 
-  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
   if (!backendUrl) {
-    throw new Error("BACKEND_URL is not set!");
+    console.error("BACKEND_URL is not set!");
   }
 
   useEffect(() => {
