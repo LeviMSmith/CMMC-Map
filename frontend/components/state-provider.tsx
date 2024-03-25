@@ -53,6 +53,7 @@ export interface State {
   assessment_id?: string | undefined | null;
   sectionProgress?: SectionProgress | undefined | null;
   controlProgress?: ControlProgress[] | undefined | null;
+  backendUrl: string | undefined;
 }
 
 export interface StateContextType {
@@ -102,7 +103,7 @@ export const StateProvider = ({
       if (sharedState.revision_id) {
         try {
           const res = await fetch(
-            `${backendUrl}/api/revisions/${sharedState.revision_id}/implementation_status/`,
+            `${backendUrl}/api/revisions/${sharedState.revision_id}/policy/`,
           );
 
           const data = await res.json();
@@ -129,6 +130,7 @@ export const StateProvider = ({
           updateSharedState({
             sectionProgress: istat as SectionProgress,
             controlProgress: cstat as ControlProgress[],
+            backendUrl: backendUrl,
           });
         } catch (error) {
           console.error("Failed to fetch implementation status", error);

@@ -34,7 +34,7 @@ class Policy(models.Model):
         return f"${self.control} {self.revision} {self.id}"
 
     policy_description = models.TextField(null=True)
-    implementation_description = models.TextField(null=True)
+    plan_description = models.TextField(null=True)
     na_description = models.TextField(null=True)
     implementation_status = models.PositiveSmallIntegerField(default=0)
     control = models.ForeignKey(Control, on_delete=models.CASCADE)

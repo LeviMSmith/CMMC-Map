@@ -1,5 +1,10 @@
 from django.urls import path
-from .views import RevisionListView, AssessmentListView, policy_status_by_section
+from .views import (
+    RevisionListView,
+    AssessmentListView,
+    policy_status_by_section,
+    PolicyUpdateAPIView,
+)
 
 urlpatterns = [
     path("revisions/", RevisionListView.as_view(), name="revision-list"),
@@ -9,8 +14,13 @@ urlpatterns = [
         name="assessment-list-for-revision",
     ),
     path(
-        "revisions/<int:revision>/implementation_status/",
+        "revisions/<int:revision>/policy/",
         policy_status_by_section,
         name="policy-status-by-section",
+    ),
+    path(
+        "revisions/<int:revision>/policy/<int:control>/",
+        PolicyUpdateAPIView.as_view(),
+        name="update_policy_api",
     ),
 ]

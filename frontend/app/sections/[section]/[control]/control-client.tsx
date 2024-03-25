@@ -14,9 +14,19 @@ import {
   Textarea,
   Title,
 } from "@mantine/core";
-import { useState } from "react";
+import { useState, useContext } from "react";
 
+import { StateContextType, StateContext } from "@/components/state-provider";
 import { Control } from "@/lib/static-data";
+
+const getImplementationStatus = (tab) => {
+  const mapping = {
+    policy: 1,
+    plan: 2,
+    na: 3, // 'na' stands for 'Not Applicable'
+  };
+  return mapping[tab] || 0; // Return 0 or some default value if tab is not recognized
+};
 
 export default function ControlDash({
   control,
@@ -25,7 +35,68 @@ export default function ControlDash({
   control: Control;
   controls: Control[];
 }) {
+  const { sharedState, setSharedState } =
+    useContext<StateContextType>(StateContext);
   const [activeTab, setActiveTab] = useState<string | null>(null);
+
+  function TabPanel({ value, label, placeholder }) {
+    const [description, setDescription] = useState("");
+
+    const handleSubmit = () => {
+      if (
+        sharedState.backendUrl &&
+        activeTab &&
+        sharedState.revision_id &&
+        control.id &&
+        description
+      ) {
+        const implementationStatus = getImplementationStatus(activeTab);
+        const bodyData = {
+          [`${activeTab}_description`]: description,
+          implementation_status: implementationStatus,
+        };
+
+        console.log(JSON.stringify(bodyData));
+
+        fetch(
+          `${sharedState.backendUrl}/api/revisions/${sharedState.revision_id}/policy/${control.id}/`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(bodyData),
+          },
+        )
+          .then((response) => response.json())
+          .then((data) => {
+            // Handle successful response
+            console.log("Success:", data);
+          })
+          .catch((error) => {
+            // Handle error
+            console.error("Error:", error);
+          });
+      }
+    };
+
+    return (
+      <>
+        <Tabs.Panel value={value}>
+          <Textarea
+            label={label}
+            placeholder={placeholder}
+            autosize
+            minRows={4}
+            maxRows={8}
+            value={description}
+            onChange={(event) => setDescription(event.currentTarget.value)}
+          />
+          <Button onClick={handleSubmit}>Submit</Button>
+        </Tabs.Panel>
+      </>
+    );
+  }
 
   return (
     <Container>
@@ -41,39 +112,27 @@ export default function ControlDash({
       >
         <Center>
           <Tabs.List>
-            <Tabs.Tab value="implemented">Implemented</Tabs.Tab>
-            <Tabs.Tab value="planned">Planned to be Implemented</Tabs.Tab>
+            <Tabs.Tab value="policy">Implemented</Tabs.Tab>
+            <Tabs.Tab value="plan">Planned to be Implemented</Tabs.Tab>
             <Tabs.Tab value="na">Not Applicable</Tabs.Tab>
           </Tabs.List>
         </Center>
-        <Tabs.Panel value="implemented">
-          <Textarea
-            label="Policy"
-            placeholder="What is the policy?"
-            autosize
-            minRows={4}
-            maxRows={8}
-          />
-        </Tabs.Panel>
-        <Tabs.Panel value="planned">
-          <Textarea
-            label="Plan"
-            placeholder="What's the plan? What will be the policy?"
-            autosize
-            minRows={4}
-            maxRows={8}
-          />
-        </Tabs.Panel>
-        <Tabs.Panel value="na">
-          <Textarea
-            label="Explaination"
-            placeholder="Why is this control not applicable?"
-            autosize
-            minRows={4}
-            maxRows={8}
-          />
-        </Tabs.Panel>
-      </Tabs>
+        <TabPanel
+          value="policy"
+          label="Policy"
+          placeholder="What is the policy?"
+        />
+        <TabPanel
+          value="plan"
+          label="Plan"
+          placeholder="What's the plan? What will be the policy?"
+        />
+        <TabPanel
+          value="na"
+          label="Explanation"
+          placeholder="Why is this control not applicable?"
+        />
+      </Tabs>{" "}
       {activeTab === null && (
         <>
           <div className="h-8" />

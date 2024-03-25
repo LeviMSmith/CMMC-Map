@@ -1,8 +1,26 @@
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
-from .models import Revision, Assessment, Section
-from .serializers import RevisionSerializer, AssessmentSerializer, SectionSerializer
+from rest_framework.views import APIView
+from rest_framework import status
+from django.shortcuts import get_object_or_404
+from .models import Revision, Assessment, Section, Policy
+from .serializers import (
+    RevisionSerializer,
+    AssessmentSerializer,
+    SectionSerializer,
+    PolicySerializer,
+)
+
+
+class PolicyUpdateAPIView(APIView):
+    def post(self, request, revision, control):
+        policy = get_object_or_404(Policy, revision_id=revision, control_id=control)
+        serializer = PolicySerializer(policy, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(["GET"])

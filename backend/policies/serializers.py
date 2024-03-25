@@ -5,7 +5,15 @@ from .models import Revision, Assessment, Policy, Section, Control
 class PolicySerializer(serializers.ModelSerializer):
     class Meta:
         model = Policy
-        fields = ["id", "description", "implementation_status", "control"]
+        fields = [
+            "id",
+            "policy_description",
+            "plan_description",
+            "na_description",
+            "implementation_status",
+            "control",
+        ]
+        read_only_fields = ("id", "control")
 
 
 class SectionSerializer(serializers.ModelSerializer):
