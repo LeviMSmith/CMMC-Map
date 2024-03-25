@@ -25,14 +25,20 @@ export default function ControlDash({
   control: Control;
   controls: Control[];
 }) {
-  const [discussionOpen, setDiscussionOpen] = useState<boolean>(false);
+  const [activeTab, setActiveTab] = useState<string | null>(null);
 
   return (
     <Container>
       <h2 className="lessbigtitle">{control.section_name}</h2>
       <Text>{control.brief_description}</Text>
       <Divider className="my-4" />
-      <Tabs variant="pills" allowTabDeactivation className="w-full">
+      <Tabs
+        variant="pills"
+        allowTabDeactivation
+        className="w-full"
+        value={activeTab}
+        onChange={(value) => setActiveTab(value)}
+      >
         <Center>
           <Tabs.List>
             <Tabs.Tab value="implemented">Implemented</Tabs.Tab>
@@ -68,6 +74,14 @@ export default function ControlDash({
           />
         </Tabs.Panel>
       </Tabs>
+      {activeTab === null && (
+        <>
+          <div className="h-8" />
+          <Title ta="center">
+            Not yet implemented. Please select a tab to begin implementation.
+          </Title>
+        </>
+      )}
     </Container>
   );
 }

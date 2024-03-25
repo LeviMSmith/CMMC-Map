@@ -2,7 +2,7 @@
 
 import { redirect } from "next/navigation";
 
-import { controls } from "@/lib/static-data";
+import { Control, controls } from "@/lib/static-data";
 
 import ControlDash from "./control-client";
 
