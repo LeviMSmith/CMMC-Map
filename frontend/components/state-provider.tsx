@@ -43,7 +43,9 @@ export function isKeyOfSectionProgress(key: any): key is keyof SectionProgress {
 
 export interface ControlProgress {
   id: number;
-  description?: string;
+  policy_description?: string;
+  plan_description?: string;
+  na_description?: string;
   implementation_status: number;
   control: number;
 }
@@ -53,6 +55,7 @@ export interface State {
   assessment_id?: string | undefined | null;
   sectionProgress?: SectionProgress | undefined | null;
   controlProgress?: ControlProgress[] | undefined | null;
+  refreshControlProgress: boolean;
   backendUrl: string | undefined;
 }
 
@@ -139,7 +142,7 @@ export const StateProvider = ({
     };
 
     fetchData();
-  }, [sharedState.revision_id, backendUrl]);
+  }, [sharedState.revision_id, backendUrl, sharedState.refreshControlProgress]);
 
   const updateSharedState = (newState: Partial<State>) => {
     setSharedState((prevState = {}) => ({

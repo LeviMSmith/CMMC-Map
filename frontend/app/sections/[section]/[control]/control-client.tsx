@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  ActionIcon,
   Button,
   Center,
   Collapse,
@@ -8,12 +9,16 @@ import {
   Divider,
   Group,
   Loader,
+  Notification,
   Paper,
   Tabs,
   Text,
   Textarea,
   Title,
+  Tooltip,
 } from "@mantine/core";
+import { notifications } from "@mantine/notifications";
+import { IconCheck } from "@tabler/icons-react";
 import { useState, useContext } from "react";
 
 import { StateContextType, StateContext } from "@/components/state-provider";
@@ -37,10 +42,31 @@ export default function ControlDash({
 }) {
   const { sharedState, setSharedState } =
     useContext<StateContextType>(StateContext);
-  const [activeTab, setActiveTab] = useState<string | null>(null);
+
+  const currentControlProgress = sharedState.controlProgress?.find(
+    (element: ControlProgress) => element.id === control.id,
+  );
+
+  const implementation_status: number = currentControlProgress
+    ? currentControlProgress.implementation_status
+    : 0;
+
+  const [activeTab, setActiveTab] = useState<string | null>(
+    implementation_status === 1
+      ? "policy"
+      : implementation_status === 2
+        ? "plan"
+        : implementation_status === 3
+          ? "na"
+          : null,
+  );
 
   function TabPanel({ value, label, placeholder }) {
-    const [description, setDescription] = useState("");
+    const [description, setDescription] = useState(
+      currentControlProgress
+        ? currentControlProgress[`${value}_description`] || ""
+        : "",
+    );
 
     const handleSubmit = () => {
       if (
@@ -56,8 +82,6 @@ export default function ControlDash({
           implementation_status: implementationStatus,
         };
 
-        console.log(JSON.stringify(bodyData));
-
         fetch(
           `${sharedState.backendUrl}/api/revisions/${sharedState.revision_id}/policy/${control.id}/`,
           {
@@ -70,14 +94,31 @@ export default function ControlDash({
         )
           .then((response) => response.json())
           .then((data) => {
-            // Handle successful response
-            console.log("Success:", data);
+            setSharedState({
+              ...sharedState,
+              refreshControlProgress: !sharedState.refreshControlProgress,
+            });
+            notifications.show({
+              title: "Policy updated!",
+            });
           })
           .catch((error) => {
-            // Handle error
-            console.error("Error:", error);
+            notifications.show({
+              title: "Failed to update policy!",
+              message: "Try again later.",
+            });
           });
       }
+    };
+
+    const SubmitButton = () => {
+      return (
+        <Tooltip label="Submit policy">
+          <ActionIcon variant="light" onClick={handleSubmit}>
+            <IconCheck />
+          </ActionIcon>
+        </Tooltip>
+      );
     };
 
     return (
@@ -87,12 +128,15 @@ export default function ControlDash({
             label={label}
             placeholder={placeholder}
             autosize
-            minRows={4}
-            maxRows={8}
+            minRows={6}
+            maxRows={16}
             value={description}
             onChange={(event) => setDescription(event.currentTarget.value)}
+            size="lg"
+            rightSectionPointerEvents="auto"
+            rightSection={<SubmitButton />}
           />
-          <Button onClick={handleSubmit}>Submit</Button>
+          <div className="h-8" />
         </Tabs.Panel>
       </>
     );

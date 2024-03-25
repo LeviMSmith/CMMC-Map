@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { theme } from "../theme";
 import "@mantine/core/styles.css";
+import "@mantine/notifications/styles.css";
 
 import { ColorSchemeScript, MantineProvider } from "@mantine/core";
+import { Notifications } from "@mantine/notifications";
 
 import { StateProvider } from "@/components/state-provider";
 import Header from "@/components/header";
@@ -32,6 +34,7 @@ export default function RootLayout({
             <Header backendUrl={backendUrl} />
             {children}
           </StateProvider>
+          <Notifications position="bottom-right" />
         </MantineProvider>
       </body>
     </html>

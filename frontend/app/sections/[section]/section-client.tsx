@@ -12,7 +12,12 @@ import {
   Tooltip,
   SimpleGrid,
 } from "@mantine/core";
-import { IconCheck, IconMinus, IconQuestionMark } from "@tabler/icons-react";
+import {
+  IconCheck,
+  IconMinus,
+  IconQuestionMark,
+  IconListCheck,
+} from "@tabler/icons-react";
 import { useContext } from "react";
 import Link from "next/link";
 
@@ -88,6 +93,10 @@ export default function SectionDash({
                           </Tooltip>
                         ) : controlProgress.implementation_status === 2 ? (
                           <Tooltip label="Planned to be implemented">
+                            <IconListCheck className="text-yellow-400" />
+                          </Tooltip>
+                        ) : controlProgress.implementation_status === 3 ? (
+                          <Tooltip label="Not applicable">
                             <IconMinus className="text-teal-400" />
                           </Tooltip>
                         ) : (
