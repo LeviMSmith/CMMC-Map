@@ -1,0 +1,10 @@
+.git
+.gitignore
+.results
+scripts
+*Dockerfile*
+*dockerfile*
+node_modules
+.env*
+.next
+README.md

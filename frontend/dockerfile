@@ -1,0 +1,39 @@
+# Base stage for shared configurations and setting up the work directory.
+FROM node:21-alpine as base
+WORKDIR /app
+COPY package*.json ./
+EXPOSE 3000
+
+# Builder stage for building the application.
+FROM base as builder
+WORKDIR /app
+COPY . .
+RUN yarn install
+RUN yarn build
+
+# Production stage for setting up the production environment.
+FROM base as production
+WORKDIR /app
+
+# Set the environment to production.
+ENV NODE_ENV=production
+
+# Copy over the package.json (and yarn.lock if present) files.
+COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/yarn.lock ./yarn.lock
+
+# Install production dependencies.
+RUN yarn install --production --frozen-lockfile
+
+# Set up a non-root user for security.
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nextjs -u 1001
+USER nextjs
+
+# Copy necessary build artifacts and static files.
+COPY --from=builder --chown=nextjs:nodejs /app/.next ./.next
+COPY --from=builder --chown=nextjs:nodejs /app/public ./public
+
+# Start the application.
+CMD ["yarn", "start"]
+
