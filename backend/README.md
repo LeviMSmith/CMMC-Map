@@ -1,4 +1,4 @@
-# CMMC-Handler Backend
+# CMMC-Map Backend
 
 This is a django backend to handle the data part of the app through a restful api.
 
