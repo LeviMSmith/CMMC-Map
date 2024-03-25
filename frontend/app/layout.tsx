@@ -22,6 +22,7 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <ColorSchemeScript />
+        <link rel="icon" type="image/x-icon" href="/images/favicon.ico" />
       </head>
       <body>
         <MantineProvider theme={theme}>
