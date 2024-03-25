@@ -56,7 +56,7 @@ export interface State {
   sectionProgress?: SectionProgress | undefined | null;
   controlProgress?: ControlProgress[] | undefined | null;
   refreshControlProgress: boolean;
-  backendUrl: string | undefined;
+  backendUrl?: string | undefined;
 }
 
 export interface StateContextType {
@@ -82,7 +82,7 @@ const mockProgress: SectionProgress = {
 };
 
 const defaultState: StateContextType = {
-  sharedState: {},
+  sharedState: { refreshControlProgress: false },
   setSharedState: () => {},
 };
 
@@ -95,7 +95,9 @@ export const StateProvider = ({
   children: React.ReactNode;
   backendUrl: string | undefined;
 }) => {
-  const [sharedState, setSharedState] = useState<State>({});
+  const [sharedState, setSharedState] = useState<State>(
+    defaultState.sharedState,
+  );
 
   if (!backendUrl) {
     console.error("BACKEND_URL is not set!");
@@ -145,7 +147,7 @@ export const StateProvider = ({
   }, [sharedState.revision_id, backendUrl, sharedState.refreshControlProgress]);
 
   const updateSharedState = (newState: Partial<State>) => {
-    setSharedState((prevState = {}) => ({
+    setSharedState((prevState = defaultState.sharedState) => ({
       ...prevState,
       ...newState,
     }));

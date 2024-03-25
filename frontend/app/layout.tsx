@@ -11,7 +11,7 @@ import { StateProvider } from "@/components/state-provider";
 import Header from "@/components/header";
 
 export const metadata: Metadata = {
-  title: "CMMC Handler",
+  title: "CMMC Map",
   description: "Web app to handle CMMC Policy",
 };
 

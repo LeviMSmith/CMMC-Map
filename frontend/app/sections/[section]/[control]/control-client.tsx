@@ -21,16 +21,20 @@ import { notifications } from "@mantine/notifications";
 import { IconCheck } from "@tabler/icons-react";
 import { useState, useContext } from "react";
 
-import { StateContextType, StateContext } from "@/components/state-provider";
+import {
+  StateContextType,
+  StateContext,
+  ControlProgress,
+} from "@/components/state-provider";
 import { Control } from "@/lib/static-data";
 
-const getImplementationStatus = (tab) => {
-  const mapping = {
+const getImplementationStatus = (tab: string) => {
+  const mapping: { [key: string]: number } = {
     policy: 1,
     plan: 2,
-    na: 3, // 'na' stands for 'Not Applicable'
+    na: 3,
   };
-  return mapping[tab] || 0; // Return 0 or some default value if tab is not recognized
+  return mapping[tab] || 0;
 };
 
 export default function ControlDash({
@@ -61,10 +65,36 @@ export default function ControlDash({
           : null,
   );
 
-  function TabPanel({ value, label, placeholder }) {
+  function TabPanel({
+    value,
+    label,
+    placeholder,
+  }: {
+    value: string;
+    label: string;
+    placeholder: string;
+  }) {
+    function isString(value: any): value is string {
+      return typeof value === "string";
+    }
+
+    function getDescription(
+      controlProgress: ControlProgress,
+      value: string,
+    ): string | undefined {
+      const key = `${value}_description` as keyof ControlProgress;
+      if (key in controlProgress) {
+        const possibleStringValue = controlProgress[key];
+        if (isString(possibleStringValue)) {
+          return possibleStringValue;
+        }
+      }
+      return undefined;
+    }
+
     const [description, setDescription] = useState(
       currentControlProgress
-        ? currentControlProgress[`${value}_description`] || ""
+        ? getDescription(currentControlProgress, value) || ""
         : "",
     );
 
@@ -100,6 +130,7 @@ export default function ControlDash({
             });
             notifications.show({
               title: "Policy updated!",
+              message: "Good job.",
             });
           })
           .catch((error) => {
