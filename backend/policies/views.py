@@ -4,13 +4,22 @@ from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 from rest_framework import status
 from django.shortcuts import get_object_or_404
-from .models import Revision, Assessment, Section, Policy
+from .models import Revision, Assessment, Section, Policy, Evidence
 from .serializers import (
     RevisionSerializer,
     AssessmentSerializer,
     SectionSerializer,
     PolicySerializer,
+    EvidenceSerializer,
 )
+
+
+class EvidenceListView(APIView):
+    def get(self, request, revision, control, format=None):
+        policies = Policy.objects.filter(revision__version=revision, control=control)
+        evidence_list = Evidence.objects.filter(policy__in=policies).distinct()
+        serializer = EvidenceSerializer(evidence_list, many=True)
+        return Response(serializer.data)
 
 
 class PolicyUpdateAPIView(APIView):

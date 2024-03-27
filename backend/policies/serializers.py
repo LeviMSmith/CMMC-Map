@@ -1,5 +1,11 @@
 from rest_framework import serializers
-from .models import Revision, Assessment, Policy, Section, Control
+from .models import Revision, Assessment, Policy, Section, Control, Evidence
+
+
+class EvidenceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Evidence
+        fields = ['file', 'link', 'description']
 
 
 class PolicySerializer(serializers.ModelSerializer):

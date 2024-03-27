@@ -4,6 +4,7 @@ from .views import (
     AssessmentListView,
     policy_status_by_section,
     PolicyUpdateAPIView,
+    EvidenceListView,
 )
 
 urlpatterns = [
@@ -22,5 +23,10 @@ urlpatterns = [
         "revisions/<int:revision>/policy/<int:control>/",
         PolicyUpdateAPIView.as_view(),
         name="update_policy_api",
+    ),
+    path(
+        "revisions/<int:revision>/policy/<int:control>/evidence/",
+        EvidenceListView.as_view(),
+        name="evidence-list",
     ),
 ]

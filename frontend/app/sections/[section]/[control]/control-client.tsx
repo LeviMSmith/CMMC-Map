@@ -11,6 +11,7 @@ import {
   Loader,
   Notification,
   Paper,
+  SimpleGrid,
   Tabs,
   Text,
   Textarea,
@@ -18,8 +19,8 @@ import {
   Tooltip,
 } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
-import { IconCheck } from "@tabler/icons-react";
-import { useState, useContext } from "react";
+import { IconCheck, IconPlus } from "@tabler/icons-react";
+import { useState, useEffect, useContext } from "react";
 
 import {
   StateContextType,
@@ -37,6 +38,13 @@ const getImplementationStatus = (tab: string) => {
   return mapping[tab] || 0;
 };
 
+interface Evidence {
+  id: number;
+  file?: string;
+  link?: string;
+  description?: string;
+}
+
 export default function ControlDash({
   control,
   controls,
@@ -46,6 +54,8 @@ export default function ControlDash({
 }) {
   const { sharedState, setSharedState } =
     useContext<StateContextType>(StateContext);
+
+  const [evidences, setEvidences] = useState<Evidence[] | undefined>(undefined);
 
   const currentControlProgress = sharedState.controlProgress?.find(
     (element: ControlProgress) => element.id === control.id,
@@ -156,7 +166,7 @@ export default function ControlDash({
       <>
         <Tabs.Panel value={value}>
           <Textarea
-            label={label}
+            pt="16"
             placeholder={placeholder}
             autosize
             minRows={6}
@@ -173,47 +183,106 @@ export default function ControlDash({
     );
   }
 
+  useEffect(() => {
+    const fetchEvidences = async () => {
+      try {
+        const response = await fetch(
+          `${sharedState.backendUrl}/api/revisions/${sharedState.revision_id}/policy/${control.id}/evidence/`,
+        );
+        if (!response.ok) {
+          throw new Error(`Error: ${response.status}`);
+        }
+        const data = await response.json();
+        setEvidences(data);
+      } catch (err: any) {
+        console.log(err.message);
+      }
+    };
+
+    fetchEvidences();
+  }, [sharedState.revision_id, control.id, sharedState.backendUrl]);
+
   return (
     <Container>
       <h2 className="lessbigtitle">{control.section_name}</h2>
       <Text>{control.brief_description}</Text>
       <Divider className="my-4" />
-      <Tabs
-        variant="pills"
-        allowTabDeactivation
-        className="w-full"
-        value={activeTab}
-        onChange={(value) => setActiveTab(value)}
-      >
-        <Center>
-          <Tabs.List>
-            <Tabs.Tab value="policy">Implemented</Tabs.Tab>
-            <Tabs.Tab value="plan">Planned to be Implemented</Tabs.Tab>
-            <Tabs.Tab value="na">Not Applicable</Tabs.Tab>
-          </Tabs.List>
-        </Center>
-        <TabPanel
-          value="policy"
-          label="Policy"
-          placeholder="What is the policy?"
-        />
-        <TabPanel
-          value="plan"
-          label="Plan"
-          placeholder="What's the plan? What will be the policy?"
-        />
-        <TabPanel
-          value="na"
-          label="Explanation"
-          placeholder="Why is this control not applicable?"
-        />
-      </Tabs>{" "}
-      {activeTab === null && (
+      <Paper className="min-h-[300px]">
+        <Group>
+          <Text fw={500} size="lg">
+            Policy
+          </Text>
+        </Group>
+        <Tabs
+          variant="pills"
+          allowTabDeactivation
+          className="w-full"
+          value={activeTab}
+          onChange={(value) => setActiveTab(value)}
+        >
+          <Center>
+            <Tabs.List>
+              <Tabs.Tab value="policy">Implemented</Tabs.Tab>
+              <Tabs.Tab value="plan">Planned to be Implemented</Tabs.Tab>
+              <Tabs.Tab value="na">Not Applicable</Tabs.Tab>
+            </Tabs.List>
+          </Center>
+          <TabPanel
+            value="policy"
+            label="Policy"
+            placeholder="What is the policy?"
+          />
+          <TabPanel
+            value="plan"
+            label="Plan"
+            placeholder="What's the plan? What will be the policy?"
+          />
+          <TabPanel
+            value="na"
+            label="Explanation"
+            placeholder="Why is this control not applicable?"
+          />
+        </Tabs>{" "}
+        {activeTab === null && (
+          <>
+            <div className="h-8" />
+            <Text fw={500} size="lg" ta="center">
+              Not yet implemented. Please select a tab to begin implementation.
+            </Text>
+          </>
+        )}
+      </Paper>
+      <div className="h-16" />
+      <Group>
+        <Text fw={500} size="lg">
+          Evidence
+        </Text>
+        <ActionIcon variant="light">
+          <IconPlus />
+        </ActionIcon>
+      </Group>
+      {evidences ? (
+        evidences.length > 0 ? (
+          <Paper withBorder>
+            <SimpleGrid cols={3}>
+              {evidences.map((evidence) => (
+                <Text key={evidence.id}>
+                  {evidence.description || "Evidence has no description"}
+                </Text>
+              ))}
+            </SimpleGrid>
+          </Paper>
+        ) : (
+          <Text size="lg" fw={500} ta="center" pt="32">
+            No evidence yet. Press the plus icon above to get started.
+          </Text>
+        )
+      ) : (
         <>
           <div className="h-8" />
-          <Title ta="center">
-            Not yet implemented. Please select a tab to begin implementation.
-          </Title>
+          <Center>
+            <Loader />
+          </Center>
         </>
       )}
     </Container>

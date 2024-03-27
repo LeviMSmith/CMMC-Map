@@ -42,11 +42,10 @@ class Policy(models.Model):
 
 
 class Evidence(models.Model):
-    image = models.ImageField(null=True)
     file = models.FileField(null=True)
     link = models.URLField(null=True)
     description = models.TextField(null=True)
-    policy = models.ForeignKey(Policy, on_delete=models.CASCADE)
+    policy = models.ManyToManyField(Policy)
 
 
 class Assessment(models.Model):

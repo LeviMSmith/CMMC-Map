@@ -33,6 +33,7 @@ export default function RootLayout({
           <StateProvider backendUrl={backendUrl}>
             <Header backendUrl={backendUrl} />
             {children}
+            <div className="h-16" />
           </StateProvider>
           <Notifications position="bottom-right" />
         </MantineProvider>
