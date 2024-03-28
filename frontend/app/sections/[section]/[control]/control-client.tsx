@@ -19,7 +19,8 @@ import {
   Tooltip,
 } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
-import { IconCheck, IconPlus } from "@tabler/icons-react";
+import { Dropzone, DronzoneProps } from "@mantine/dropzone";
+import { IconCheck, IconPlus, IconX } from "@tabler/icons-react";
 import { useState, useEffect, useContext } from "react";
 
 import {
@@ -56,6 +57,7 @@ export default function ControlDash({
     useContext<StateContextType>(StateContext);
 
   const [evidences, setEvidences] = useState<Evidence[] | undefined>(undefined);
+  const [evidenceAdd, setEvidenceAdd] = useState<boolean>(false);
 
   const currentControlProgress = sharedState.controlProgress?.find(
     (element: ControlProgress) => element.id === control.id,
@@ -154,7 +156,7 @@ export default function ControlDash({
 
     const SubmitButton = () => {
       return (
-        <Tooltip label="Submit policy">
+        <Tooltip label="Save policy">
           <ActionIcon variant="light" onClick={handleSubmit}>
             <IconCheck />
           </ActionIcon>
@@ -167,6 +169,7 @@ export default function ControlDash({
         <Tabs.Panel value={value}>
           <Textarea
             pt="16"
+            description={label}
             placeholder={placeholder}
             autosize
             minRows={6}
@@ -247,44 +250,84 @@ export default function ControlDash({
           <>
             <div className="h-8" />
             <Text fw={500} size="lg" ta="center">
-              Not yet implemented. Please select a tab to begin implementation.
+              No policy set yet. Please select a tab to begin implementation.
             </Text>
           </>
         )}
       </Paper>
       <div className="h-16" />
-      <Group>
-        <Text fw={500} size="lg">
-          Evidence
-        </Text>
-        <ActionIcon variant="light">
-          <IconPlus />
-        </ActionIcon>
-      </Group>
-      {evidences ? (
-        evidences.length > 0 ? (
-          <Paper withBorder>
-            <SimpleGrid cols={3}>
-              {evidences.map((evidence) => (
-                <Text key={evidence.id}>
-                  {evidence.description || "Evidence has no description"}
-                </Text>
-              ))}
-            </SimpleGrid>
-          </Paper>
-        ) : (
-          <Text size="lg" fw={500} ta="center" pt="32">
-            No evidence yet. Press the plus icon above to get started.
+      <Paper className="min-h-[300px]">
+        <Group>
+          <Text fw={500} size="lg">
+            Evidence
           </Text>
-        )
-      ) : (
-        <>
-          <div className="h-8" />
-          <Center>
-            <Loader />
-          </Center>
-        </>
-      )}
+          {evidenceAdd ? (
+            <>
+              <Tooltip label="Cancel">
+                <ActionIcon
+                  onClick={() => {
+                    setEvidenceAdd(false);
+                  }}
+                  variant="light"
+                >
+                  <IconX />
+                </ActionIcon>
+              </Tooltip>
+              <Tooltip label="Save evidence">
+                <ActionIcon>
+                  <IconCheck />
+                </ActionIcon>
+              </Tooltip>
+            </>
+          ) : (
+            <Tooltip label="Add evidence">
+              <ActionIcon
+                variant="light"
+                onClick={() => {
+                  setEvidenceAdd(true);
+                }}
+              >
+                <IconPlus />
+              </ActionIcon>
+            </Tooltip>
+          )}
+        </Group>
+        <Collapse in={evidenceAdd}>
+          <Paper className="mt-8" shadow="lg" p={16}>
+            <Dropzone mb="16">
+              <Text ta="center">Upload some evidence</Text>
+            </Dropzone>
+            <Textarea
+              placeholder="This screenshot shows..."
+              description="Give your evidence a description"
+            />
+          </Paper>
+        </Collapse>
+        {evidences ? (
+          evidences.length > 0 ? (
+            <Paper withBorder>
+              <SimpleGrid cols={3}>
+                {evidences.map((evidence) => (
+                  <Text key={evidence.id}>
+                    {evidence.description || "Evidence has no description"}
+                  </Text>
+                ))}
+              </SimpleGrid>
+            </Paper>
+          ) : !evidenceAdd ? (
+            <Text size="lg" fw={500} ta="center" pt="32">
+              No evidence yet. Press the plus icon above to get started.
+            </Text>
+          ) : null
+        ) : (
+          <>
+            <div className="h-8" />
+            <Center>
+              <Loader />
+            </Center>
+          </>
+        )}
+      </Paper>
     </Container>
   );
 }
