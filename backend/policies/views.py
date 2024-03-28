@@ -1,8 +1,8 @@
-from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework.views import APIView
-from rest_framework import status
+from rest_framework.exceptions import ValidationError
+from rest_framework import status, generics
 from django.shortcuts import get_object_or_404
 from .models import Revision, Assessment, Section, Policy, Evidence
 from .serializers import (
@@ -16,10 +16,27 @@ from .serializers import (
 
 class EvidenceListView(APIView):
     def get(self, request, revision, control, format=None):
-        policies = Policy.objects.filter(revision__version=revision, control=control)
+        policies = Policy.objects.filter(revision__id=revision, control=control)
         evidence_list = Evidence.objects.filter(policy__in=policies).distinct()
         serializer = EvidenceSerializer(evidence_list, many=True)
         return Response(serializer.data)
+
+    def post(self, request, revision, control, format=None):
+        serializer = EvidenceSerializer(data=request.data)
+        if serializer.is_valid():
+            self.perform_create(serializer, revision, control)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def perform_create(self, serializer, revision, control):
+        # Find the policy based on revision and control
+        policy = Policy.objects.filter(revision__id=revision, control=control).first()
+        if not policy:
+            raise ValidationError(
+                f"Policy not found with the provided revision {revision} and control {control}."
+            )
+        evidence = serializer.save()
+        evidence.policy.add(policy)
 
 
 class PolicyUpdateAPIView(APIView):

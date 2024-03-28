@@ -5,7 +5,8 @@ from .models import Revision, Assessment, Policy, Section, Control, Evidence
 class EvidenceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Evidence
-        fields = ['file', 'link', 'description']
+        fields = ["id", "file", "link", "description"]
+        read_only_fields = ["id"]
 
 
 class PolicySerializer(serializers.ModelSerializer):

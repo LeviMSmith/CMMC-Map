@@ -8,6 +8,7 @@ import {
   Container,
   Divider,
   Group,
+  Image,
   Loader,
   Notification,
   Paper,
@@ -58,6 +59,8 @@ export default function ControlDash({
 
   const [evidences, setEvidences] = useState<Evidence[] | undefined>(undefined);
   const [evidenceAdd, setEvidenceAdd] = useState<boolean>(false);
+  const [files, setFiles] = useState([]);
+  const [description, setDescription] = useState("");
 
   const currentControlProgress = sharedState.controlProgress?.find(
     (element: ControlProgress) => element.id === control.id,
@@ -146,6 +149,7 @@ export default function ControlDash({
             });
           })
           .catch((error) => {
+            console.error(error);
             notifications.show({
               title: "Failed to update policy!",
               message: "Try again later.",
@@ -204,6 +208,59 @@ export default function ControlDash({
 
     fetchEvidences();
   }, [sharedState.revision_id, control.id, sharedState.backendUrl]);
+
+  const handleUpload = async () => {
+    if (!sharedState.backendUrl || !sharedState.revision_id) {
+      console.error("Cannot upload: query info not set");
+      return;
+    }
+
+    if (files.length === 0) {
+      console.error("Cannot upload: no files selected");
+      return;
+    }
+
+    const formData = new FormData();
+
+    files.forEach((file) => {
+      formData.append("file", file);
+    });
+    if (description) {
+      formData.append("description", description);
+    }
+
+    try {
+      const response = await fetch(
+        `${sharedState.backendUrl}/api/revisions/${sharedState.revision_id}/policy/${control.id}/evidence/`,
+        {
+          method: "POST",
+          body: formData,
+          // Include headers if needed, for example, for authentication
+          // headers: {
+          //   'Authorization': 'Bearer YOUR_TOKEN',
+          // },
+        },
+      );
+
+      const result = await response.json();
+      notifications.show({
+        title: "Evidence added!",
+        message: "Good job.",
+      });
+
+      // Handle success, clear files and description, give user feedback, etc.
+    } catch (error) {
+      console.error(error);
+      notifications.show({
+        title: "Failed to upload evidence!",
+        message: "Try again later.",
+      });
+    }
+  };
+
+  const isImage = (fileName) => {
+    return /\.(jpg|jpeg|png|gif)$/i.test(fileName);
+  };
 
   return (
     <Container>
@@ -274,7 +331,7 @@ export default function ControlDash({
                 </ActionIcon>
               </Tooltip>
               <Tooltip label="Save evidence">
-                <ActionIcon>
+                <ActionIcon onClick={handleUpload}>
                   <IconCheck />
                 </ActionIcon>
               </Tooltip>
@@ -294,23 +351,46 @@ export default function ControlDash({
         </Group>
         <Collapse in={evidenceAdd}>
           <Paper className="mt-8" shadow="lg" p={16}>
-            <Dropzone mb="16">
-              <Text ta="center">Upload some evidence</Text>
+            <Dropzone
+              onDrop={(acceptedFiles) => setFiles(acceptedFiles)}
+              mb="16"
+            >
+              <Text ta="center" size="xl">
+                Drag evidence files here or click to select files
+              </Text>
+              <Text ta="center" size="sm" c="dimmed">
+                Attach a file of any type.
+              </Text>
             </Dropzone>
             <Textarea
               placeholder="This screenshot shows..."
-              description="Give your evidence a description"
+              description="Give these files a description"
+              value={description}
+              onChange={(event) => setDescription(event.currentTarget.value)}
             />
           </Paper>
         </Collapse>
         {evidences ? (
           evidences.length > 0 ? (
             <Paper withBorder>
-              <SimpleGrid cols={3}>
+              <SimpleGrid cols={3} p={32}>
                 {evidences.map((evidence) => (
-                  <Text key={evidence.id}>
-                    {evidence.description || "Evidence has no description"}
-                  </Text>
+                  <div key={evidence.id}>
+                    {evidence.file &&
+                    isImage(evidence.file) &&
+                    sharedState.backendUrl ? (
+                      <Image
+                        src={`${sharedState.backendUrl}${evidence.file}`}
+                        alt={evidence.description || "Evidence image"}
+                        height={200}
+                        fit="cover"
+                        m={16}
+                      />
+                    ) : null}
+                    <Text ta="center">
+                      {evidence.description || "Evidence has no description"}
+                    </Text>
+                  </div>
                 ))}
               </SimpleGrid>
             </Paper>
