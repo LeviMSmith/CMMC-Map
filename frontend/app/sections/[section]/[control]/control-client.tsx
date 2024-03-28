@@ -372,28 +372,31 @@ export default function ControlDash({
         </Collapse>
         {evidences ? (
           evidences.length > 0 ? (
-            <Paper withBorder>
-              <SimpleGrid cols={3} p={32}>
-                {evidences.map((evidence) => (
-                  <div key={evidence.id}>
-                    {evidence.file &&
-                    isImage(evidence.file) &&
-                    sharedState.backendUrl ? (
-                      <Image
-                        src={`${sharedState.backendUrl}${evidence.file}`}
-                        alt={evidence.description || "Evidence image"}
-                        height={200}
-                        fit="cover"
-                        m={16}
-                      />
-                    ) : null}
-                    <Text ta="center">
-                      {evidence.description || "Evidence has no description"}
-                    </Text>
-                  </div>
-                ))}
-              </SimpleGrid>
-            </Paper>
+            <>
+              <div className="h-8" />
+              <Paper withBorder>
+                <SimpleGrid cols={3} p={32}>
+                  {evidences.map((evidence) => (
+                    <div key={evidence.id}>
+                      {evidence.file &&
+                      isImage(evidence.file) &&
+                      sharedState.backendUrl ? (
+                        <Image
+                          src={`${sharedState.backendUrl}${evidence.file}`}
+                          alt={evidence.description || "Evidence image"}
+                          height={200}
+                          fit="cover"
+                          m={16}
+                        />
+                      ) : null}
+                      <Text ta="center">
+                        {evidence.description || "Evidence has no description"}
+                      </Text>
+                    </div>
+                  ))}
+                </SimpleGrid>
+              </Paper>
+            </>
           ) : !evidenceAdd ? (
             <Text size="lg" fw={500} ta="center" pt="32">
               No evidence yet. Press the plus icon above to get started.
