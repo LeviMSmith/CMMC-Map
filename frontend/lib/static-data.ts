@@ -2649,9 +2649,9 @@ export const controls: Control[] = [
     id: 81,
     level: 2,
     section: "3.11.1",
-    section_name: "RI",
+    section_name: "RISK ASSESSMENTS",
     brief_description:
-      "sk Assessments \nRisk Assessment (RA) \n\nRA.L2-3.11.1 – RISK ASSESSMENTS \nPeriodically assess the risk to organizational operations (including mission, functions, image, \nor reputation), organizational assets, and individuals, resulting from the operation of \norganizational systems and the associated processing, storage, or transmission of CUI. \n",
+      "Periodically assess the risk to organizational operations (including mission, functions, image, \nor reputation), organizational assets, and individuals, resulting from the operation of \norganizational systems and the associated processing, storage, or transmission of CUI. \n",
     assessment_objectives: {
       a: "the frequency to assess risk to organizational operations, organizational assets, and \nindividuals is defined; and",
       b: "risk to organizational operations, organizational assets, and individuals resulting from \nthe operation of an organizational system that processes, stores, or transmits CUI is \nassessed with the defined frequency.",
