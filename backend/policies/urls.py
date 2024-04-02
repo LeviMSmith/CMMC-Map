@@ -5,6 +5,7 @@ from .views import (
     policy_status_by_section,
     PolicyUpdateAPIView,
     EvidenceListView,
+    EvidenceDeleteView,
 )
 
 urlpatterns = [
@@ -28,5 +29,10 @@ urlpatterns = [
         "revisions/<int:revision>/policy/<int:control>/evidence/",
         EvidenceListView.as_view(),
         name="evidence-list",
+    ),
+    path(
+        "revisions/<int:revision>/policy/<int:control>/evidence/<int:evidence_id>/",
+        EvidenceDeleteView.as_view(),
+        name="evidence-delete",
     ),
 ]

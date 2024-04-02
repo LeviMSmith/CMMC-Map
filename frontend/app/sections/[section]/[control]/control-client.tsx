@@ -67,6 +67,7 @@ export default function ControlDash({
   const { sharedState, setSharedState } =
     useContext<StateContextType>(StateContext);
 
+  const [evidenceRefresh, setEvidenceRefresh] = useState<boolean>(false);
   const [evidences, setEvidences] = useState<Evidence[] | undefined>(undefined);
   const [evidenceAdd, setEvidenceAdd] = useState<boolean>(false);
   const [files, setFiles] = useState([]);
@@ -163,6 +164,7 @@ export default function ControlDash({
             notifications.show({
               title: "Failed to update policy!",
               message: "Try again later.",
+              color: "red",
             });
           });
       }
@@ -217,7 +219,12 @@ export default function ControlDash({
     };
 
     fetchEvidences();
-  }, [sharedState.revision_id, control.id, sharedState.backendUrl]);
+  }, [
+    sharedState.revision_id,
+    control.id,
+    sharedState.backendUrl,
+    evidenceRefresh,
+  ]);
 
   const handleUpload = async () => {
     if (!sharedState.backendUrl || !sharedState.revision_id) {
@@ -264,7 +271,47 @@ export default function ControlDash({
       notifications.show({
         title: "Failed to upload evidence!",
         message: "Try again later.",
+        color: "red",
       });
+    } finally {
+      setEvidenceRefresh(!evidenceRefresh);
+    }
+  };
+
+  const deleteEvidence = (evidence_id) => {
+    if (sharedState.backendUrl && sharedState.revision_id && control.id) {
+      fetch(
+        `${sharedState.backendUrl}/api/revisions/${sharedState.revision_id}/policy/${control.id}/evidence/${evidence_id}/`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      )
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Network response was not ok");
+          }
+        })
+        .then(() => {
+          console.log("Evidence deleted successfully");
+          notifications.show({
+            title: "Evidence deleted.",
+            message: "May it rest in peace.",
+          });
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+          notifications.show({
+            title: "Failed to delete evidence!",
+            message: "Try again later.",
+            color: "red",
+          });
+        })
+        .finally(() => {
+          setEvidenceRefresh(!evidenceRefresh);
+        });
     }
   };
 
@@ -461,9 +508,23 @@ export default function ControlDash({
                           />
                         )}
                       </div>
-                      <Text ta="center" size="lg" fw={500}>
-                        {evidence.description || evidence.file.split("/").pop()}
-                      </Text>
+                      <Group wrap="nowrap">
+                        <Text
+                          ta="center"
+                          size="lg"
+                          fw={500}
+                          className="text-ellipsis"
+                        >
+                          {evidence.description ||
+                            evidence.file.split("/").pop()}
+                        </Text>
+                        <ActionIcon
+                          variant="subtle"
+                          onClick={() => deleteEvidence(evidence.id)}
+                        >
+                          <IconX />
+                        </ActionIcon>
+                      </Group>
                     </div>
                   ))}
                 </SimpleGrid>

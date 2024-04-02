@@ -39,6 +39,29 @@ class EvidenceListView(APIView):
         evidence.policy.add(policy)
 
 
+class EvidenceDeleteView(APIView):
+    def delete(self, request, revision, control, evidence_id, format=None):
+        print("Hello?")
+        try:
+            # Retrieve the specific evidence item to be deleted.
+            # Assuming `evidence_id` is passed in the URL to this view.
+            policies = Policy.objects.filter(revision__id=revision, control=control)
+            print(f"Policies that match: {len(policies)}")
+            evidence = Evidence.objects.filter(
+                policy__in=policies, id=evidence_id
+            ).first()
+            if evidence:
+                evidence.delete()
+                return Response(status=status.HTTP_204_NO_CONTENT)
+            else:
+                return Response(
+                    {"error": "Evidence not found."}, status=status.HTTP_404_NOT_FOUND
+                )
+        except Evidence.DoesNotExist:
+            # If no evidence found with the provided ID
+            raise Http404
+
+
 class PolicyUpdateAPIView(APIView):
     def post(self, request, revision, control):
         policy = get_object_or_404(Policy, revision_id=revision, control_id=control)
