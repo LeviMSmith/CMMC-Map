@@ -1,0 +1,25 @@
+.imageContainer {
+  height: 200px;
+  width: 200px;
+  margin: auto;
+  overflow: hidden;
+  border-radius: rem(10px); /* Adjust according to your design */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 300ms ease-in-out;
+  margin-bottom: rem(32px);
+}
+
+.imageContainer:hover {
+  transform: scale(1.1); /* Scale up the image by 10% on hover */
+}
+
+.image {
+  border-radius: rem(10px); /* Ensures the image also has rounded corners */
+  cursor: pointer;
+}
+
+.icon {
+  transition: transform 300ms ease-in-out;
+}

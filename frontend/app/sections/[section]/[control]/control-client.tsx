@@ -18,11 +18,19 @@ import {
   Textarea,
   Title,
   Tooltip,
+  rem,
 } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { Dropzone, DronzoneProps } from "@mantine/dropzone";
-import { IconCheck, IconPlus, IconX } from "@tabler/icons-react";
+import {
+  IconCheck,
+  IconPlus,
+  IconX,
+  IconUpload,
+  IconFile,
+} from "@tabler/icons-react";
 import { useState, useEffect, useContext } from "react";
+import NextImage from "next/image";
 
 import {
   StateContextType,
@@ -30,6 +38,8 @@ import {
   ControlProgress,
 } from "@/components/state-provider";
 import { Control } from "@/lib/static-data";
+
+import styles from "./control-client.module.css";
 
 const getImplementationStatus = (tab: string) => {
   const mapping: { [key: string]: number } = {
@@ -352,19 +362,67 @@ export default function ControlDash({
         <Collapse in={evidenceAdd}>
           <Paper className="mt-8" shadow="lg" p={16}>
             <Dropzone
-              onDrop={(acceptedFiles) => setFiles(acceptedFiles)}
+              onDrop={(acceptedFiles) => setFiles([acceptedFiles[0]])}
+              onReject={(files) => console.error("rejected files", files)}
               mb="16"
+              maxSize={100 * 1024 ** 2}
+              multiple={false}
             >
-              <Text ta="center" size="xl">
-                Drag evidence files here or click to select files
-              </Text>
-              <Text ta="center" size="sm" c="dimmed">
-                Attach a file of any type.
-              </Text>
+              <Group
+                justify="center"
+                gap="xl"
+                mih={220}
+                style={{ pointerEvents: "none" }}
+              >
+                <Dropzone.Accept>
+                  <IconUpload
+                    style={{
+                      width: rem(52),
+                      height: rem(52),
+                      color: "var(--mantine-color-green-6)",
+                    }}
+                    stroke={1.5}
+                  />
+                </Dropzone.Accept>
+                <Dropzone.Reject>
+                  <IconX
+                    style={{
+                      width: rem(52),
+                      height: rem(52),
+                      color: "var(--mantine-color-red-6)",
+                    }}
+                    stroke={1.5}
+                  />
+                </Dropzone.Reject>
+                <Dropzone.Idle>
+                  <IconFile
+                    style={{
+                      width: rem(52),
+                      height: rem(52),
+                      color: "var(--mantine-color-dimmed)",
+                    }}
+                    stroke={1.5}
+                  />
+                </Dropzone.Idle>
+
+                <div>
+                  <Text ta="center" size="xl">
+                    Drag evidence files here or click to select files
+                  </Text>
+                  <Text ta="center" size="sm" c="dimmed">
+                    Attach a file of any type.
+                  </Text>
+                  {files.length > 0 && (
+                    <Text ta="center" mt={32}>
+                      Successfully uploaded {files.length} file.
+                    </Text>
+                  )}
+                </div>
+              </Group>
             </Dropzone>
             <Textarea
               placeholder="This screenshot shows..."
-              description="Give these files a description"
+              description="Give this file a description"
               value={description}
               onChange={(event) => setDescription(event.currentTarget.value)}
             />
@@ -374,23 +432,37 @@ export default function ControlDash({
           evidences.length > 0 ? (
             <>
               <div className="h-8" />
-              <Paper withBorder>
-                <SimpleGrid cols={3} p={32}>
+              <Paper withBorder className="w-full">
+                <SimpleGrid cols={{ base: 1, lg: 3 }} p={32}>
                   {evidences.map((evidence) => (
-                    <div key={evidence.id}>
-                      {evidence.file &&
-                      isImage(evidence.file) &&
-                      sharedState.backendUrl ? (
-                        <Image
-                          src={`${sharedState.backendUrl}${evidence.file}`}
-                          alt={evidence.description || "Evidence image"}
-                          height={200}
-                          fit="cover"
-                          m={16}
-                        />
-                      ) : null}
-                      <Text ta="center">
-                        {evidence.description || "Evidence has no description"}
+                    <div key={evidence.id} className="text-center m-4">
+                      <div className={styles.imageContainer}>
+                        {evidence.file &&
+                        isImage(evidence.file) &&
+                        sharedState.backendUrl ? (
+                          <NextImage
+                            src={`${sharedState.backendUrl}${evidence.file}`}
+                            alt={
+                              evidence.description ||
+                              evidence.file.split("/").pop()
+                            }
+                            height={200}
+                            width={200}
+                            className={styles.image}
+                            onClick={() => {
+                              /* Function to open image in a larger view */
+                            }}
+                          />
+                        ) : (
+                          <IconFile
+                            className={styles.icon}
+                            width="96"
+                            height="96"
+                          />
+                        )}
+                      </div>
+                      <Text ta="center" size="lg" fw={500}>
+                        {evidence.description || evidence.file.split("/").pop()}
                       </Text>
                     </div>
                   ))}
