@@ -29,6 +29,7 @@ import {
   IconUpload,
   IconFile,
 } from "@tabler/icons-react";
+import { useScrollIntoView } from "@mantine/hooks";
 import { useState, useEffect, useContext } from "react";
 import NextImage from "next/image";
 
@@ -39,6 +40,7 @@ import {
 } from "@/components/state-provider";
 import { Control } from "@/lib/static-data";
 
+import { Evidence, EvidenceList, isImage } from "./evidence";
 import styles from "./control-client.module.css";
 
 const getImplementationStatus = (tab: string) => {
@@ -49,13 +51,6 @@ const getImplementationStatus = (tab: string) => {
   };
   return mapping[tab] || 0;
 };
-
-interface Evidence {
-  id: number;
-  file?: string;
-  link?: string;
-  description?: string;
-}
 
 export default function ControlDash({
   control,
@@ -204,17 +199,19 @@ export default function ControlDash({
 
   useEffect(() => {
     const fetchEvidences = async () => {
-      try {
-        const response = await fetch(
-          `${sharedState.backendUrl}/api/revisions/${sharedState.revision_id}/policy/${control.id}/evidence/`,
-        );
-        if (!response.ok) {
-          throw new Error(`Error: ${response.status}`);
+      if (sharedState.backendUrl && sharedState.revision_id) {
+        try {
+          const response = await fetch(
+            `${sharedState.backendUrl}/api/revisions/${sharedState.revision_id}/policy/${control.id}/evidence/`,
+          );
+          if (!response.ok) {
+            throw new Error(`Error: ${response.status}`);
+          }
+          const data = await response.json();
+          setEvidences(data);
+        } catch (err: any) {
+          console.log(err.message);
         }
-        const data = await response.json();
-        setEvidences(data);
-      } catch (err: any) {
-        console.log(err.message);
       }
     };
 
@@ -265,7 +262,9 @@ export default function ControlDash({
         message: "Good job.",
       });
 
-      // Handle success, clear files and description, give user feedback, etc.
+      setFiles([]);
+      setDescription("");
+      setEvidenceAdd(false);
     } catch (error) {
       console.error(error);
       notifications.show({
@@ -315,8 +314,38 @@ export default function ControlDash({
     }
   };
 
-  const isImage = (fileName) => {
-    return /\.(jpg|jpeg|png|gif)$/i.test(fileName);
+  const EvidenceDisplay = ({ evidence }: { evidence: Evidence }) => {
+    return (
+      <div className="text-center m-4">
+        <div className={styles.imageContainer}>
+          {evidence.file && isImage(evidence.file) && sharedState.backendUrl ? (
+            <NextImage
+              src={`${sharedState.backendUrl}${evidence.file}`}
+              alt={evidence.description || evidence.file.split("/").pop()}
+              height={200}
+              width={200}
+              className={styles.image}
+              onClick={() => {
+                /* Function to download */
+              }}
+            />
+          ) : (
+            <IconFile className={styles.icon} width="96" height="96" />
+          )}
+        </div>
+        <Group wrap="nowrap" justify="center">
+          <Text ta="center" size="lg" fw={500} className="text-ellipsis">
+            {evidence.description || evidence.file.split("/").pop()}
+          </Text>
+          <ActionIcon
+            variant="subtle"
+            onClick={() => deleteEvidence(evidence.id)}
+          >
+            <IconX />
+          </ActionIcon>
+        </Group>
+      </div>
+    );
   };
 
   return (
@@ -473,6 +502,8 @@ export default function ControlDash({
               value={description}
               onChange={(event) => setDescription(event.currentTarget.value)}
             />
+            <Divider my={32} label="Or pick from existing evidence" />
+            <EvidenceList backendUrl={sharedState.backendUrl} />
           </Paper>
         </Collapse>
         {evidences ? (
@@ -481,51 +512,11 @@ export default function ControlDash({
               <div className="h-8" />
               <Paper withBorder className="w-full">
                 <SimpleGrid cols={{ base: 1, lg: 3 }} p={32}>
-                  {evidences.map((evidence) => (
-                    <div key={evidence.id} className="text-center m-4">
-                      <div className={styles.imageContainer}>
-                        {evidence.file &&
-                        isImage(evidence.file) &&
-                        sharedState.backendUrl ? (
-                          <NextImage
-                            src={`${sharedState.backendUrl}${evidence.file}`}
-                            alt={
-                              evidence.description ||
-                              evidence.file.split("/").pop()
-                            }
-                            height={200}
-                            width={200}
-                            className={styles.image}
-                            onClick={() => {
-                              /* Function to open image in a larger view */
-                            }}
-                          />
-                        ) : (
-                          <IconFile
-                            className={styles.icon}
-                            width="96"
-                            height="96"
-                          />
-                        )}
-                      </div>
-                      <Group wrap="nowrap">
-                        <Text
-                          ta="center"
-                          size="lg"
-                          fw={500}
-                          className="text-ellipsis"
-                        >
-                          {evidence.description ||
-                            evidence.file.split("/").pop()}
-                        </Text>
-                        <ActionIcon
-                          variant="subtle"
-                          onClick={() => deleteEvidence(evidence.id)}
-                        >
-                          <IconX />
-                        </ActionIcon>
-                      </Group>
-                    </div>
+                  {evidences.map((evidence, index) => (
+                    <EvidenceDisplay
+                      key={`Evidence display ${index}`}
+                      evidence={evidence}
+                    />
                   ))}
                 </SimpleGrid>
               </Paper>
