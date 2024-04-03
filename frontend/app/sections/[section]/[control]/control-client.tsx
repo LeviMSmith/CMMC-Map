@@ -8,7 +8,6 @@ import {
   Container,
   Divider,
   Group,
-  Image,
   Loader,
   Notification,
   Paper,
@@ -40,7 +39,7 @@ import {
 } from "@/components/state-provider";
 import { Control } from "@/lib/static-data";
 
-import { Evidence, EvidenceList, isImage } from "./evidence";
+import { Evidence, EvidenceList, EvidenceDisplay, isImage } from "./evidence";
 import styles from "./control-client.module.css";
 
 const getImplementationStatus = (tab: string) => {
@@ -314,40 +313,6 @@ export default function ControlDash({
     }
   };
 
-  const EvidenceDisplay = ({ evidence }: { evidence: Evidence }) => {
-    return (
-      <div className="text-center m-4">
-        <div className={styles.imageContainer}>
-          {evidence.file && isImage(evidence.file) && sharedState.backendUrl ? (
-            <NextImage
-              src={`${sharedState.backendUrl}${evidence.file}`}
-              alt={evidence.description || evidence.file.split("/").pop()}
-              height={200}
-              width={200}
-              className={styles.image}
-              onClick={() => {
-                /* Function to download */
-              }}
-            />
-          ) : (
-            <IconFile className={styles.icon} width="96" height="96" />
-          )}
-        </div>
-        <Group wrap="nowrap" justify="center">
-          <Text ta="center" size="lg" fw={500} className="text-ellipsis">
-            {evidence.description || evidence.file.split("/").pop()}
-          </Text>
-          <ActionIcon
-            variant="subtle"
-            onClick={() => deleteEvidence(evidence.id)}
-          >
-            <IconX />
-          </ActionIcon>
-        </Group>
-      </div>
-    );
-  };
-
   return (
     <Container>
       <h2 className="lessbigtitle">{control.section_name}</h2>
@@ -516,6 +481,8 @@ export default function ControlDash({
                     <EvidenceDisplay
                       key={`Evidence display ${index}`}
                       evidence={evidence}
+                      onDelete={() => deleteEvidence(evidence.id)}
+                      backendUrl={sharedState.backendUrl}
                     />
                   ))}
                 </SimpleGrid>

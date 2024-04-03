@@ -39,7 +39,10 @@ class EvidenceListView(APIView):
     def get(self, request, revision, control, format=None):
         policies = Policy.objects.filter(revision__id=revision, control=control)
         evidence_list = Evidence.objects.filter(policy__in=policies).distinct()
-        serializer = EvidenceSerializer(evidence_list, many=True)
+        # Pass 'context' with 'request' to the serializer
+        serializer = EvidenceSerializer(
+            evidence_list, many=True, context={"request": request}
+        )
         return Response(serializer.data)
 
     def post(self, request, revision, control, format=None):
