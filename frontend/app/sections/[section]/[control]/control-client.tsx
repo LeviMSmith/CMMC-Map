@@ -313,6 +313,10 @@ export default function ControlDash({
     }
   };
 
+  const { scrollIntoView, targetRef } = useScrollIntoView<HTMLDivElement>({
+    offset: 60,
+  });
+
   return (
     <Container>
       <h2 className="lessbigtitle">{control.section_name}</h2>
@@ -366,7 +370,7 @@ export default function ControlDash({
       <div className="h-16" />
       <Paper className="min-h-[300px]">
         <Group>
-          <Text fw={500} size="lg">
+          <Text fw={500} size="lg" ref={targetRef}>
             Evidence
           </Text>
           {evidenceAdd ? (
@@ -393,6 +397,7 @@ export default function ControlDash({
                 variant="light"
                 onClick={() => {
                   setEvidenceAdd(true);
+                  scrollIntoView();
                 }}
               >
                 <IconPlus />
