@@ -159,7 +159,10 @@ export function EvidenceList({
   const fetchEvidence = () => {
     setError(false); // Reset error state on new fetch attempt
     if (backendUrl) {
-      fetch(`${backendUrl}/api/evidence/?page=${page}`)
+      fetch(`${backendUrl}/api/evidence/?page=${page}`, {
+        method: "GET",
+        credentials: "include",
+      })
         .then((response) => {
           if (response.ok) {
             response.json().then((data) => {

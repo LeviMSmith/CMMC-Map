@@ -104,6 +104,10 @@ export const StateProvider = ({
   }
 
   useEffect(() => {
+    setSharedState({ ...sharedState, backendUrl: backendUrl });
+  }, [backendUrl]);
+
+  useEffect(() => {
     const fetchData = async () => {
       if (sharedState.revision_id) {
         try {
