@@ -1,25 +1,50 @@
 .imageContainer {
+  position: relative;
   height: 200px;
   width: 200px;
   margin: auto;
   overflow: hidden;
-  border-radius: rem(10px); /* Adjust according to your design */
+  border-radius: 10px; /* Assuming you want to use pixels; adjust as necessary */
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform 300ms ease-in-out;
-  margin-bottom: rem(32px);
-}
-
-.imageContainer:hover {
-  transform: scale(1.1); /* Scale up the image by 10% on hover */
-}
-
-.image {
-  border-radius: rem(10px); /* Ensures the image also has rounded corners */
+  transition: transform 200ms ease-in-out;
+  margin-bottom: 32px; /* If you're using a preprocessor that supports rem(), adjust accordingly */
   cursor: pointer;
 }
 
+.imageContainer:hover {
+  transform: scale(1.1); /* Scale up the image container by 10% on hover */
+}
+
+.overlay {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5); /* Gray overlay */
+  color: white;
+  justify-content: center;
+  align-items: center;
+  font-size: 24px; /* Icon size */
+  border-radius: 10px; /* Match the imageContainer's border-radius */
+  pointer-events: none;
+}
+
+.imageContainer:hover .overlay {
+  display: flex;
+}
+
+.image {
+  border-radius: 10px; /* Ensures the image also has rounded corners */
+  cursor: pointer;
+  width: 100%; /* Ensure it covers the container */
+  height: 100%; /* Ensure it covers the container */
+  object-fit: cover; /* Adjust the image as needed to cover the container */
+}
+
 .icon {
-  transition: transform 300ms ease-in-out;
+  transition: transform 200ms ease-in-out;
 }

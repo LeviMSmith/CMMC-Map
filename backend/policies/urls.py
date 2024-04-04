@@ -6,6 +6,7 @@ from .views import (
     PolicyUpdateAPIView,
     EvidenceListView,
     EvidenceDeleteView,
+    AllEvidenceListView,
 )
 
 urlpatterns = [
@@ -35,4 +36,5 @@ urlpatterns = [
         EvidenceDeleteView.as_view(),
         name="evidence-delete",
     ),
+    path("evidence/", AllEvidenceListView.as_view(), name="all-evidence"),
 ]
