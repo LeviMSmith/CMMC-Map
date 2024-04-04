@@ -473,7 +473,13 @@ export default function ControlDash({
               onChange={(event) => setDescription(event.currentTarget.value)}
             />
             <Divider my={32} label="Or pick from existing evidence" />
-            <EvidenceList backendUrl={sharedState.backendUrl} />
+            <EvidenceList
+              backendUrl={sharedState.backendUrl}
+              sharedState={sharedState}
+              controlId={control.id}
+              evidenceRefresh={evidenceRefresh}
+              setEvidenceRefresh={setEvidenceRefresh}
+            />
           </Paper>
         </Collapse>
         {evidences ? (

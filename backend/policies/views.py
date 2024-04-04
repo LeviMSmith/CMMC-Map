@@ -95,6 +95,30 @@ class EvidenceDeleteView(APIView):
         except Evidence.DoesNotExist:
             raise Http404
 
+    def post(self, request, revision, control, evidence_id, format=None):
+        # Find the policy based on revision and control
+        policy = Policy.objects.filter(revision__id=revision, control=control).first()
+        if not policy:
+            return Response(
+                {"error": "Policy not found."}, status=status.HTTP_404_NOT_FOUND
+            )
+
+        # Find the evidence by id
+        try:
+            evidence = Evidence.objects.get(id=evidence_id)
+        except Evidence.DoesNotExist:
+            return Response(
+                {"error": "Evidence not found."}, status=status.HTTP_404_NOT_FOUND
+            )
+
+        # Add the evidence to the policy
+        policy.evidence_set.add(evidence)
+
+        return Response(
+            {"success": "Evidence associated with the policy successfully."},
+            status=status.HTTP_200_OK,
+        )
+
 
 class PolicyUpdateAPIView(APIView):
     def post(self, request, revision, control):

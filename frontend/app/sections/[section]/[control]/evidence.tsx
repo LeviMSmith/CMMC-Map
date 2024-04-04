@@ -9,7 +9,8 @@ import {
   SimpleGrid,
   Text,
 } from "@mantine/core";
-import { IconFile, IconX, IconEye } from "@tabler/icons-react";
+import { notifications } from "@mantine/notifications";
+import { IconFile, IconPlus, IconX, IconEye } from "@tabler/icons-react";
 
 import NextImage from "next/image";
 import { useEffect, useState } from "react";
@@ -27,12 +28,63 @@ export const isImage = (fileName) => {
   return /\.(jpg|jpeg|png|gif)$/i.test(fileName);
 };
 
+function associateEvidenceToPolicy(
+  evidenceId: number,
+  sharedState: State,
+  controlId: number,
+  evidenceRefresh: any,
+  setEvidenceRefresh: any,
+) {
+  if (sharedState.backendUrl && sharedState.revision_id && controlId) {
+    // Constructing the URL for associating evidence to the policy
+    const url = `${sharedState.backendUrl}/api/revisions/${sharedState.revision_id}/policy/${controlId}/evidence/${evidenceId}/`;
+
+    fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        } else {
+          throw new Error("Failed to associate evidence with policy");
+        }
+      })
+      .then((data) => {
+        notifications.show({
+          title: "Evidence associated!",
+          message: "Evidence was successfully associated with the policy.",
+        });
+        setEvidenceRefresh(!evidenceRefresh);
+      })
+      .catch((error) => {
+        console.error(error);
+        notifications.show({
+          title: "Failed to associate evidence!",
+          message: "Try again later.",
+          color: "red",
+        });
+      });
+  } else {
+    console.error("Missing required information to associate evidence.");
+    notifications.show({
+      title: "Operation failed",
+      message: "Missing required information to associate evidence.",
+      color: "red",
+    });
+  }
+}
+
 export function EvidenceDisplay({
   evidence,
   onDelete,
+  onAdd,
 }: {
   evidence: Evidence;
   onDelete: any;
+  onAdd: any;
 }) {
   const openInNewTab = (url) => {
     window.open(url, "_blank", "noopener,noreferrer");
@@ -77,6 +129,11 @@ export function EvidenceDisplay({
             <IconX />
           </ActionIcon>
         )}
+        {onAdd && (
+          <ActionIcon variant="subtle" onClick={onAdd}>
+            <IconPlus />
+          </ActionIcon>
+        )}
       </Group>
     </div>
   );
@@ -84,8 +141,16 @@ export function EvidenceDisplay({
 
 export function EvidenceList({
   backendUrl,
+  sharedState,
+  controlId,
+  evidenceRefresh,
+  setEvidenceRefresh,
 }: {
   backendUrl: string | undefined;
+  sharedState: State;
+  controlId: number;
+  evidenceRefresh: any;
+  setEvidenceRefresh: any;
 }) {
   const [evidences, setEvidences] = useState<Evidence[]>([]);
   const [page, setPage] = useState(1);
@@ -141,6 +206,15 @@ export function EvidenceList({
               <EvidenceDisplay
                 key={`Evidence list ${index}`}
                 evidence={evidence}
+                onAdd={() => {
+                  associateEvidenceToPolicy(
+                    evidence.id,
+                    sharedState,
+                    controlId,
+                    evidenceRefresh,
+                    setEvidenceRefresh,
+                  );
+                }}
               />
             ))}
           </SimpleGrid>
