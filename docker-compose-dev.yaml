@@ -1,0 +1,65 @@
+services:
+  certgen:
+    image: nginx:latest
+    volumes:
+      - ./certs:/etc/ssl/certs
+    command: >
+      /bin/sh -c "
+        if [ ! -f /etc/ssl/certs/localhost.crt ]; then
+          openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/certs/localhost.key -out /etc/ssl/certs/localhost.crt -subj '/CN=localhost/O=Localhost/C=US' && echo 'Certificates ready.' || echo 'Error making certificate request';
+        else
+          echo 'Certificates already exist.';
+        fi"
+  nginx:
+    image: nginx:latest
+    ports:
+      - "443:443"
+    volumes:
+      - ./nginx:/etc/nginx/conf.d
+      - ./certs:/etc/ssl/certs:ro
+    depends_on:
+      - certgen
+      - backend
+      - frontend
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./backend:/app
+      - ./backend/media:/app/media
+    environment:
+      - PYTHONDONTWRITEBYTECODE=1
+      - PYTHONUNBUFFERED=1
+      - DATABASE_URL=mysql://cmmcmapdev:${MARIADB_PASSWORD}@db/cmmcmap
+      - DJANGO_DEBUG=${DJANGO_DEBUG}
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
+      - PROJECT_URL=${PROJECT_URL}
+    depends_on:
+      - db
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - BACKEND_URL=${PROJECT_URL}
+  db:
+    image: mariadb
+    volumes:
+      - dev_mariadb_data:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
+      - MYSQL_DATABASE=cmmcmap
+      - MYSQL_USER=cmmcmapdev
+      - MYSQL_PASSWORD=${MARIADB_PASSWORD}
+    ports:
+      - "3306:3306"
+
+volumes:
+  dev_mariadb_data:

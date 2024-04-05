@@ -12,7 +12,9 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 from datetime import timedelta
+from urllib.parse import urlparse
 import os
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -26,19 +28,22 @@ MEDIA_URL = "/media/"
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-wc6#g2ceprwldklyttt9hglx2%o8204$g+mtsx870jk4an24i("
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "default_secret_key_for_local_development")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv("DJANGO_DEBUG", False)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 CORS_ALLOW_CREDENTIALS = True
 
+
+PROJECT_URL = os.getenv("PROJECT_URL", "https://localhost")
+parsed_project_url = urlparse(PROJECT_URL)
+
 # Application definition
 CORS_ALLOWED_ORIGINS = [
-    "http://127.0.0.1:3000",
-    "http://localhost:3000",
+    f"{parsed_project_url.scheme}://{parsed_project_url.hostname}",
 ]
 
 INSTALLED_APPS = [
@@ -101,15 +106,7 @@ WSGI_APPLICATION = "cmmchandler.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.mysql",
-        "OPTIONS": {
-            "read_default_file": "dbcreds.cnf",
-            "init_command": "SET sql_mode='STRICT_TRANS_TABLES'; SET default_storage_engine=INNODB",
-        },
-    }
-}
+DATABASES = {"default": dj_database_url.config(default=os.getenv("DATABASE_URL"))}
 
 
 # Password validation

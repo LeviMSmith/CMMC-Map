@@ -1,0 +1,20 @@
+# Use the official lightweight Node.js base image.
+FROM node:20
+
+# Set the working directory in the Docker container
+WORKDIR /app
+
+# Copy package.json and package-lock.json to work directory to install dependencies
+COPY package*.json ./
+
+# Install dependencies in the container
+RUN yarn
+
+# Copy the rest of your application's code
+COPY . .
+
+# Expose the port on which your app will run
+EXPOSE 3000
+
+CMD ["yarn", "dev"]
+
