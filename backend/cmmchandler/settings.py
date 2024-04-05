@@ -12,7 +12,6 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 from datetime import timedelta
-from urllib.parse import urlparse
 import os
 import dj_database_url
 
@@ -28,24 +27,15 @@ MEDIA_URL = "/media/"
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "default_secret_key_for_local_development")
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv("DJANGO_DEBUG", False)
+DEBUG = os.getenv("DJANGO_DEBUG", "False").lower() in ["true", "1", "t", "y", "yes"]
 
 ALLOWED_HOSTS = ["*"]
 
-CORS_ALLOW_CREDENTIALS = True
-
-
-PROJECT_URL = os.getenv("PROJECT_URL", "https://localhost")
-parsed_project_url = urlparse(PROJECT_URL)
 
 # Application definition
-CORS_ALLOWED_ORIGINS = [
-    f"{parsed_project_url.scheme}://{parsed_project_url.hostname}",
-]
-
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -53,14 +43,12 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "corsheaders",
     "rest_framework",
     "rest_framework_simplejwt.token_blacklist",
     "policies.apps.PoliciesConfig",
 ]
 
 MIDDLEWARE = [
-    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -106,7 +94,9 @@ WSGI_APPLICATION = "cmmchandler.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-DATABASES = {"default": dj_database_url.config(default=os.getenv("DATABASE_URL"))}
+DATABASES = {
+    "default": dj_database_url.config(default=os.getenv("DJANGO_DATABASE_URL"))
+}
 
 
 # Password validation
@@ -126,6 +116,8 @@ AUTH_PASSWORD_VALIDATORS = [
         "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
+
+CSRF_TRUSTED_ORIGINS = [os.getenv("PROJECT_URL")]
 
 
 # Internationalization

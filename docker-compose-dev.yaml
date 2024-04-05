@@ -13,7 +13,7 @@ services:
   nginx:
     image: nginx:latest
     ports:
-      - "443:443"
+      - "3001:443"
     volumes:
       - ./nginx:/etc/nginx/conf.d
       - ./certs:/etc/ssl/certs:ro
@@ -31,9 +31,10 @@ services:
     environment:
       - PYTHONDONTWRITEBYTECODE=1
       - PYTHONUNBUFFERED=1
-      - DATABASE_URL=mysql://cmmcmapdev:${MARIADB_PASSWORD}@db/cmmcmap
+      - DJANGO_DATABASE_URL=mysql://cmmcmapdev:${MARIADB_PASSWORD}@db/cmmcmap
       - DJANGO_DEBUG=${DJANGO_DEBUG}
       - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
+      - DJANGO_ROOT_PASSWORD=${DJANGO_ROOT_PASSWORD}
       - PROJECT_URL=${PROJECT_URL}
     depends_on:
       - db

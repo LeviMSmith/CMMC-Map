@@ -2,3 +2,4 @@
 
 /.env.dev
 /.env.prod
+/.env
