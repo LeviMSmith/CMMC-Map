@@ -1,10 +1,35 @@
+# Node modules and build output
+node_modules
+.next
+out
+
+# Environment variables and secrets
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.*
+
+# Version control
 .git
 .gitignore
-.results
-scripts
-*Dockerfile*
-*dockerfile*
-node_modules
-.env*
-.next
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editors
+.vscode
+.idea
+*.swp
+*.swo
+*.sublime*
+
+# Logs
+*.log
+
+# Others
 README.md
+Dockerfile
+docker-compose.yml
+*.md

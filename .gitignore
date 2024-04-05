@@ -1,0 +1,5 @@
+/certs/
+
+/.env.dev
+/.env.prod
+/.env

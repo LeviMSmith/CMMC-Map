@@ -1,6 +1,0 @@
-[client]
-database = cmmcdjango
-user = cmmcdjango-prod
-password = 
-host = localhost
-default-character-set = utf8

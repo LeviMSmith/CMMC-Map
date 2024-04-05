@@ -10,6 +10,9 @@ from rest_framework import status, generics
 from django.shortcuts import get_object_or_404
 from django.db.models import Count
 from django.http import Http404
+from django.conf import settings
+from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
 from .models import Revision, Assessment, Section, Policy, Evidence
 from .serializers import (
     RevisionSerializer,
@@ -150,3 +153,36 @@ class AssessmentListView(generics.ListAPIView):
     def get_queryset(self):
         revision_id = self.kwargs["revision"]
         return Assessment.objects.filter(revision_id=revision_id)
+
+
+class CookieTokenObtainPairView(TokenObtainPairView):
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+
+        try:
+            serializer.is_valid(raise_exception=True)
+        except TokenError as e:
+            raise InvalidToken(e.args[0])
+
+        # Instead of returning tokens in the response body, set them as cookies
+        response = Response("Login Successful")
+        # Use Django's DEBUG setting to determine whether to set the cookies as secure
+        secure = (
+            not settings.DEBUG
+        )  # Cookies will be secure unless Django is in DEBUG mode
+
+        response.set_cookie(
+            "access",
+            serializer.validated_data["access"],
+            httponly=True,
+            secure=secure,  # Set based on DEBUG mode
+            samesite="Lax",
+        )
+        response.set_cookie(
+            "refresh",
+            serializer.validated_data["refresh"],
+            httponly=True,
+            secure=secure,  # Set based on DEBUG mode
+            samesite="Lax",
+        )
+        return response
