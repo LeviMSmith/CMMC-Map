@@ -41,7 +41,11 @@ export default function LoginPage() {
 
         const data = await response.json();
 
-        console.log(JSON.stringify(data));
+        const oBackendUrl = sharedState.backendUrl;
+
+        // Force everything to refresh
+        setSharedState({ ...sharedState, backendUrl: "" });
+        setSharedState({ ...sharedState, backendUrl: oBackendUrl });
 
         // Redirect or do something upon successful login
         router.push("/sections");

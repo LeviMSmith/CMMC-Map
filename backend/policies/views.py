@@ -166,23 +166,19 @@ class CookieTokenObtainPairView(TokenObtainPairView):
 
         # Instead of returning tokens in the response body, set them as cookies
         response = Response("Login Successful")
-        # Use Django's DEBUG setting to determine whether to set the cookies as secure
-        secure = (
-            not settings.DEBUG
-        )  # Cookies will be secure unless Django is in DEBUG mode
 
         response.set_cookie(
             "access",
             serializer.validated_data["access"],
             httponly=True,
-            secure=secure,  # Set based on DEBUG mode
-            samesite="Lax",
+            secure=True,
+            samesite="Strict",
         )
         response.set_cookie(
             "refresh",
             serializer.validated_data["refresh"],
             httponly=True,
-            secure=secure,  # Set based on DEBUG mode
-            samesite="Lax",
+            secure=True,
+            samesite="Strict",
         )
         return response
