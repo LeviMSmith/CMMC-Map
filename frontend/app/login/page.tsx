@@ -5,6 +5,7 @@ import { useState, useContext } from "react";
 import { useRouter } from "next/navigation";
 
 import { StateContextType, StateContext } from "@/components/state-provider";
+import { backendFetch } from "@/lib/session";
 
 export default function LoginPage() {
   const { sharedState, setSharedState } =
@@ -25,38 +26,31 @@ export default function LoginPage() {
       password: password,
     };
 
-    if (sharedState.backendUrl) {
-      try {
-        const response = await fetch(`${sharedState.backendUrl}/api/token/`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(loginData),
-        });
+    try {
+      const response = await backendFetch(`/api/token/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(loginData),
+      });
 
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-
-        const data = await response.json();
-
-        const oBackendUrl = sharedState.backendUrl;
-
-        // Force everything to refresh
-        setSharedState({ ...sharedState, backendUrl: "" });
-        setSharedState({ ...sharedState, backendUrl: oBackendUrl });
-
-        // Redirect or do something upon successful login
-        router.push("/sections");
-      } catch (err) {
-        setError("Failed to login. Check your credentials and try again.");
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
       }
-    } else {
-      console.error("Can't login. backendUrl not defined.");
-      setError(
-        "Looks like we're having trouble accessing the backend. Try again later",
-      );
+
+      const data = await response.json();
+
+      // Force everything to refresh
+      setSharedState({
+        ...sharedState,
+        refreshRevisions: !sharedState.refreshRevisions,
+      });
+
+      // Redirect or do something upon successful login
+      router.push("/sections");
+    } catch (err) {
+      setError("Failed to login. Check your credentials and try again.");
     }
   };
 
@@ -71,14 +65,18 @@ export default function LoginPage() {
           label="Username"
           placeholder="Your username"
           value={email}
-          onChange={(e) => setEmail(e.currentTarget.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setEmail(e.currentTarget.value)
+          }
           required
         />
         <TextInput
           label="Password"
           placeholder="Your password"
           value={password}
-          onChange={(e) => setPassword(e.currentTarget.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setPassword(e.currentTarget.value)
+          }
           required
           type="password"
           mt="md"

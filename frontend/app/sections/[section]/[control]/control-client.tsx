@@ -38,6 +38,7 @@ import {
   ControlProgress,
 } from "@/components/state-provider";
 import { Control } from "@/lib/static-data";
+import { backendFetch } from "@/lib/session";
 
 import { Evidence, EvidenceList, EvidenceDisplay, isImage } from "./evidence";
 import styles from "./control-client.module.css";
@@ -119,21 +120,15 @@ export default function ControlDash({
     );
 
     const handleSubmit = () => {
-      if (
-        sharedState.backendUrl &&
-        activeTab &&
-        sharedState.revision_id &&
-        control.id &&
-        description
-      ) {
+      if (activeTab && sharedState.revision_id && control.id && description) {
         const implementationStatus = getImplementationStatus(activeTab);
         const bodyData = {
           [`${activeTab}_description`]: description,
           implementation_status: implementationStatus,
         };
 
-        fetch(
-          `${sharedState.backendUrl}/api/revisions/${sharedState.revision_id}/policy/${control.id}/`,
+        backendFetch(
+          `/api/revisions/${sharedState.revision_id}/policy/${control.id}/`,
           {
             method: "POST",
             headers: {
@@ -171,7 +166,6 @@ export default function ControlDash({
       } else {
         console.error(
           "Bad vars. Not submitting.",
-          sharedState.backendUrl,
           activeTab,
           sharedState.revision_id,
           control.id,
@@ -219,10 +213,10 @@ export default function ControlDash({
 
   useEffect(() => {
     const fetchEvidences = async () => {
-      if (sharedState.backendUrl && sharedState.revision_id) {
+      if (sharedState.revision_id) {
         try {
-          const response = await fetch(
-            `${sharedState.backendUrl}/api/revisions/${sharedState.revision_id}/policy/${control.id}/evidence/`,
+          const response = await backendFetch(
+            `/api/revisions/${sharedState.revision_id}/policy/${control.id}/evidence/`,
             {
               method: "GET",
               credentials: "include",
@@ -240,15 +234,10 @@ export default function ControlDash({
     };
 
     fetchEvidences();
-  }, [
-    sharedState.revision_id,
-    control.id,
-    sharedState.backendUrl,
-    evidenceRefresh,
-  ]);
+  }, [sharedState.revision_id, control.id, evidenceRefresh]);
 
   const handleUpload = async () => {
-    if (!sharedState.backendUrl || !sharedState.revision_id) {
+    if (!sharedState.revision_id) {
       console.error("Cannot upload: query info not set");
       return;
     }
@@ -268,8 +257,8 @@ export default function ControlDash({
     }
 
     try {
-      const response = await fetch(
-        `${sharedState.backendUrl}/api/revisions/${sharedState.revision_id}/policy/${control.id}/evidence/`,
+      const response = await backendFetch(
+        `/api/revisions/${sharedState.revision_id}/policy/${control.id}/evidence/`,
         {
           method: "POST",
           body: formData,
@@ -299,9 +288,9 @@ export default function ControlDash({
   };
 
   const deleteEvidence = (evidence_id) => {
-    if (sharedState.backendUrl && sharedState.revision_id && control.id) {
-      fetch(
-        `${sharedState.backendUrl}/api/revisions/${sharedState.revision_id}/policy/${control.id}/evidence/${evidence_id}/`,
+    if (sharedState.revision_id && control.id) {
+      backendFetch(
+        `/api/revisions/${sharedState.revision_id}/policy/${control.id}/evidence/${evidence_id}/`,
         {
           method: "DELETE",
           credentials: "include",
@@ -497,7 +486,6 @@ export default function ControlDash({
             />
             <Divider my={32} label="Or pick from existing evidence" />
             <EvidenceList
-              backendUrl={sharedState.backendUrl}
               sharedState={sharedState}
               controlId={control.id}
               evidenceRefresh={evidenceRefresh}
@@ -516,7 +504,6 @@ export default function ControlDash({
                       key={`Evidence display ${index}`}
                       evidence={evidence}
                       onDelete={() => deleteEvidence(evidence.id)}
-                      backendUrl={sharedState.backendUrl}
                     />
                   ))}
                 </SimpleGrid>

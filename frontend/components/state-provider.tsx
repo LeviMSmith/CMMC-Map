@@ -2,6 +2,8 @@
 
 import { useState, useEffect, createContext } from "react";
 
+import { backendFetch } from "@/lib/session";
+
 export interface SectionProgress {
   "3.1": number;
   "3.2": number;
@@ -56,7 +58,7 @@ export interface State {
   sectionProgress?: SectionProgress | undefined | null;
   controlProgress?: ControlProgress[] | undefined | null;
   refreshControlProgress: boolean;
-  backendUrl?: string | undefined;
+  refreshRevisions: boolean;
 }
 
 export interface StateContextType {
@@ -64,58 +66,26 @@ export interface StateContextType {
   setSharedState: (newState: State) => void;
 }
 
-const mockProgress: SectionProgress = {
-  "3.1": 50,
-  "3.2": 25,
-  "3.3": 75,
-  "3.4": 33,
-  "3.5": 66,
-  "3.6": 99,
-  "3.7": 100,
-  "3.8": 0,
-  "3.9": 10,
-  "3.10": 20,
-  "3.11": 30,
-  "3.12": 40,
-  "3.13": 50,
-  "3.14": 60,
-};
-
 const defaultState: StateContextType = {
-  sharedState: { refreshControlProgress: false },
+  sharedState: { refreshControlProgress: false, refreshRevisions: false },
   setSharedState: () => {},
 };
 
 export const StateContext = createContext<StateContextType>(defaultState);
 
-export const StateProvider = ({
-  children,
-  backendUrl,
-}: {
-  children: React.ReactNode;
-  backendUrl: string | undefined;
-}) => {
+export const StateProvider = ({ children }: { children: React.ReactNode }) => {
   const [sharedState, setSharedState] = useState<State>(
     defaultState.sharedState,
   );
-
-  if (!backendUrl) {
-    console.error("BACKEND_URL is not set!");
-  }
-
-  useEffect(() => {
-    setSharedState({ ...sharedState, backendUrl: backendUrl });
-  }, [backendUrl]);
 
   useEffect(() => {
     const fetchData = async () => {
       if (sharedState.revision_id) {
         try {
-          const res = await fetch(
-            `${backendUrl}/api/revisions/${sharedState.revision_id}/policy/`,
+          const res = await backendFetch(
+            `/api/revisions/${sharedState.revision_id}/policy/`,
             {
               method: "GET",
-              credentials: "include",
             },
           );
 
@@ -143,7 +113,6 @@ export const StateProvider = ({
           updateSharedState({
             sectionProgress: istat as SectionProgress,
             controlProgress: cstat as ControlProgress[],
-            backendUrl: backendUrl,
           });
         } catch (error) {
           console.error("Failed to fetch implementation status", error);
@@ -152,7 +121,7 @@ export const StateProvider = ({
     };
 
     fetchData();
-  }, [sharedState.revision_id, backendUrl, sharedState.refreshControlProgress]);
+  }, [sharedState.revision_id, sharedState.refreshControlProgress]);
 
   const updateSharedState = (newState: Partial<State>) => {
     setSharedState((prevState = defaultState.sharedState) => ({

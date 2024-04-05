@@ -3,46 +3,38 @@ import type { NextRequest } from "next/server";
 
 import { jwtDecode } from "jwt-decode";
 
-async function refreshAccess() {
-  const response = await fetch("/api/token/refresh/", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    credentials: "include",
-  });
-}
-
 export async function middleware(request: NextRequest) {
-  const { cookies } = request;
-
-  const accessToken = cookies.get("access");
-  const refreshToken = cookies.get("refresh");
-
   const loginUrl = "/login";
 
-  if (!refreshToken && request.nextUrl.pathname !== loginUrl) {
-    return NextResponse.redirect(new URL(loginUrl, request.url));
+  if (request.nextUrl.pathname === loginUrl) {
+    return NextResponse.next();
   }
 
-  if (!accessToken) {
-    await refreshAccess();
-  } else {
-    const decodedAccess = jwtDecode(accessToken.value);
+  const { cookies } = request;
+
+  const refreshToken = cookies.get("refresh");
+  const accessToken = cookies.get("access");
+
+  if (refreshToken) {
+    const decodedRefresh = jwtDecode(refreshToken.value);
     const currentTime = Date.now() / 1000;
 
-    if (decodedAccess.exp < currentTime) {
-      await refreshAccess();
+    if (decodedRefresh.exp < currentTime) {
+      return NextResponse.redirect(new URL(loginUrl, request.url));
     }
+  } else {
+    return NextResponse.redirect(new URL(loginUrl, request.url));
   }
 
-  if (!accessToken) {
-    return NextResponse.redirect(new URL(loginUrl, request.url));
-  } else {
+  if (accessToken) {
     const decodedAccess = jwtDecode(accessToken.value);
     const currentTime = Date.now() / 1000;
 
     if (decodedAccess.exp < currentTime) {
       return NextResponse.redirect(new URL(loginUrl, request.url));
     }
+  } else {
+    return NextResponse.redirect(new URL(loginUrl, request.url));
   }
 
   return NextResponse.next();

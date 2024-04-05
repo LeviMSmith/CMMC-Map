@@ -2,6 +2,7 @@ from django.urls import path
 from rest_framework_simplejwt.views import TokenRefreshView
 from .views import (
     CookieTokenObtainPairView,
+    CookieTokenRefreshView,
     RevisionListView,
     AssessmentListView,
     policy_status_by_section,
@@ -40,5 +41,5 @@ urlpatterns = [
     ),
     path("evidence/", AllEvidenceListView.as_view(), name="all-evidence"),
     path("token/", CookieTokenObtainPairView.as_view(), name="token_obtain_pair"),
-    path("token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
+    path("token/refresh/", CookieTokenRefreshView.as_view(), name="token_refresh"),
 ]

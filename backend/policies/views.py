@@ -3,16 +3,18 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework.views import APIView
-from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import ValidationError, AuthenticationFailed
 from rest_framework.generics import GenericAPIView
 from rest_framework.mixins import ListModelMixin
 from rest_framework import status, generics
 from django.shortcuts import get_object_or_404
 from django.db.models import Count
-from django.http import Http404
+from django.http import Http404, JsonResponse
 from django.conf import settings
-from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
+from rest_framework_simplejwt.backends import TokenBackend
+from rest_framework_simplejwt.settings import api_settings
 from .models import Revision, Assessment, Section, Policy, Evidence
 from .serializers import (
     RevisionSerializer,
@@ -181,4 +183,35 @@ class CookieTokenObtainPairView(TokenObtainPairView):
             secure=True,
             samesite="Strict",
         )
+        return response
+
+
+class CookieTokenRefreshView(TokenRefreshView):
+    def post(self, request, *args, **kwargs):
+        refresh_token = request.COOKIES.get("refresh", None)
+        if not refresh_token:
+            return Response("Refresh token not found in cookies", status=400)
+
+        request.data["refresh"] = refresh_token
+        serializer = self.get_serializer(data=request.data)
+
+        try:
+            serializer.is_valid(raise_exception=True)
+        except TokenError as e:
+            raise InvalidToken(e.args[0])
+
+        # We don't need to set the refresh token again, just the access token
+        response = Response("Access token refreshed successfully")
+
+        response.set_cookie(
+            "access",
+            serializer.validated_data["access"],
+            httponly=True,
+            secure=True,
+            samesite="Strict",
+        )
+
+        # Optionally, if you're also refreshing the refresh token itself, you'd set it here
+        # This depends on your token refresh policy/strategy
+
         return response

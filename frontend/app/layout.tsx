@@ -21,8 +21,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const backendUrl: string | undefined = process.env.BACKEND_URL;
-
   return (
     <html lang="en">
       <head>
@@ -31,8 +29,8 @@ export default function RootLayout({
       </head>
       <body>
         <MantineProvider theme={theme}>
-          <StateProvider backendUrl={backendUrl}>
-            <Header backendUrl={backendUrl} />
+          <StateProvider>
+            <Header />
             {children}
             <div className="h-16" />
           </StateProvider>

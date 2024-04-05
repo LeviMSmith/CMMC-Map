@@ -13,7 +13,7 @@ services:
   nginx:
     image: nginx:latest
     ports:
-      - "3001:443"
+      - "3001:3001"
     volumes:
       - ./nginx:/etc/nginx/conf.d
       - ./certs:/etc/ssl/certs:ro
@@ -49,7 +49,7 @@ services:
       - "3000:3000"
     environment:
       - NODE_ENV=development
-      - BACKEND_URL=${PROJECT_URL}
+      - NEXT_PUBLIC_BACKEND_URL=${PROJECT_URL}
   db:
     image: mariadb
     volumes:

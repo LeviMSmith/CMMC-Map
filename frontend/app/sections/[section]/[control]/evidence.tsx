@@ -15,6 +15,7 @@ import { IconFile, IconPlus, IconX, IconEye } from "@tabler/icons-react";
 import NextImage from "next/image";
 import { useEffect, useState } from "react";
 
+import { backendFetch } from "@/lib/session";
 import styles from "./control-client.module.css";
 
 export interface Evidence {
@@ -35,11 +36,11 @@ function associateEvidenceToPolicy(
   evidenceRefresh: any,
   setEvidenceRefresh: any,
 ) {
-  if (sharedState.backendUrl && sharedState.revision_id && controlId) {
+  if (sharedState.revision_id && controlId) {
     // Constructing the URL for associating evidence to the policy
-    const url = `${sharedState.backendUrl}/api/revisions/${sharedState.revision_id}/policy/${controlId}/evidence/${evidenceId}/`;
+    const url = `/api/revisions/${sharedState.revision_id}/policy/${controlId}/evidence/${evidenceId}/`;
 
-    fetch(url, {
+    backendFetch(url, {
       method: "POST",
       credentials: "include",
       headers: {
@@ -91,6 +92,10 @@ export function EvidenceDisplay({
     window.open(url, "_blank", "noopener,noreferrer");
   };
 
+  const dontMessWithMyUrlDagummitLoader = ({ src }) => {
+    return src;
+  };
+
   return (
     <div className="text-center m-4">
       <div
@@ -100,6 +105,7 @@ export function EvidenceDisplay({
         {evidence.file && isImage(evidence.file) ? (
           <>
             <NextImage
+              loader={dontMessWithMyUrlDagummitLoader}
               src={evidence.file}
               alt={evidence.description || evidence.file.split("/").pop()}
               height={200}
@@ -122,7 +128,7 @@ export function EvidenceDisplay({
         )}
       </div>
       <Group wrap="nowrap" justify="center">
-        <Text ta="center" size="lg" fw={500} className="text-ellipsis">
+        <Text ta="center" size="lg" fw={500} truncate="end">
           {evidence.description || evidence.file.split("/").pop()}
         </Text>
         {onDelete && (
@@ -141,13 +147,11 @@ export function EvidenceDisplay({
 }
 
 export function EvidenceList({
-  backendUrl,
   sharedState,
   controlId,
   evidenceRefresh,
   setEvidenceRefresh,
 }: {
-  backendUrl: string | undefined;
   sharedState: State;
   controlId: number;
   evidenceRefresh: any;
@@ -159,34 +163,32 @@ export function EvidenceList({
 
   const fetchEvidence = () => {
     setError(false); // Reset error state on new fetch attempt
-    if (backendUrl) {
-      fetch(`${backendUrl}/api/evidence/?page=${page}`, {
-        method: "GET",
-        credentials: "include",
+    backendFetch(`/api/evidence/?page=${page}`, {
+      method: "GET",
+      credentials: "include",
+    })
+      .then((response) => {
+        if (response.ok) {
+          response.json().then((data) => {
+            if (data.results.length > 0) {
+              setEvidences((prev) => [...prev, ...data.results]);
+            } else {
+              setError(true);
+            }
+          });
+        } else {
+          throw new Error("Network response was not ok");
+        }
       })
-        .then((response) => {
-          if (response.ok) {
-            response.json().then((data) => {
-              if (data.results.length > 0) {
-                setEvidences((prev) => [...prev, ...data.results]);
-              } else {
-                setError(true);
-              }
-            });
-          } else {
-            throw new Error("Network response was not ok");
-          }
-        })
-        .catch((error) => {
-          console.error("Failed to get evidence list!", error);
-          setError(true); // Set error state to true on fetch failure
-        });
-    }
+      .catch((error) => {
+        console.error("Failed to get evidence list!", error);
+        setError(true); // Set error state to true on fetch failure
+      });
   };
 
   useEffect(() => {
     fetchEvidence();
-  }, [page, backendUrl]);
+  }, [page]);
 
   return (
     <>

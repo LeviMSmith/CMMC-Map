@@ -29,6 +29,7 @@ import {
   StateContextType,
 } from "@/components/state-provider";
 import { Revision, Assessment } from "@/lib/static-data";
+import { backendFetch } from "@/lib/session";
 import styles from "./header.module.css";
 
 function CurrentUrlSections() {
@@ -210,11 +211,7 @@ const AssessmentSelect = ({
   );
 };
 
-export default function Header({
-  backendUrl,
-}: {
-  backendUrl: string | undefined;
-}) {
+export default function Header() {
   const { sharedState, setSharedState } =
     useContext<StateContextType>(StateContext);
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
@@ -222,14 +219,10 @@ export default function Header({
   const [revisions, setRevisions] = useState<Revision[] | undefined>();
   const [assessments, setAssessments] = useState<Assessment[] | undefined>();
 
-  if (!backendUrl) {
-    console.error("BACKEND_URL is not set!");
-  }
-
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetch(`${backendUrl}/api/revisions/`);
+        const res = await backendFetch(`/api/revisions/`);
         const data = await res.json();
 
         const revisions: Revision[] = data.map((revision: Revision) => {
@@ -262,13 +255,13 @@ export default function Header({
     };
 
     fetchData();
-  }, []);
+  }, [sharedState.refreshRevisions]);
 
   useEffect(() => {
     const fetchAssessments = async (revisionId: string) => {
       try {
-        const res = await fetch(
-          `${backendUrl}/api/revisions/${revisionId}/assessments/`,
+        const res = await backendFetch(
+          `/api/revisions/${revisionId}/assessments/`,
           {
             method: "GET",
             credentials: "include",
