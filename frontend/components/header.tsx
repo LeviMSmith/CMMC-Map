@@ -269,6 +269,10 @@ export default function Header({
       try {
         const res = await fetch(
           `${backendUrl}/api/revisions/${revisionId}/assessments/`,
+          {
+            method: "GET",
+            credentials: "include",
+          },
         );
         const data = await res.json();
         const assessments = data.map((assessment: Assessment) => {

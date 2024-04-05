@@ -139,10 +139,17 @@ export default function ControlDash({
             headers: {
               "Content-Type": "application/json",
             },
+            credentials: "include",
             body: JSON.stringify(bodyData),
           },
         )
-          .then((response) => response.json())
+          .then((response) => {
+            if (!response.ok) {
+              // If the response is not ok, throw an error to be caught by the catch block
+              throw new Error("Failed to fetch. Status: " + response.status);
+            }
+            return response.json(); // Return the promise to the next then() if ok
+          })
           .then((data) => {
             setSharedState({
               ...sharedState,
@@ -161,6 +168,20 @@ export default function ControlDash({
               color: "red",
             });
           });
+      } else {
+        console.error(
+          "Bad vars. Not submitting.",
+          sharedState.backendUrl,
+          activeTab,
+          sharedState.revision_id,
+          control.id,
+          description,
+        );
+        notifications.show({
+          title: "Failed to update policy!",
+          message: "Try again later.",
+          color: "red",
+        });
       }
     };
 
@@ -202,6 +223,10 @@ export default function ControlDash({
         try {
           const response = await fetch(
             `${sharedState.backendUrl}/api/revisions/${sharedState.revision_id}/policy/${control.id}/evidence/`,
+            {
+              method: "GET",
+              credentials: "include",
+            },
           );
           if (!response.ok) {
             throw new Error(`Error: ${response.status}`);
@@ -248,10 +273,7 @@ export default function ControlDash({
         {
           method: "POST",
           body: formData,
-          // Include headers if needed, for example, for authentication
-          // headers: {
-          //   'Authorization': 'Bearer YOUR_TOKEN',
-          // },
+          credentials: "include",
         },
       );
 
@@ -282,6 +304,7 @@ export default function ControlDash({
         `${sharedState.backendUrl}/api/revisions/${sharedState.revision_id}/policy/${control.id}/evidence/${evidence_id}/`,
         {
           method: "DELETE",
+          credentials: "include",
           headers: {
             "Content-Type": "application/json",
           },

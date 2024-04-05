@@ -41,6 +41,7 @@ function associateEvidenceToPolicy(
 
     fetch(url, {
       method: "POST",
+      credentials: "include",
       headers: {
         "Content-Type": "application/json",
       },
@@ -166,7 +167,11 @@ export function EvidenceList({
         .then((response) => {
           if (response.ok) {
             response.json().then((data) => {
-              setEvidences((prev) => [...prev, ...data.results]);
+              if (data.results.length > 0) {
+                setEvidences((prev) => [...prev, ...data.results]);
+              } else {
+                setError(true);
+              }
             });
           } else {
             throw new Error("Network response was not ok");

@@ -113,6 +113,10 @@ export const StateProvider = ({
         try {
           const res = await fetch(
             `${backendUrl}/api/revisions/${sharedState.revision_id}/policy/`,
+            {
+              method: "GET",
+              credentials: "include",
+            },
           );
 
           const data = await res.json();
