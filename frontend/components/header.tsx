@@ -9,6 +9,7 @@ import {
   Title,
   ActionIcon,
   TextInput,
+  Popover,
   Select,
   Loader,
   Tooltip,
@@ -76,44 +77,89 @@ function CurrentUrlSections() {
 }
 
 interface AddIconProps {
-  disableText?: string; // Marking disableText as optional with '?'
+  addUrl: string;
+  disableText?: string;
+  placeholder?: string;
 }
 
 const AddIcon: React.FC<AddIconProps> = ({
+  addUrl,
   disableText,
-  revision,
-}: {
-  disableText: string | undefined;
-  addUrl: string;
+  placeholder,
 }) => {
   const [newRevisionOpen, setNewRevisionOpen] = useState<boolean>(false);
   const [newRevisionName, setNewRevisionName] = useState<string>("");
 
+  const handleSubmit = async () => {
+    if (!newRevisionName.trim()) return; // Prevent submitting empty names
+
+    // Here you would call your API to add the new revision
+    console.log("Submitting new revision name:", newRevisionName);
+    // Example POST request using fetch API
+    try {
+      const response = await backendFetch(addUrl, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          version: newRevisionName,
+          name: newRevisionName,
+        }),
+      });
+      if (response.ok) {
+        // Handle successful submission
+        console.log("Revision added successfully");
+      } else {
+        // Handle server errors or invalid responses
+        console.error("Failed to add revision");
+      }
+    } catch (error) {
+      // Handle network errors
+      console.error("Error submitting revision:", error);
+    }
+    // Reset state and close popover
+    setNewRevisionName("");
+    setNewRevisionOpen(false);
+  };
+
+  const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter") {
+      handleSubmit();
+    }
+  };
+
   if (disableText) {
     return (
-      <>
-        <Tooltip label={disableText}>
-          <ActionIcon
-            variant="subtle"
-            disabled
-            onClick={(event) => event.preventDefault()}
-          >
-            <IconPlus />
-          </ActionIcon>
-        </Tooltip>
-      </>
+      <Tooltip label={disableText}>
+        <ActionIcon variant="subtle" disabled>
+          <IconPlus />
+        </ActionIcon>
+      </Tooltip>
     );
   }
 
   return (
-    <ActionIcon
-      variant="subtle"
-      onClick={() => {
-        console.log("add button");
-      }}
-    >
-      <IconPlus />
-    </ActionIcon>
+    <Popover opened={newRevisionOpen} onChange={setNewRevisionOpen}>
+      <Popover.Target>
+        <ActionIcon
+          variant="subtle"
+          onClick={() => setNewRevisionOpen((o) => !o)}
+        >
+          <IconPlus />
+        </ActionIcon>
+      </Popover.Target>
+      <Popover.Dropdown>
+        <TextInput
+          value={newRevisionName}
+          onChange={(e) => setNewRevisionName(e.currentTarget.value)}
+          placeholder={placeholder || "Enter new name"}
+          onKeyPress={handleKeyPress}
+          autoFocus // Automatically focus the input when the popover opens
+        />
+      </Popover.Dropdown>
+    </Popover>
   );
 };
 
@@ -141,7 +187,7 @@ const RevisionSelect = ({
     return (
       <Group>
         <Text>Add revision</Text>
-        <AddIcon />
+        <AddIcon addUrl="/api/revisions/" />
       </Group>
     );
   }
@@ -159,7 +205,7 @@ const RevisionSelect = ({
         });
       }}
       rightSectionPointerEvents="auto"
-      rightSection={AddIcon({})}
+      rightSection={AddIcon({ addUrl: "/api/revisions/" })}
       allowDeselect={false}
     />
   ) : (
@@ -196,7 +242,9 @@ const AssessmentSelect = ({
     return (
       <Group>
         <Text>Add assessment</Text>
-        <AddIcon />
+        <AddIcon
+          addUrl={`/api/revisions/${sharedState.revision_id}/assessments/`}
+        />
       </Group>
     );
   }
@@ -214,7 +262,9 @@ const AssessmentSelect = ({
         });
       }}
       rightSectionPointerEvents="auto"
-      rightSection={AddIcon({})}
+      rightSection={AddIcon({
+        addUrl: `/api/revisions/${sharedState.revision_id}/assessments/`,
+      })}
       allowDeselect={false}
     />
   ) : (

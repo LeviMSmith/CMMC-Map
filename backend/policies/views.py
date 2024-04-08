@@ -178,12 +178,27 @@ class RevisionView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class AssessmentListView(generics.ListAPIView):
-    serializer_class = AssessmentSerializer
+class AssessmentView(APIView):
+    """
+    List all assessments for a specific revision, or create a new assessment.
+    """
 
-    def get_queryset(self):
-        revision_id = self.kwargs["revision"]
-        return Assessment.objects.filter(revision_id=revision_id)
+    def get(self, request, revision_id, format=None):
+        assessments = Assessment.objects.filter(revision_id=revision_id)
+        serializer = AssessmentSerializer(assessments, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, revision_id, format=None):
+        # Update the request data with the revision_id
+        modified_data = request.data.copy()  # Create a mutable copy of the request data
+        modified_data["revision_id"] = revision_id  # Set the revision ID
+
+        serializer = AssessmentSerializer(data=modified_data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class CookieTokenObtainPairView(TokenObtainPairView):

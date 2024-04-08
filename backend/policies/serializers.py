@@ -42,9 +42,11 @@ class RevisionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Revision
         fields = ["id", "version", "date_completed"]
+        read_only_fields = ["id"]
 
 
 class AssessmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Assessment
         fields = ["id", "name", "started", "finished"]
+        read_only_fields = ["id"]
