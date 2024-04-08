@@ -4,6 +4,10 @@ FROM python:3.11
 # Set the working directory in the container
 WORKDIR /app
 
+# Install MariaDB client
+# Note: The list of packages is updated first to make sure we get the latest version available
+RUN apt-get update && apt-get install -y mariadb-client && rm -rf /var/lib/apt/lists/*
+
 # Install any needed packages specified in requirements.txt
 COPY requirements.txt /app/
 RUN pip install --no-cache-dir -r requirements.txt
