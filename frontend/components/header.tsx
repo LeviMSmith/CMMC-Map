@@ -14,6 +14,7 @@ import {
   Loader,
   Tooltip,
 } from "@mantine/core";
+import { notifications } from "@mantine/notifications";
 import {
   IconSearch,
   IconFileDescription,
@@ -80,22 +81,23 @@ interface AddIconProps {
   addUrl: string;
   disableText?: string;
   placeholder?: string;
+  refresh: () => void;
 }
 
 const AddIcon: React.FC<AddIconProps> = ({
   addUrl,
   disableText,
   placeholder,
+  refresh,
 }) => {
   const [newRevisionOpen, setNewRevisionOpen] = useState<boolean>(false);
   const [newRevisionName, setNewRevisionName] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const handleSubmit = async () => {
     if (!newRevisionName.trim()) return; // Prevent submitting empty names
 
-    // Here you would call your API to add the new revision
-    console.log("Submitting new revision name:", newRevisionName);
-    // Example POST request using fetch API
+    setIsLoading(true);
     try {
       const response = await backendFetch(addUrl, {
         method: "POST",
@@ -111,17 +113,29 @@ const AddIcon: React.FC<AddIconProps> = ({
       if (response.ok) {
         // Handle successful submission
         console.log("Revision added successfully");
+        setNewRevisionName("");
+        setNewRevisionOpen(false);
+        refresh();
       } else {
         // Handle server errors or invalid responses
-        console.error("Failed to add revision");
+        console.error("Failed to add");
+        notifications.show({
+          title: "Couldn't add.",
+          message: "Got a backend error",
+          color: "red",
+        });
       }
     } catch (error) {
       // Handle network errors
       console.error("Error submitting revision:", error);
+      notifications.show({
+        title: "Couldn't add.",
+        message: "Got a network error",
+        color: "red",
+      });
+    } finally {
+      setIsLoading(false); // End loading regardless of outcome
     }
-    // Reset state and close popover
-    setNewRevisionName("");
-    setNewRevisionOpen(false);
   };
 
   const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -151,13 +165,16 @@ const AddIcon: React.FC<AddIconProps> = ({
         </ActionIcon>
       </Popover.Target>
       <Popover.Dropdown>
-        <TextInput
-          value={newRevisionName}
-          onChange={(e) => setNewRevisionName(e.currentTarget.value)}
-          placeholder={placeholder || "Enter new name"}
-          onKeyPress={handleKeyPress}
-          autoFocus // Automatically focus the input when the popover opens
-        />
+        <div className="flex items-center">
+          <TextInput
+            value={newRevisionName}
+            onChange={(e) => setNewRevisionName(e.currentTarget.value)}
+            placeholder={placeholder || "Enter new name"}
+            onKeyPress={handleKeyPress}
+            autoFocus
+          />
+          {isLoading && <Loader size="xs" style={{ marginLeft: 10 }} />}
+        </div>
       </Popover.Dropdown>
     </Popover>
   );
@@ -182,12 +199,20 @@ const RevisionSelect = ({
     return <Loader type="dots" />;
   }
 
+  const refresh = () => {
+    setSharedState({
+      ...sharedState,
+      refreshRevisions: !sharedState.refreshRevisions,
+      revision_id: undefined,
+    });
+  };
+
   // Scenario 2: revisionOptions is an empty array
   if (revisionOptions.length === 0) {
     return (
       <Group>
         <Text>Add revision</Text>
-        <AddIcon addUrl="/api/revisions/" />
+        <AddIcon addUrl="/api/revisions/" refresh={refresh} />
       </Group>
     );
   }
@@ -205,7 +230,10 @@ const RevisionSelect = ({
         });
       }}
       rightSectionPointerEvents="auto"
-      rightSection={AddIcon({ addUrl: "/api/revisions/" })}
+      rightSection={AddIcon({
+        addUrl: "/api/revisions/",
+        refresh: refresh,
+      })}
       allowDeselect={false}
     />
   ) : (
@@ -237,6 +265,14 @@ const AssessmentSelect = ({
     return <Loader type="dots" />;
   }
 
+  const refresh = () => {
+    setSharedState({
+      ...sharedState,
+      refreshRevisions: !sharedState.refreshRevisions,
+      revision_id: undefined,
+    });
+  };
+
   // Scenario 2: assessmentOptions is an empty array
   if (assessmentOptions.length === 0) {
     return (
@@ -244,6 +280,7 @@ const AssessmentSelect = ({
         <Text>Add assessment</Text>
         <AddIcon
           addUrl={`/api/revisions/${sharedState.revision_id}/assessments/`}
+          refresh={refresh}
         />
       </Group>
     );
@@ -264,6 +301,7 @@ const AssessmentSelect = ({
       rightSectionPointerEvents="auto"
       rightSection={AddIcon({
         addUrl: `/api/revisions/${sharedState.revision_id}/assessments/`,
+        refresh: refresh,
       })}
       allowDeselect={false}
     />

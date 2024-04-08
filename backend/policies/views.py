@@ -191,7 +191,7 @@ class AssessmentView(APIView):
     def post(self, request, revision_id, format=None):
         # Update the request data with the revision_id
         modified_data = request.data.copy()  # Create a mutable copy of the request data
-        modified_data["revision_id"] = revision_id  # Set the revision ID
+        modified_data["revision"] = int(revision_id)
 
         serializer = AssessmentSerializer(data=modified_data)
         if serializer.is_valid():
