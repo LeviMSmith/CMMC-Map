@@ -5,6 +5,12 @@
   margin-bottom: rem(128px);
 }
 
+@media print {
+  .header {
+    display: none !important;
+  }
+}
+
 .headersection {
   padding-bottom: rem(16px);
   padding-top: rem(16px);

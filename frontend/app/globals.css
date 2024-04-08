@@ -20,3 +20,9 @@
   transform: scale(1.03); /* Make the div 10% larger */
   box-shadow: 0 5px 15px var(--mantine-color-green-2); /* Add a drop shadow */
 }
+
+@media print {
+  body {
+    color: black;
+  }
+}

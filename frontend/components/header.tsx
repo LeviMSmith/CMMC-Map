@@ -26,6 +26,7 @@ import {
   IconSun,
   IconMoon,
   IconLogout,
+  IconHome,
 } from "@tabler/icons-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -45,38 +46,52 @@ function CurrentUrlSections() {
   const pathname = usePathname();
 
   const path = pathname.split("?")[0].split("#")[0];
-
   const sections = path.split("/").filter(Boolean);
 
-  const navigateTo = (path: string) => () => {
-    router.push(path);
-  };
+  if (sections[0] !== "sections") {
+    return (
+      <Button
+        onClick={() => {
+          router.push("/");
+        }}
+        variant="light"
+        className="min-w-[100px]"
+      >
+        <IconHome />
+      </Button>
+    );
+  }
 
   type PathAndLabel = {
     path: string;
     label: string;
+    isHome?: boolean; // Optional flag to indicate the home button
   };
 
-  const pathsAndLabels: PathAndLabel[] = sections.reduce<PathAndLabel[]>(
-    (acc, curr, index) => {
-      const pathSoFar = "/" + sections.slice(0, index + 1).join("/");
+  // Prepend a special "Home" entry to the navigation paths
+  const pathsAndLabels: PathAndLabel[] = [
+    { path: "/", label: "Home", isHome: true },
+  ].concat(
+    sections.slice(1).reduce<PathAndLabel[]>((acc, curr, index) => {
+      // Start slice from 1 to exclude 'sections'
+      const pathSoFar = "/" + sections.slice(0, index + 2).join("/"); // Adjust index due to slicing
       const label = curr;
       acc.push({ path: pathSoFar, label });
       return acc;
-    },
-    [],
+    }, []),
   );
 
   return (
     <Group>
-      {pathsAndLabels.map(({ path, label }, index) => (
+      {pathsAndLabels.map(({ path, label, isHome }, index) => (
         <Button
           key={index}
           variant="light"
           disabled={index === pathsAndLabels.length - 1}
-          onClick={navigateTo(path)}
+          onClick={() => router.push(path)}
+          className="min-w-[100px]"
         >
-          {label}
+          {isHome ? <IconHome /> : label}{" "}
         </Button>
       ))}
     </Group>
@@ -412,6 +427,15 @@ export default function Header() {
     }
   }, [sharedState.revision_id]);
 
+  const pathname = usePathname();
+
+  const path = pathname.split("?")[0].split("#")[0];
+  const sections = path.split("/").filter(Boolean);
+
+  if (sections[0] === "login") {
+    return null;
+  }
+
   var revisionOptions: SelectOption[] | undefined;
   if (revisions !== undefined && revisions.length > 0) {
     revisionOptions = revisions.map((revision: Revision) => {
@@ -472,8 +496,24 @@ export default function Header() {
         </Stack>
         <Stack className={styles.headersection}>
           <Text fw={700}>Reports</Text>
-          <Button variant="light">System Security Plan</Button>
-          <Button variant="light">Plan of Action and Milestones</Button>
+          <Button
+            variant="light"
+            onClick={() => {
+              router.push("/ssp");
+              setMenuOpen(false);
+            }}
+          >
+            System Security Plan
+          </Button>
+          <Button
+            variant="light"
+            onClick={() => {
+              router.push("/poam");
+              setMenuOpen(false);
+            }}
+          >
+            Plan of Action and Milestones
+          </Button>
         </Stack>
         <Stack className={styles.headersection}>
           <Text fw={700}>Account</Text>
