@@ -9,7 +9,7 @@ from rest_framework.mixins import ListModelMixin
 from rest_framework import status, generics
 from django.shortcuts import get_object_or_404
 from django.db.models import Count
-from django.http import Http404, JsonResponse
+from django.http import Http404, JsonResponse, FileResponse
 from django.conf import settings
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
@@ -29,6 +29,22 @@ class StandardResultsSetPagination(PageNumberPagination):
     page_size = 12
     page_size_query_param = "page_size"
     max_page_size = 100
+
+
+# This isn't a super reccommended way to serve media since it's a bit slower
+# than nginx, but it protects the media with the same authentication as the
+# other routes.
+class ServeProtectedMediaView(APIView):
+    """
+    Serve media files to users who meet the authentication and permission requirements.
+    """
+
+    def get(self, request, path, format=None):
+        file_path = os.path.join(settings.MEDIA_ROOT, path)
+        if os.path.exists(file_path):
+            return FileResponse(open(file_path, "rb"))
+        else:
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
 
 class AllEvidenceListView(GenericAPIView, ListModelMixin):
