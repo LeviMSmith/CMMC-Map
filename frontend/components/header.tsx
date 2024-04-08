@@ -25,6 +25,7 @@ import {
   IconPlus,
   IconSun,
   IconMoon,
+  IconLogout,
 } from "@tabler/icons-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -470,14 +471,17 @@ export default function Header() {
           <TextInput placeholder="Search" />
         </Stack>
         <Stack className={styles.headersection}>
-          <Text fw={700}>Export Report</Text>
+          <Text fw={700}>Reports</Text>
           <Button variant="light">System Security Plan</Button>
           <Button variant="light">Plan of Action and Milestones</Button>
         </Stack>
-        <Stack>
+        <Stack className={styles.headersection}>
           <Text fw={700}>Account</Text>
           <Button variant="light" onClick={handleLogout}>
-            Logout
+            <div className="flex justify-center items-center gap-2">
+              Logout
+              <IconLogout />
+            </div>
           </Button>
         </Stack>
       </Drawer>
