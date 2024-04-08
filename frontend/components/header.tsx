@@ -1,5 +1,6 @@
 "use client";
 
+import cx from "clsx";
 import {
   Stack,
   Text,
@@ -13,6 +14,8 @@ import {
   Select,
   Loader,
   Tooltip,
+  useMantineColorScheme,
+  useComputedColorScheme,
 } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import {
@@ -20,6 +23,8 @@ import {
   IconFileDescription,
   IconMenu2,
   IconPlus,
+  IconSun,
+  IconMoon,
 } from "@tabler/icons-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -317,6 +322,12 @@ export default function Header() {
 
   const [revisions, setRevisions] = useState<Revision[] | undefined>();
   const [assessments, setAssessments] = useState<Assessment[] | undefined>();
+  const { setColorScheme } = useMantineColorScheme();
+  const computedColorScheme = useComputedColorScheme("light", {
+    getInitialValueInEffect: true,
+  });
+
+  const router = useRouter();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -422,6 +433,29 @@ export default function Header() {
     });
   }
 
+  const handleLogout = () => {
+    try {
+      backendFetch("/api/logout/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      }).then((response) => {
+        if (response.ok) {
+          console.log("Successfully logged out.");
+
+          router.push("/login");
+          setMenuOpen(false);
+        } else {
+          console.error("Failed to logout.");
+        }
+      });
+    } catch (error) {
+      console.error("Failed to logout", error);
+    }
+  };
+
   return (
     <header className={styles.header}>
       <Drawer
@@ -433,12 +467,18 @@ export default function Header() {
       >
         <Stack className={styles.headersection}>
           <Text fw={700}>Search</Text>
-          <TextInput placeholder="AI powered search" />
+          <TextInput placeholder="Search" />
         </Stack>
         <Stack className={styles.headersection}>
           <Text fw={700}>Export Report</Text>
           <Button variant="light">System Security Plan</Button>
           <Button variant="light">Plan of Action and Milestones</Button>
+        </Stack>
+        <Stack>
+          <Text fw={700}>Account</Text>
+          <Button variant="light" onClick={handleLogout}>
+            Logout
+          </Button>
         </Stack>
       </Drawer>
       <Group justify="space-between">
@@ -453,12 +493,7 @@ export default function Header() {
           </ActionIcon>
           <CurrentUrlSections />
         </Group>
-        <Group
-          wrap="nowrap"
-          justify="space-around"
-          p={8}
-          className="w-full md:w-1/2 lg:w-1/3 xl:w-1/3 min-w-24"
-        >
+        <div className="flex justify-end items-end my-2 gap-4">
           <RevisionSelect
             revisionOptions={revisionOptions}
             sharedState={sharedState}
@@ -469,7 +504,22 @@ export default function Header() {
             sharedState={sharedState}
             setSharedState={setSharedState}
           />
-        </Group>
+          <Group>
+            <ActionIcon
+              onClick={() =>
+                setColorScheme(
+                  computedColorScheme === "light" ? "dark" : "light",
+                )
+              }
+              variant="default"
+              size="lg"
+              aria-label="Toggle color scheme"
+            >
+              <IconSun className={cx(styles.icon, styles.light)} stroke={1.5} />
+              <IconMoon className={cx(styles.icon, styles.dark)} stroke={1.5} />
+            </ActionIcon>
+          </Group>
+        </div>
       </Group>
     </header>
   );

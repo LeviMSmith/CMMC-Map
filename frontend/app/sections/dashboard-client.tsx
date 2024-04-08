@@ -67,7 +67,7 @@ export default function Dashboard() {
     <Container className="pb-16">
       <h1 className="bigtitle">CMMC Map</h1>
       <Space h="lg" />
-      <TextInput placeholder="AI powered search" />
+      <TextInput placeholder="Search" />
       <div className="h-16" />
       <SimpleGrid cols={{ base: 1, md: 2 }}>
         {sections.map((section, index) => {

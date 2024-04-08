@@ -230,6 +230,29 @@ class CookieTokenObtainPairView(TokenObtainPairView):
         return response
 
 
+class CookieTokenLogoutView(APIView):
+    def post(self, request, *args, **kwargs):
+        # Prepare a simple JSON response
+        response = JsonResponse({"detail": "Logout successful"})
+
+        # Clear the access token cookie by setting its value to an empty string
+        # and its max_age to 0 to immediately expire it
+        response.delete_cookie(
+            "access",
+            path="/",
+            samesite="Strict",
+        )
+
+        # Do the same for the refresh token cookie
+        response.delete_cookie(
+            "refresh",
+            path="/",
+            samesite="Strict",
+        )
+
+        return response
+
+
 class CookieTokenRefreshView(TokenRefreshView):
     def post(self, request, *args, **kwargs):
         refresh_token = request.COOKIES.get("refresh", None)
