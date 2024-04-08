@@ -9,10 +9,12 @@ import {
   Title,
   ActionIcon,
   TextInput,
+  Popover,
   Select,
   Loader,
   Tooltip,
 } from "@mantine/core";
+import { notifications } from "@mantine/notifications";
 import {
   IconSearch,
   IconFileDescription,
@@ -76,18 +78,76 @@ function CurrentUrlSections() {
 }
 
 interface AddIconProps {
-  disableText?: string; // Marking disableText as optional with '?'
+  addUrl: string;
+  disableText?: string;
+  placeholder?: string;
+  refresh: () => void;
 }
 
-const AddIcon: React.FC<AddIconProps> = ({ disableText }) => {
+const AddIcon: React.FC<AddIconProps> = ({
+  addUrl,
+  disableText,
+  placeholder,
+  refresh,
+}) => {
+  const [newRevisionOpen, setNewRevisionOpen] = useState<boolean>(false);
+  const [newRevisionName, setNewRevisionName] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const handleSubmit = async () => {
+    if (!newRevisionName.trim()) return; // Prevent submitting empty names
+
+    setIsLoading(true);
+    try {
+      const response = await backendFetch(addUrl, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          version: newRevisionName,
+          name: newRevisionName,
+        }),
+      });
+      if (response.ok) {
+        // Handle successful submission
+        console.log("Revision added successfully");
+        setNewRevisionName("");
+        setNewRevisionOpen(false);
+        refresh();
+      } else {
+        // Handle server errors or invalid responses
+        console.error("Failed to add");
+        notifications.show({
+          title: "Couldn't add.",
+          message: "Got a backend error",
+          color: "red",
+        });
+      }
+    } catch (error) {
+      // Handle network errors
+      console.error("Error submitting revision:", error);
+      notifications.show({
+        title: "Couldn't add.",
+        message: "Got a network error",
+        color: "red",
+      });
+    } finally {
+      setIsLoading(false); // End loading regardless of outcome
+    }
+  };
+
+  const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter") {
+      handleSubmit();
+    }
+  };
+
   if (disableText) {
     return (
       <Tooltip label={disableText}>
-        <ActionIcon
-          variant="subtle"
-          disabled
-          onClick={(event) => event.preventDefault()}
-        >
+        <ActionIcon variant="subtle" disabled>
           <IconPlus />
         </ActionIcon>
       </Tooltip>
@@ -95,14 +155,28 @@ const AddIcon: React.FC<AddIconProps> = ({ disableText }) => {
   }
 
   return (
-    <ActionIcon
-      variant="subtle"
-      onClick={() => {
-        console.log("add button");
-      }}
-    >
-      <IconPlus />
-    </ActionIcon>
+    <Popover opened={newRevisionOpen} onChange={setNewRevisionOpen}>
+      <Popover.Target>
+        <ActionIcon
+          variant="subtle"
+          onClick={() => setNewRevisionOpen((o) => !o)}
+        >
+          <IconPlus />
+        </ActionIcon>
+      </Popover.Target>
+      <Popover.Dropdown>
+        <div className="flex items-center">
+          <TextInput
+            value={newRevisionName}
+            onChange={(e) => setNewRevisionName(e.currentTarget.value)}
+            placeholder={placeholder || "Enter new name"}
+            onKeyPress={handleKeyPress}
+            autoFocus
+          />
+          {isLoading && <Loader size="xs" style={{ marginLeft: 10 }} />}
+        </div>
+      </Popover.Dropdown>
+    </Popover>
   );
 };
 
@@ -125,12 +199,20 @@ const RevisionSelect = ({
     return <Loader type="dots" />;
   }
 
+  const refresh = () => {
+    setSharedState({
+      ...sharedState,
+      refreshRevisions: !sharedState.refreshRevisions,
+      revision_id: undefined,
+    });
+  };
+
   // Scenario 2: revisionOptions is an empty array
   if (revisionOptions.length === 0) {
     return (
       <Group>
         <Text>Add revision</Text>
-        <AddIcon />
+        <AddIcon addUrl="/api/revisions/" refresh={refresh} />
       </Group>
     );
   }
@@ -148,7 +230,10 @@ const RevisionSelect = ({
         });
       }}
       rightSectionPointerEvents="auto"
-      rightSection={AddIcon({})}
+      rightSection={AddIcon({
+        addUrl: "/api/revisions/",
+        refresh: refresh,
+      })}
       allowDeselect={false}
     />
   ) : (
@@ -180,12 +265,23 @@ const AssessmentSelect = ({
     return <Loader type="dots" />;
   }
 
+  const refresh = () => {
+    setSharedState({
+      ...sharedState,
+      refreshRevisions: !sharedState.refreshRevisions,
+      revision_id: undefined,
+    });
+  };
+
   // Scenario 2: assessmentOptions is an empty array
   if (assessmentOptions.length === 0) {
     return (
       <Group>
         <Text>Add assessment</Text>
-        <AddIcon />
+        <AddIcon
+          addUrl={`/api/revisions/${sharedState.revision_id}/assessments/`}
+          refresh={refresh}
+        />
       </Group>
     );
   }
@@ -203,7 +299,10 @@ const AssessmentSelect = ({
         });
       }}
       rightSectionPointerEvents="auto"
-      rightSection={AddIcon({})}
+      rightSection={AddIcon({
+        addUrl: `/api/revisions/${sharedState.revision_id}/assessments/`,
+        refresh: refresh,
+      })}
       allowDeselect={false}
     />
   ) : (
@@ -250,6 +349,7 @@ export default function Header() {
           });
         }
       } catch (error) {
+        setRevisions([]);
         console.error("Failed to fetch revisions", error);
       }
     };

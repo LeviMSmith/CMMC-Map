@@ -160,17 +160,45 @@ def policy_status_by_section(request, revision):
     return Response(serializer.data)
 
 
-class RevisionListView(generics.ListAPIView):
-    queryset = Revision.objects.all()
-    serializer_class = RevisionSerializer
+class RevisionView(APIView):
+    """
+    List all revisions, or create a new revision.
+    """
+
+    def get(self, request, format=None):
+        revisions = Revision.objects.all()
+        serializer = RevisionSerializer(revisions, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, format=None):
+        serializer = RevisionSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class AssessmentListView(generics.ListAPIView):
-    serializer_class = AssessmentSerializer
+class AssessmentView(APIView):
+    """
+    List all assessments for a specific revision, or create a new assessment.
+    """
 
-    def get_queryset(self):
-        revision_id = self.kwargs["revision"]
-        return Assessment.objects.filter(revision_id=revision_id)
+    def get(self, request, revision_id, format=None):
+        assessments = Assessment.objects.filter(revision_id=revision_id)
+        serializer = AssessmentSerializer(assessments, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, revision_id, format=None):
+        # Update the request data with the revision_id
+        modified_data = request.data.copy()  # Create a mutable copy of the request data
+        modified_data["revision"] = int(revision_id)
+
+        serializer = AssessmentSerializer(data=modified_data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class CookieTokenObtainPairView(TokenObtainPairView):
