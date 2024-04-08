@@ -79,18 +79,29 @@ interface AddIconProps {
   disableText?: string; // Marking disableText as optional with '?'
 }
 
-const AddIcon: React.FC<AddIconProps> = ({ disableText }) => {
+const AddIcon: React.FC<AddIconProps> = ({
+  disableText,
+  revision,
+}: {
+  disableText: string | undefined;
+  addUrl: string;
+}) => {
+  const [newRevisionOpen, setNewRevisionOpen] = useState<boolean>(false);
+  const [newRevisionName, setNewRevisionName] = useState<string>("");
+
   if (disableText) {
     return (
-      <Tooltip label={disableText}>
-        <ActionIcon
-          variant="subtle"
-          disabled
-          onClick={(event) => event.preventDefault()}
-        >
-          <IconPlus />
-        </ActionIcon>
-      </Tooltip>
+      <>
+        <Tooltip label={disableText}>
+          <ActionIcon
+            variant="subtle"
+            disabled
+            onClick={(event) => event.preventDefault()}
+          >
+            <IconPlus />
+          </ActionIcon>
+        </Tooltip>
+      </>
     );
   }
 
@@ -250,6 +261,7 @@ export default function Header() {
           });
         }
       } catch (error) {
+        setRevisions([]);
         console.error("Failed to fetch revisions", error);
       }
     };

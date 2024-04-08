@@ -3,7 +3,7 @@ from rest_framework_simplejwt.views import TokenRefreshView
 from .views import (
     CookieTokenObtainPairView,
     CookieTokenRefreshView,
-    RevisionListView,
+    RevisionView,
     AssessmentListView,
     policy_status_by_section,
     PolicyUpdateAPIView,
@@ -14,7 +14,7 @@ from .views import (
 )
 
 urlpatterns = [
-    path("revisions/", RevisionListView.as_view(), name="revision-list"),
+    path("revisions/", RevisionView.as_view(), name="revision-list"),
     path(
         "revisions/<int:revision>/assessments/",
         AssessmentListView.as_view(),
