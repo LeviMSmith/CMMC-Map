@@ -24,6 +24,9 @@ import { Dropzone, DronzoneProps } from "@mantine/dropzone";
 import {
   IconCheck,
   IconPlus,
+  IconMinus,
+  IconQuestionMark,
+  IconListCheck,
   IconX,
   IconUpload,
   IconFile,
@@ -83,7 +86,7 @@ export default function ControlDash({
         ? "plan"
         : implementation_status === 3
           ? "na"
-          : null,
+          : "n",
   );
 
   function TabPanel({
@@ -333,25 +336,50 @@ export default function ControlDash({
     <Container>
       <h2 className="lessbigtitle">{control.section_name}</h2>
       <Text>{control.brief_description}</Text>
-      <Divider className="my-4" />
-      <Paper className="min-h-[300px]">
-        <Group>
-          <Text fw={500} size="lg">
-            Policy
-          </Text>
-        </Group>
+      <Divider className="my-4" label="Policy" />
+      <Paper className="min-h-[250px]">
         <Tabs
-          variant="pills"
-          allowTabDeactivation
+          variant="outline"
           className="w-full"
           value={activeTab}
           onChange={(value) => setActiveTab(value)}
+          defaultValue="n"
+          color="gray"
         >
           <Center>
             <Tabs.List>
-              <Tabs.Tab value="policy">Implemented</Tabs.Tab>
-              <Tabs.Tab value="plan">Planned to be Implemented</Tabs.Tab>
-              <Tabs.Tab value="na">Not Applicable</Tabs.Tab>
+              <Tabs.Tab value="policy">
+                <div className="flex items-center justify-center gap-2">
+                  <IconCheck
+                    className={`${activeTab === "policy" ? "text-green-500" : "default-color-class"}`}
+                  />
+                  <Text ta="center">Implemented</Text>
+                </div>
+              </Tabs.Tab>
+              <Tabs.Tab value="plan">
+                <div className="flex items-center justify-center gap-2">
+                  <IconListCheck
+                    className={`${activeTab === "plan" ? "text-yellow-400" : "default-color-class"}`}
+                  />
+                  <Text ta="center">Planned to be Implemented</Text>
+                </div>
+              </Tabs.Tab>
+              <Tabs.Tab value="na">
+                <div className="flex items-center justify-center gap-2">
+                  <IconMinus
+                    className={`${activeTab === "na" ? "text-teal-400" : "default-color-class"}`}
+                  />
+                  <Text ta="center">Not Applicable</Text>
+                </div>
+              </Tabs.Tab>
+              <Tabs.Tab value="n">
+                <div className="flex items-center justify-center gap-2">
+                  <IconX
+                    className={`${activeTab === "n" ? "text-red-500" : "default-color-class"}`}
+                  />
+                  <Text ta="center">Unset</Text>
+                </div>
+              </Tabs.Tab>
             </Tabs.List>
           </Center>
           <TabPanel
@@ -369,15 +397,13 @@ export default function ControlDash({
             label="Explanation"
             placeholder="Why is this control not applicable?"
           />
-        </Tabs>{" "}
-        {activeTab === null && (
-          <>
-            <div className="h-8" />
-            <Text fw={500} size="lg" ta="center">
-              No policy set yet. Please select a tab to begin implementation.
-            </Text>
-          </>
-        )}
+          <Tabs.Panel value="n">
+            <div className="flex justify-center items-center h-[250px]">
+              <IconX />
+              <Text fw={300}>Unset! Choose another tab to get started.</Text>
+            </div>
+          </Tabs.Panel>
+        </Tabs>
       </Paper>
       <div className="h-16" />
       <Paper className="min-h-[300px]">
