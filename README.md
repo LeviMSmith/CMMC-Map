@@ -4,7 +4,16 @@ This is a work in progress project to handle CMMC policy with a web app.
 
 It is still heavily in development and not reccommend to be run anywhere.
 
-See the subfolders for more details and instructions on running.
+It however can be run with the command:
+
+`docker compose -f docker-compose-dev.yaml up --build`
+
+See the subfolders for more details and instructions on running manually.
+
+## Glamour Shots
+
+![](screenshots/SectionsLightDark.png)
+![](screenshots/ControlLightDark.png)
 
 ## CMU Showcase Abstract
 
