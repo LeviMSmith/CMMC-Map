@@ -837,7 +837,22 @@ export const controls: Control[] = [
     discussion:
       'Limits on the use of organization-controlled portable storage devices in external systems \ninclude complete prohibition of the use of such devices or restrictions on how the devices \nmay be used and under what conditions the devices may be used. Note that while “external” \ntypically refers to outside of the organization’s direct supervision and authority that is not \nalways the case. Regarding the protection of CUI across an organization, the organization \nmay have systems that process CUI and others that do not. Among the systems that process \nCUI there are likely access restrictions for CUI that apply between systems. Therefore, from \nthe perspective of a given system, other systems within the organization may be considered \n“external" to that system.',
     further_discussion:
-      "A portable storage device is a system component that can be inserted or attached and easily \nremoved from a system. It is used to store data or information.",
+      "A portable storage device is a system component that can be inserted or attached and easily\
+      removed from a system. It is used to store data or information. Examples of portable storage\
+      devices include:\
+       compact/digital video disks (CDs/DVDs);\
+       Universal Serial Bus (USB) drives;\
+       external hard disk drives;\
+       flash memory cards/drives; and\
+       floppy disks.\
+      This practice can be implemented in two ways:\
+       identifying the portable storage device usage restrictions, identifying portable storage\
+      devices that may be used on external systems, identifying associated external systems on\
+      which a portable storage device may be used, and administratively (through the use of a\
+      written policy) limiting the usage of the devices to those systems; or\
+       configuring devices to work only when connected to a system to which the portable\
+      storage device can authenticate, limiting the devices’ use on external systems to those\
+      that the contractor has the ability to manage.",
     fd_examples: {
       Example:
         "Your organization has a written portable device usage restriction policy. It states that users \ncan only use external storage devices such as thumb dives or external hard disks that belong \nto the company. When needed for a specific business function, a user checks the device out \nfrom IT and returns it to IT when no longer needed [a,b].",

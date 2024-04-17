@@ -37,6 +37,7 @@ import {
   State,
   StateContextType,
 } from "@/components/state-provider";
+import SearchBar from "@/components/search";
 import { Revision, Assessment } from "@/lib/static-data";
 import { backendFetch } from "@/lib/session";
 import styles from "./header.module.css";
@@ -492,7 +493,7 @@ export default function Header() {
       >
         <Stack className={styles.headersection}>
           <Text fw={700}>Search</Text>
-          <TextInput placeholder="Search" />
+          <SearchBar />
         </Stack>
         <Stack className={styles.headersection}>
           <Text fw={700}>Reports</Text>

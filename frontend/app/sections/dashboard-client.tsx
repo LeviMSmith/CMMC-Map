@@ -40,6 +40,7 @@ import {
   SectionProgress,
   isKeyOfSectionProgress,
 } from "@/components/state-provider";
+import SearchBar from "@/components/search";
 import { Control, controls, sections } from "@/lib/static-data";
 
 const sectionIcons = [
@@ -67,7 +68,7 @@ export default function Dashboard() {
     <Container className="pb-16">
       <h1 className="bigtitle">CMMC Map</h1>
       <Space h="lg" />
-      <TextInput placeholder="Search" />
+      <SearchBar />
       <div className="h-16" />
       <SimpleGrid cols={{ base: 1, md: 2 }}>
         {sections.map((section, index) => {
