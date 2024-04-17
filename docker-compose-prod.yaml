@@ -13,9 +13,10 @@ services:
   nginx:
     image: nginx:latest
     ports:
-      - "3001:3001"
+      - "443:443"
+      - "80:80"
     volumes:
-      - ./nginx/dev:/etc/nginx/conf.d
+      - ./nginx:/etc/nginx/conf.d
       - ./certs:/etc/ssl/certs:ro
     depends_on:
       - certgen
@@ -24,15 +25,15 @@ services:
   backend:
     build:
       context: ./backend
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile.prod
     volumes:
       - ./backend:/app
       - ./backend/media:/app/media
     environment:
       - PYTHONDONTWRITEBYTECODE=1
       - PYTHONUNBUFFERED=1
-      - DJANGO_DATABASE_URL=mysql://cmmcmapdev:${MARIADB_PASSWORD}@db/cmmcmap
-      - DJANGO_DEBUG=${DJANGO_DEBUG}
+      - DJANGO_DATABASE_URL=mysql://cmmcmapprod:${MARIADB_PASSWORD}@db/cmmcmap
+      - DJANGO_DEBUG="False"
       - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
       - DJANGO_ROOT_PASSWORD=${DJANGO_ROOT_PASSWORD}
       - PROJECT_URL=${PROJECT_URL}
@@ -41,7 +42,7 @@ services:
   frontend:
     build:
       context: ./frontend
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile.prod
     volumes:
       - ./frontend:/app
       - /app/node_modules
@@ -53,14 +54,14 @@ services:
   db:
     image: mariadb
     volumes:
-      - dev_mariadb_data:/var/lib/mysql
+      - prod_mariadb_data:/var/lib/mysql
     environment:
       - MYSQL_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
       - MYSQL_DATABASE=cmmcmap
-      - MYSQL_USER=cmmcmapdev
+      - MYSQL_USER=cmmcmapprod
       - MYSQL_PASSWORD=${MARIADB_PASSWORD}
     ports:
       - "3306:3306"
 
 volumes:
-  dev_mariadb_data:
+  prod_mariadb_data:
