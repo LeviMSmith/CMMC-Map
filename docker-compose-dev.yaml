@@ -11,17 +11,23 @@ services:
           echo 'Certificates already exist.';
         fi"
   nginx:
+    container_name: cmmc-dev-nginx
     image: nginx:latest
     ports:
       - "3001:3001"
     volumes:
       - ./nginx/dev:/etc/nginx/conf.d
       - ./certs:/etc/ssl/certs:ro
+      - ./nginx/docker-entrypoint.sh:/docker-entrypoint.sh
+    command: ["/docker-entrypoint.sh"]
+    environment:
+      - PROJECT_URL=${PROJECT_URL}
     depends_on:
       - certgen
       - backend
       - frontend
   backend:
+    container_name: cmmc-dev-backend
     build:
       context: ./backend
       dockerfile: Dockerfile.dev
@@ -32,13 +38,15 @@ services:
       - PYTHONDONTWRITEBYTECODE=1
       - PYTHONUNBUFFERED=1
       - DJANGO_DATABASE_URL=mysql://cmmcmapdev:${MARIADB_PASSWORD}@db/cmmcmap
-      - DJANGO_DEBUG=${DJANGO_DEBUG}
+      - DJANGO_DEBUG=True
       - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
       - DJANGO_ROOT_PASSWORD=${DJANGO_ROOT_PASSWORD}
+      - DJANGO_ALLOWED_HOSTS=*
       - PROJECT_URL=${PROJECT_URL}
     depends_on:
       - db
   frontend:
+    container_name: cmmc-dev-frontend
     build:
       context: ./frontend
       dockerfile: Dockerfile.dev
@@ -51,6 +59,7 @@ services:
       - NODE_ENV=development
       - NEXT_PUBLIC_BACKEND_URL=${PROJECT_URL}
   db:
+    container_name: cmmc-dev-db
     image: mariadb
     volumes:
       - dev_mariadb_data:/var/lib/mysql

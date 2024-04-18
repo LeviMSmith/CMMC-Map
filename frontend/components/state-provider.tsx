@@ -89,6 +89,13 @@ export const StateProvider = ({ children }: { children: React.ReactNode }) => {
             },
           );
 
+          if (!res) {
+            throw new Error("No response");
+          }
+          if (!res.ok) {
+            throw new Error(`Network error ${res.status}`);
+          }
+
           const data = await res.json();
           let istat: Partial<SectionProgress> = {};
           let cstat: ControlProgress[] = [];

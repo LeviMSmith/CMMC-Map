@@ -20,7 +20,7 @@ import {
   rem,
 } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
-import { Dropzone, DronzoneProps } from "@mantine/dropzone";
+import { Dropzone, DropzoneProps, FileWithPath } from "@mantine/dropzone";
 import {
   IconCheck,
   IconPlus,
@@ -68,7 +68,7 @@ export default function ControlDash({
   const [evidenceRefresh, setEvidenceRefresh] = useState<boolean>(false);
   const [evidences, setEvidences] = useState<Evidence[] | undefined>(undefined);
   const [evidenceAdd, setEvidenceAdd] = useState<boolean>(false);
-  const [files, setFiles] = useState([]);
+  const [files, setFiles] = useState<FileWithPath[]>([]);
   const [description, setDescription] = useState("");
 
   const currentControlProgress = sharedState.controlProgress?.find(
@@ -142,6 +142,9 @@ export default function ControlDash({
           },
         )
           .then((response) => {
+            if (!response) {
+              throw new Error("Failed to fetch. No response");
+            }
             if (!response.ok) {
               // If the response is not ok, throw an error to be caught by the catch block
               throw new Error("Failed to fetch. Status: " + response.status);
@@ -225,6 +228,9 @@ export default function ControlDash({
               credentials: "include",
             },
           );
+          if (!response) {
+            throw new Error("Failed to fetch. No response");
+          }
           if (!response.ok) {
             throw new Error(`Error: ${response.status}`);
           }
@@ -269,6 +275,13 @@ export default function ControlDash({
         },
       );
 
+      if (!response) {
+        throw new Error("Failed to fetch. No response");
+      }
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status}`);
+      }
+
       const result = await response.json();
       notifications.show({
         title: "Evidence added!",
@@ -290,7 +303,7 @@ export default function ControlDash({
     }
   };
 
-  const deleteEvidence = (evidence_id) => {
+  const deleteEvidence = (evidence_id: string) => {
     if (sharedState.revision_id && control.id) {
       backendFetch(
         `/api/revisions/${sharedState.revision_id}/policy/${control.id}/evidence/${evidence_id}/`,
@@ -303,6 +316,9 @@ export default function ControlDash({
         },
       )
         .then((response) => {
+          if (!response) {
+            throw new Error("Failed to fetch. No response");
+          }
           if (!response.ok) {
             throw new Error("Network response was not ok");
           }
@@ -529,7 +545,7 @@ export default function ControlDash({
                     <EvidenceDisplay
                       key={`Evidence display ${index}`}
                       evidence={evidence}
-                      onDelete={() => deleteEvidence(evidence.id)}
+                      onDelete={() => deleteEvidence(evidence.id.toString())}
                     />
                   ))}
                 </SimpleGrid>

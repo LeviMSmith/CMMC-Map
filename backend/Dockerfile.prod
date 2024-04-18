@@ -22,8 +22,8 @@ EXPOSE 8000
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
-COPY docker-entrypoint.dev.sh /app/docker-entrypoint.dev.sh
-RUN chmod +x /app/docker-entrypoint.dev.sh
+COPY docker-entrypoint.prod.sh /app/docker-entrypoint.prod.sh
+RUN chmod +x /app/docker-entrypoint.prod.sh
 
-ENTRYPOINT ["/app/docker-entrypoint.dev.sh"]
+ENTRYPOINT ["/app/docker-entrypoint.prod.sh"]
 

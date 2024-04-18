@@ -17,6 +17,11 @@ export async function middleware(request: NextRequest) {
 
   if (refreshToken) {
     const decodedRefresh = jwtDecode(refreshToken.value);
+    if (!decodedRefresh || !decodedRefresh.exp) {
+      console.error("Failed to decode refresh token. Assuming bad.");
+      return NextResponse.redirect(new URL(loginUrl, request.url));
+    }
+
     const currentTime = Date.now() / 1000;
 
     if (decodedRefresh.exp < currentTime) {
@@ -28,6 +33,10 @@ export async function middleware(request: NextRequest) {
 
   if (accessToken) {
     const decodedAccess = jwtDecode(accessToken.value);
+    if (!decodedAccess || !decodedAccess.exp) {
+      console.error("Failed to decode access token. Assuming bad.");
+      return NextResponse.redirect(new URL(loginUrl, request.url));
+    }
     const currentTime = Date.now() / 1000;
 
     if (decodedAccess.exp < currentTime) {

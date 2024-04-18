@@ -19,7 +19,7 @@ async function refreshAccess() {
   }
 }
 
-export async function backendFetch(url, options = {}) {
+export async function backendFetch(url: string, options = {}) {
   if (!backendUrl) {
     console.error("Cannot fetch. backendUrl is not set");
     return null;

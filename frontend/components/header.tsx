@@ -66,7 +66,7 @@ function CurrentUrlSections() {
   type PathAndLabel = {
     path: string;
     label: string;
-    isHome?: boolean; // Optional flag to indicate the home button
+    isHome: boolean; // Optional flag to indicate the home button
   };
 
   // Prepend a special "Home" entry to the navigation paths
@@ -77,7 +77,7 @@ function CurrentUrlSections() {
       // Start slice from 1 to exclude 'sections'
       const pathSoFar = "/" + sections.slice(0, index + 2).join("/"); // Adjust index due to slicing
       const label = curr;
-      acc.push({ path: pathSoFar, label });
+      acc.push({ path: pathSoFar, label: label, isHome: false });
       return acc;
     }, []),
   );
@@ -100,10 +100,10 @@ function CurrentUrlSections() {
 }
 
 interface AddIconProps {
-  addUrl: string;
+  addUrl?: string;
   disableText?: string;
   placeholder?: string;
-  refresh: () => void;
+  refresh?: () => void;
 }
 
 const AddIcon: React.FC<AddIconProps> = ({
@@ -111,7 +111,7 @@ const AddIcon: React.FC<AddIconProps> = ({
   disableText,
   placeholder,
   refresh,
-}) => {
+}: AddIconProps) => {
   const [newRevisionOpen, setNewRevisionOpen] = useState<boolean>(false);
   const [newRevisionName, setNewRevisionName] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -121,6 +121,9 @@ const AddIcon: React.FC<AddIconProps> = ({
 
     setIsLoading(true);
     try {
+      if (!addUrl) {
+        throw new Error("addUrl not set!");
+      }
       const response = await backendFetch(addUrl, {
         method: "POST",
         credentials: "include",
@@ -132,7 +135,11 @@ const AddIcon: React.FC<AddIconProps> = ({
           name: newRevisionName,
         }),
       });
-      if (response.ok) {
+      if (!response) {
+        throw new Error("Failed to add revision : didn't get a response");
+      }
+
+      if (response.ok && refresh) {
         // Handle successful submission
         console.log("Revision added successfully");
         setNewRevisionName("");
@@ -350,6 +357,13 @@ export default function Header() {
     const fetchData = async () => {
       try {
         const res = await backendFetch(`/api/revisions/`);
+        if (!res) {
+          throw new Error("No response");
+        }
+        if (!res.ok) {
+          throw new Error(`Network error ${res.status}`);
+        }
+
         const data = await res.json();
 
         const revisions: Revision[] = data.map((revision: Revision) => {
@@ -395,6 +409,12 @@ export default function Header() {
             credentials: "include",
           },
         );
+        if (!res) {
+          throw new Error("No response");
+        }
+        if (!res.ok) {
+          throw new Error(`Network error ${res.status}`);
+        }
         const data = await res.json();
         const assessments = data.map((assessment: Assessment) => {
           const dateCompleted = assessment.finished
@@ -468,6 +488,9 @@ export default function Header() {
         },
         credentials: "include",
       }).then((response) => {
+        if (!response) {
+          throw new Error("No response");
+        }
         if (response.ok) {
           console.log("Successfully logged out.");
 

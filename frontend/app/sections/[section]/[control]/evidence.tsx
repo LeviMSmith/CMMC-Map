@@ -16,16 +16,17 @@ import NextImage from "next/image";
 import { useEffect, useState } from "react";
 
 import { backendFetch } from "@/lib/session";
+import { State } from "@/components/state-provider";
 import styles from "./control-client.module.css";
 
 export interface Evidence {
   id: number;
-  file?: string;
+  file: string;
   link?: string;
   description?: string;
 }
 
-export const isImage = (fileName) => {
+export const isImage = (fileName: string): boolean => {
   return /\.(jpg|jpeg|png|gif)$/i.test(fileName);
 };
 
@@ -48,6 +49,12 @@ function associateEvidenceToPolicy(
       },
     })
       .then((response) => {
+        if (!response) {
+          throw new Error(
+            "Failed to associate evidence with policy: No response",
+          );
+        }
+
         if (response.ok) {
           return response.json();
         } else {
@@ -85,14 +92,14 @@ export function EvidenceDisplay({
   onAdd,
 }: {
   evidence: Evidence;
-  onDelete: any;
-  onAdd: any;
+  onDelete?: () => void;
+  onAdd?: () => void;
 }) {
-  const openInNewTab = (url) => {
+  const openInNewTab = (url: string) => {
     window.open(url, "_blank", "noopener,noreferrer");
   };
 
-  const dontMessWithMyUrlDagummitLoader = ({ src }) => {
+  const dontMessWithMyUrlDagummitLoader = ({ src }: { src: string }) => {
     return src;
   };
 
@@ -100,14 +107,22 @@ export function EvidenceDisplay({
     <div className="text-center m-4">
       <div
         className={styles.imageContainer}
-        onClick={() => openInNewTab(evidence.file)}
+        onClick={() => {
+          if (evidence.file) {
+            openInNewTab(evidence.file);
+          }
+        }}
       >
         {evidence.file && isImage(evidence.file) ? (
           <>
             <NextImage
               loader={dontMessWithMyUrlDagummitLoader}
               src={evidence.file}
-              alt={evidence.description || evidence.file.split("/").pop()}
+              alt={
+                evidence.description ||
+                evidence.file.split("/").pop() ||
+                "Unknown evidence"
+              }
               height={200}
               width={200}
               className={styles.image}
@@ -129,7 +144,9 @@ export function EvidenceDisplay({
       </div>
       <Group wrap="nowrap" justify="center">
         <Text ta="center" size="lg" fw={500} truncate="end">
-          {evidence.description || evidence.file.split("/").pop()}
+          {evidence.description ||
+            evidence.file.split("/").pop() ||
+            "Unknown evidence name"}
         </Text>
         {onDelete && (
           <ActionIcon variant="subtle" onClick={onDelete}>
@@ -168,6 +185,10 @@ export function EvidenceList({
       credentials: "include",
     })
       .then((response) => {
+        if (!response) {
+          throw new Error("Failed to fetch evidence. Didn't get a response");
+        }
+
         if (response.ok) {
           response.json().then((data) => {
             if (data.results.length > 0) {

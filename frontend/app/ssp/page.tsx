@@ -4,7 +4,11 @@ import { Container, Divider, Group, Loader, Text, Title } from "@mantine/core";
 import { IconSquareCheck, IconSquare } from "@tabler/icons-react";
 import { useContext, useState, useEffect } from "react";
 
-import { StateContextType, StateContext } from "@/components/state-provider";
+import {
+  StateContextType,
+  StateContext,
+  ControlProgress,
+} from "@/components/state-provider";
 import {
   Section,
   Control,
@@ -23,6 +27,12 @@ export default function SSP() {
     const fetchData = async () => {
       try {
         const res = await backendFetch(`/api/revisions/`);
+        if (!res) {
+          throw new Error("Failed to get revisions: Didn't get a response");
+        }
+        if (!res.ok) {
+          throw new Error(`Failed to get revisions: ${res.status}`);
+        }
         const data = await res.json();
 
         const revisions: Revision[] = data.map((revision: Revision) => {
@@ -72,6 +82,16 @@ export default function SSP() {
     (rev: Revision) => rev.id === sharedState.revision_id,
   );
 
+  if (!selected_revision) {
+    return (
+      <Container>
+        <div className="flex justify-center">
+          <Loader />
+        </div>
+      </Container>
+    );
+  }
+
   return (
     <Container>
       <Title ta="center">System Security Plan</Title>
@@ -99,17 +119,24 @@ export default function SSP() {
                 (element: ControlProgress) => element.control === control.id,
               );
 
-              const implementation_status =
-                currentControlProgress.implementation_status;
+              var policy =
+                "No policy has been implemented for this control yet.";
 
-              const policy =
-                implementation_status === 1
-                  ? currentControlProgress.policy_description
-                  : implementation_status === 2
-                    ? currentControlProgress.plan_description
-                    : implementation_status === 3
-                      ? currentControlProgress.na_description
-                      : "No policy has been implemented for this control yet.";
+              var implementation_status = 0;
+
+              if (currentControlProgress) {
+                implementation_status =
+                  currentControlProgress.implementation_status;
+
+                const policy =
+                  implementation_status === 1
+                    ? currentControlProgress.policy_description
+                    : implementation_status === 2
+                      ? currentControlProgress.plan_description
+                      : implementation_status === 3
+                        ? currentControlProgress.na_description
+                        : "No policy has been implemented for this control yet.";
+              }
 
               return (
                 <div key={control.section} className="mb-4">
