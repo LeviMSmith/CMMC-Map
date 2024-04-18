@@ -29,8 +29,8 @@ const SearchResult: React.FC<SearchResultProps> = ({ controls }) => {
               href={`/sections/${sectionUrl}/${control.section}`}
               className="text-inherit no-underline"
             >
-              <Group spacing="sm" wrap="nowrap" className={styles.searchlink}>
-                <Text size="sm" weight={500}>
+              <Group wrap="nowrap" className={styles.searchlink}>
+                <Text size="sm" fw={500}>
                   {control.section} - {control.section_name}
                 </Text>
                 <Text size="xs" color="dimmed">
@@ -41,7 +41,7 @@ const SearchResult: React.FC<SearchResultProps> = ({ controls }) => {
           );
         })
       ) : (
-        <Text size="sm" padding="md">
+        <Text size="sm" p={16}>
           No results found
         </Text>
       )}
@@ -81,8 +81,6 @@ export default function SearchBar() {
     <Popover
       opened={opened && filteredControls.length > 0}
       position="bottom"
-      withArrow
-      transition="pop"
       width="target"
       onClose={() => setOpened(false)}
     >

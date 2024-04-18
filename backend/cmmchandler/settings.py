@@ -32,7 +32,8 @@ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DJANGO_DEBUG", "False").lower() in ["true", "1", "t", "y", "yes"]
 
-ALLOWED_HOSTS = ["*"]
+allowed_hosts = os.getenv("DJANGO_ALLOWED_HOSTS", "").split()
+ALLOWED_HOSTS = allowed_hosts
 
 USE_X_FORWARDED_HOST = True
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")

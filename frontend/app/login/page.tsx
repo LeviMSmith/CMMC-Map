@@ -17,7 +17,7 @@ export default function LoginPage() {
 
   const router = useRouter();
 
-  const handleLogin = async (e) => {
+  const handleLogin = async (e: any) => {
     e.preventDefault(); // Prevent form from reloading the page
     setError(""); // Reset error message
 
@@ -34,6 +34,10 @@ export default function LoginPage() {
         },
         body: JSON.stringify(loginData),
       });
+
+      if (!response) {
+        throw new Error("Network response was not ok");
+      }
 
       if (!response.ok) {
         throw new Error("Network response was not ok");
@@ -56,7 +60,7 @@ export default function LoginPage() {
 
   return (
     <Container size={420} my={40}>
-      <Title align="center" mb={20}>
+      <Title ta="center" mb={20}>
         Login
       </Title>
       {error && <Alert color="red">{error}</Alert>}
