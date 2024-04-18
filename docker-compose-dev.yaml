@@ -57,7 +57,6 @@ services:
       - "3000:3000"
     environment:
       - NODE_ENV=development
-      - NEXT_PUBLIC_BACKEND_URL=${PROJECT_URL}
   db:
     container_name: cmmc-dev-db
     image: mariadb
