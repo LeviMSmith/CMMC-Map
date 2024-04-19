@@ -24,8 +24,6 @@ which will build the necessary containers and network them behind an nginx ingre
 The only things strictly necessary are that the backend and frontend be served from the same origin and over https.
 See the current [nginx config files](nginx/dev/localhost.conf) for which urls need to be forewarded to which service and with which headers.
 
-You can use any kind of database you would like for the Django backend, but the project is currently only tested with MariaDB. See configuration for more details
-
 ## Configuration
 
 The compose files simplify a lot, but if you'd like the specific environment variables for each container for more complex deployments, see [below](#backend-docker)
@@ -45,11 +43,11 @@ The compose files simplify a lot, but if you'd like the specific environment var
 | Environment Variable | Description                                                                                                                                                                                                                                                                                  | Default/Required |
 | -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------- |
 | PROJECT_URL          | The origin you are serving the whole application from. For example: https://example.com                                                                                                                                                                                                      | Required         |
-| DJANGO_ROOT_PASSWORD | The backend creates a root user by default to access the admin interface in development mode                                                                                                                                                                                                 | Required         |
+| DJANGO_ROOT_PASSWORD | The backend creates a root user by default to access the admin interface to create more users.                                                                                                                                                                                                 | Required         |
 | DJANGO_SECRET_KEY    | The [secret key Django uses for signing things](https://docs.djangoproject.com/en/5.0/topics/signing/)                                                                                                                                                                                       | Required         |
 | DJANGO_DEBUG         | Whether to run Django in debug mode or production                                                                                                                                                                                                                                            | False            |
 | DJANGO_ALLOWED_HOSTS | Essentially a firewall of all sources Django will allow. For most cases all ('\*') is what you'll want.                                                                                                                                                                                      | Required         |
-| DJANGO_DATABASE_URL  | This uses [dj-database-url](https://pypi.org/project/dj-database-url/) to tell Django how to connect to the database. In theory it could really be any database Django supports, but it's only testing with MariaDB and that's what the docker entrypoint tries to connect to when starting. | Required         |
+| DJANGO_DATABASE_URL  | This uses [dj-database-url](https://pypi.org/project/dj-database-url/) to tell Django how to connect to the database. In theory it could really be any database Django supports, but it's only tested with MariaDB and that's what the docker entrypoint tries to connect to when starting. | Required         |
 
 ### Frontend Docker
 
