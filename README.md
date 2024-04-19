@@ -1,20 +1,65 @@
 # CMMC-Map
 
-This is a work in progress project to handle CMMC policy with a web app.
+This is a work in progress project to handle CMMC (Cybersecurity Maturation Model Certification) policy with a web app. Version 0.1.0 comming soon!
 
-It is still heavily in development and not reccommend to be run anywhere.
-
-It however can be run pretty easily by:
-
-`cp .env.dev.example .env`
-`docker compose -f docker-compose-dev.yaml up --build`
-
-See the subfolders for more details and instructions on running manually.
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
 
 ## Glamour Shots
 
 ![](screenshots/SectionsLightDark.png)
 ![](screenshots/ControlLightDark.png)
+
+## Running
+
+Prebuilt docker containers are a work in progress, but for now containers can be built with the Dockerfile.prod scripts in backend and frontend each.
+
+Or a single node stack can be run with
+
+`docker compose -f docker-compose-prod.yaml up --build`
+
+which will build the necessary containers and network them behind an nginx ingress handler with auto generated self signed certificates and a dedicated MariaDB container.
+
+### Running without the docker compose
+
+The only things strictly necessary are that the backend and frontend be served from the same origin and over https.
+See the current [nginx config files](nginx/dev/localhost.conf) for which urls need to be forewarded to which service and with which headers.
+
+You can use any kind of database you would like for the Django backend, but the project is currently only tested with MariaDB. See configuration for more details
+
+## Configuration
+
+The compose files simplify a lot, but if you'd like the specific environment variables for each container for more complex deployments, see [below](#backend-docker)
+
+### Compose Files
+
+| Environment Variable  | Description                                                                                            | Default/Required |
+| --------------------- | ------------------------------------------------------------------------------------------------------ | ---------------- |
+| PROJECT_URL           | The origin you are serving the whole application from. For example: https://example.com                | Required         |
+| MARIADB_PASSWORD      | The password for the user account Django uses for accessing the database                               | Required         |
+| MARIADB_ROOT_PASSWORD | The root password for acccessing the database outside of the application                               | Required         |
+| DJANGO_SECRET_KEY     | The [secret key Django uses for signing things](https://docs.djangoproject.com/en/5.0/topics/signing/) | Required         |
+| DJANGO_ROOT_PASSWORD  | The backend creates a root user by default to access the admin interface in development mode           | Required         |
+
+### Backend Docker
+
+| Environment Variable | Description                                                                                                                                                                                                                                                                                  | Default/Required |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------- |
+| PROJECT_URL          | The origin you are serving the whole application from. For example: https://example.com                                                                                                                                                                                                      | Required         |
+| DJANGO_ROOT_PASSWORD | The backend creates a root user by default to access the admin interface in development mode                                                                                                                                                                                                 | Required         |
+| DJANGO_SECRET_KEY    | The [secret key Django uses for signing things](https://docs.djangoproject.com/en/5.0/topics/signing/)                                                                                                                                                                                       | Required         |
+| DJANGO_DEBUG         | Whether to run Django in debug mode or production                                                                                                                                                                                                                                            | False            |
+| DJANGO_ALLOWED_HOSTS | Essentially a firewall of all sources Django will allow. For most cases all ('\*') is what you'll want.                                                                                                                                                                                      | Required         |
+| DJANGO_DATABASE_URL  | This uses [dj-database-url](https://pypi.org/project/dj-database-url/) to tell Django how to connect to the database. In theory it could really be any database Django supports, but it's only testing with MariaDB and that's what the docker entrypoint tries to connect to when starting. | Required         |
+
+### Frontend Docker
+
+| Environment Variable | Description                                                                             | Default/Required |
+| -------------------- | --------------------------------------------------------------------------------------- | ---------------- |
+| PROJECT_URL          | The origin you are serving the whole application from. For example: https://example.com | Required         |
+
+### Other notes on more complex environments
+
+For the most part it's as simple as run the frontend and backend with a database from the same origin. Just do that with ssl and you're good. front and backend can scale horizontally to your hearts content even though that should never really be necessary.
 
 ## CMU Showcase Abstract
 
