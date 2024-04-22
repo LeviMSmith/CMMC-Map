@@ -27,6 +27,7 @@ import {
   IconMoon,
   IconLogout,
   IconHome,
+  IconTool,
 } from "@tabler/icons-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -246,6 +247,26 @@ const RevisionSelect = ({
     );
   }
 
+  const router = useRouter();
+
+  const RevisionButtons = () => {
+    return (
+      <Group wrap="nowrap" justify="center" gap={2}>
+        <Tooltip label="Configure Revision Header">
+          <ActionIcon
+            variant="subtle"
+            onClick={() => {
+              router.push("/configure-revision");
+            }}
+          >
+            <IconTool />
+          </ActionIcon>
+        </Tooltip>
+        <AddIcon addUrl="/api/revisions/" refresh={refresh} />
+      </Group>
+    );
+  };
+
   // Scenario 3: revisionOptions is a populated array
   return sharedState?.revision_id ? (
     <Select
@@ -259,10 +280,8 @@ const RevisionSelect = ({
         });
       }}
       rightSectionPointerEvents="auto"
-      rightSection={AddIcon({
-        addUrl: "/api/revisions/",
-        refresh: refresh,
-      })}
+      rightSection={RevisionButtons()}
+      rightSectionWidth={60}
       allowDeselect={false}
     />
   ) : (

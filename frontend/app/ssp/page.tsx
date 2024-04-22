@@ -58,7 +58,7 @@ export default function SSP() {
     fetchData();
   }, [sharedState.refreshRevisions]);
 
-  if (!sharedState.revision_id || !sharedState.assessment_id || !revisions) {
+  if (!sharedState.revision_id || !revisions) {
     return (
       <Container>
         <div className="flex justify-center">
