@@ -548,15 +548,18 @@ export default function Header() {
           >
             System Security Plan
           </Button>
-          <Button
-            variant="light"
-            onClick={() => {
-              router.push("/poam");
-              setMenuOpen(false);
-            }}
-          >
-            Plan of Action and Milestones
-          </Button>
+          <Tooltip label="In Development">
+            <Button
+              variant="light"
+              onClick={() => {
+                router.push("/poam");
+                setMenuOpen(false);
+              }}
+              disabled
+            >
+              Plan of Action and Milestones
+            </Button>
+          </Tooltip>
         </Stack>
         <Stack className={styles.headersection}>
           <Text fw={700}>Account</Text>

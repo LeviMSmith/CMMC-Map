@@ -1,6 +1,15 @@
 "use client";
 
-import { Container, Divider, Group, Loader, Text, Title } from "@mantine/core";
+import {
+  Container,
+  Divider,
+  Group,
+  Loader,
+  Space,
+  Stack,
+  Text,
+  Title,
+} from "@mantine/core";
 import { IconSquareCheck, IconSquare } from "@tabler/icons-react";
 import { useContext, useState, useEffect } from "react";
 
@@ -45,6 +54,35 @@ export default function SSP() {
             id: revision.id.toString(),
             version: revision.version,
             date_completed: dateCompleted,
+            system_name: revision.system_name,
+            system_category: revision.system_category,
+            system_unique_id: revision.system_unique_id,
+            responsible_org_name: revision.responsible_org_name,
+            responsible_org_addr: revision.responsible_org_addr,
+            responsible_org_phone: revision.responsible_org_phone,
+            info_owner_name: revision.info_owner_name,
+            info_owner_title: revision.info_owner_title,
+            info_owner_addr: revision.info_owner_addr,
+            info_owner_phone: revision.info_owner_phone,
+            info_owner_email: revision.info_owner_email,
+            sys_owner_name: revision.sys_owner_name,
+            sys_owner_title: revision.sys_owner_title,
+            sys_owner_addr: revision.sys_owner_addr,
+            sys_owner_phone: revision.sys_owner_phone,
+            sys_owner_email: revision.sys_owner_email,
+            sys_sec_name: revision.sys_sec_name,
+            sys_sec_title: revision.sys_sec_title,
+            sys_sec_addr: revision.sys_sec_addr,
+            sys_sec_phone: revision.sys_sec_phone,
+            sys_sec_email: revision.sys_sec_email,
+            system_description: revision.system_description,
+            num_end_users: revision.num_end_users,
+            num_admin_users: revision.num_admin_users,
+            information_description: revision.information_description,
+            system_top_evi: revision.system_top_evi,
+            hardware_listing: revision.hardware_listing,
+            software_listing: revision.software_listing,
+            hardsoft_main: revision.hardsoft_main,
           };
         });
 
@@ -57,7 +95,6 @@ export default function SSP() {
 
     fetchData();
   }, [sharedState.refreshRevisions]);
-
   if (!sharedState.revision_id || !revisions) {
     return (
       <Container>
@@ -98,9 +135,131 @@ export default function SSP() {
       <Text fw={300} mb={64} ta="center">
         Revision {selected_revision.version}
       </Text>
+      <Title order={2}>1 System Identification</Title>
+      <Divider className="my-4" />
+      <Stack gap="sm">
+        <Group>
+          <Title order={5}>1.1 System Name/Title: </Title>
+          <Text>{selected_revision.system_name}</Text>
+        </Group>
+        <Group>
+          <Title order={5}>1.1.1 System Categorization: </Title>
+          <Text>{selected_revision.system_category}</Text>
+        </Group>
+        <Group>
+          <Title order={5}>1.1.2 System Unique Identifier: </Title>
+          <Text>{selected_revision.system_unique_id}</Text>
+        </Group>
+        <Title order={5}>1.2 Reponsible Organization: </Title>
+        <Stack ml={16} gap="sm">
+          <Text>
+            <strong>Name:</strong> {selected_revision.responsible_org_name}
+          </Text>
+          <Text>
+            <strong>Address:</strong> {selected_revision.responsible_org_addr}
+          </Text>
+          <Text>
+            <strong>Phone:</strong> {selected_revision.responsible_org_phone}
+          </Text>
+        </Stack>
+        <Title order={5}>1.2.1 Information Owner: </Title>
+        <Stack ml={16} gap="sm">
+          <Text>
+            <strong>Name:</strong>
+            {selected_revision.info_owner_name}
+          </Text>
+          <Text>
+            <strong>Title:</strong>
+            {selected_revision.info_owner_title}
+          </Text>
+          <Text>
+            <strong>Office Address:</strong>
+            {selected_revision.info_owner_addr}
+          </Text>
+          <Text>
+            <strong>Work Phone:</strong>
+            {selected_revision.info_owner_phone}
+          </Text>
+          <Text>
+            <strong>e-Mail Address:</strong>
+            {selected_revision.info_owner_email}
+          </Text>
+        </Stack>
+        <Title order={5}>1.2.1.1 System Owner: </Title>
+        <Stack ml={16} gap="sm">
+          <Text>
+            <strong>Name:</strong>
+            {selected_revision.sys_owner_name}
+          </Text>
+          <Text>
+            <strong>Title:</strong>
+            {selected_revision.sys_owner_title}
+          </Text>
+          <Text>
+            <strong>Office Address:</strong>
+            {selected_revision.sys_owner_addr}
+          </Text>
+          <Text>
+            <strong>Work Phone:</strong>
+            {selected_revision.sys_owner_phone}
+          </Text>
+          <Text>
+            <strong>e-Mail Address:</strong>
+            {selected_revision.sys_owner_email}
+          </Text>
+        </Stack>
+        <Title order={5}>1.2.1.2 System Security Officer: </Title>
+        <Stack ml={16} gap="sm">
+          <Text>
+            <strong>Name:</strong>
+            {selected_revision.sys_sec_name}
+          </Text>
+          <Text>
+            <strong>Title:</strong>
+            {selected_revision.sys_sec_title}
+          </Text>
+          <Text>
+            <strong>Office Address:</strong>
+            {selected_revision.sys_sec_addr}
+          </Text>
+          <Text>
+            <strong>Work Phone:</strong>
+            {selected_revision.sys_sec_phone}
+          </Text>
+          <Text>
+            <strong>e-Mail Address:</strong>
+            {selected_revision.sys_sec_email}
+          </Text>
+        </Stack>
+        <Title order={5}>1.3 General Description/Purpose of the System</Title>
+        <Text ml={16}>{selected_revision.system_description}</Text>
+        <Title order={5}>1.3.1 Number of End Users and Privileged Users:</Title>
+        <Group ml={16}>
+          <Text>
+            <strong>Number of Users:</strong>
+            {selected_revision.num_end_users}
+          </Text>
+          <Text>
+            <strong>Number of Administrators/Privileged Users:</strong>
+            {selected_revision.num_admin_users}
+          </Text>
+        </Group>
+        <Title order={5}>1.4 General Description of Information</Title>
+      </Stack>
+      <Space />
+      <Title order={2} mt={32}>
+        2 System Environment
+      </Title>
+      <Divider className="my-4" />
+      <Stack gap="sm">
+        <Title order={5}>2.1 Listing of Hardware</Title>
+        <Title order={5}>2.2 Listing of Software</Title>
+        <Title order={5}>2.3 Hardware and Software Maintenence</Title>
+        <Text ml={16}>{selected_revision.hardsoft_main}</Text>
+      </Stack>
       {sections.map((section, section_index) => (
         <div key={section.section}>
-          <Title order={2}>
+          <Title order={2} mt={32}>
             {section.section} {section.description} {section.abreviation}
           </Title>
           <Divider className="my-4" />
