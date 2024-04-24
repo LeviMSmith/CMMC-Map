@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  ActionIcon,
   Container,
   Divider,
   Group,
@@ -10,7 +11,7 @@ import {
   Text,
   Title,
 } from "@mantine/core";
-import { IconSquareCheck, IconSquare } from "@tabler/icons-react";
+import { IconSquareCheck, IconSquare, IconPrinter } from "@tabler/icons-react";
 import { useContext, useState, useEffect } from "react";
 
 import {
@@ -131,10 +132,22 @@ export default function SSP() {
 
   return (
     <Container>
-      <Title ta="center">System Security Plan</Title>
-      <Text fw={300} mb={64} ta="center">
-        Revision {selected_revision.version}
-      </Text>
+      <Group justify="center" mb={80} gap="lg">
+        <div>
+          <Title ta="center">System Security Plan</Title>
+          <Text fw={300} ta="center">
+            Revision {selected_revision.version}
+          </Text>
+        </div>
+        <ActionIcon
+          onClick={() => {
+            window.print();
+          }}
+          className="print:hidden"
+        >
+          <IconPrinter />
+        </ActionIcon>
+      </Group>
       <Title order={2}>1 System Identification</Title>
       <Divider className="my-4" />
       <Stack gap="sm">
