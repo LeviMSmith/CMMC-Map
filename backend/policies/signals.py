@@ -35,7 +35,7 @@ def create_default_policies_for_revision(sender, instance, created, **kwargs):
         instance.system_top_evi = EvidenceList.objects.create()
         instance.hardware_listing = EvidenceList.objects.create()
         instance.software_listing = EvidenceList.objects.create()
-        instance.hardsoft_main = EvidenceList.objects.create()
+        instance.information_description = EvidenceList.objects.create()
         instance.save()  # Save the instance again with the new EvidenceList instances
 
         controls = Control.objects.all()

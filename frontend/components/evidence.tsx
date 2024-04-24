@@ -132,6 +132,7 @@ export function EvidenceDisplay({
               height={200}
               width={200}
               className={styles.image}
+              unoptimized
             />
             <div className={styles.overlay}>
               <IconEye />
@@ -261,7 +262,15 @@ export function EvidenceList({
   );
 }
 
-export function EvidenceAdd({ evidenceListId }) {
+export function EvidenceAdd({
+  evidenceListId,
+  sectionName,
+  sectionDescription,
+}: {
+  evidenceListId: string;
+  sectionName?: string;
+  sectionDescription?: string;
+}) {
   const { sharedState, setSharedState } =
     useContext<StateContextType>(StateContext);
 
@@ -401,7 +410,7 @@ export function EvidenceAdd({ evidenceListId }) {
     <Paper className="min-h-[300px]">
       <Group>
         <Text fw={500} size="lg" ref={targetRef}>
-          Evidence
+          {sectionName || "Evidence"}
         </Text>
         {evidenceAdd ? (
           <>
@@ -435,6 +444,7 @@ export function EvidenceAdd({ evidenceListId }) {
           </Tooltip>
         )}
       </Group>
+      {sectionDescription && <Text size="sm">{sectionDescription}</Text>}
       <Collapse in={evidenceAdd}>
         <Paper className="mt-8" shadow="lg" p={16}>
           <Dropzone

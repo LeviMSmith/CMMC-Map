@@ -20,6 +20,7 @@ import { IconDeviceFloppy } from "@tabler/icons-react";
 import { useState, useEffect, useContext } from "react";
 
 import { StateContextType, StateContext } from "@/components/state-provider";
+import { EvidenceAdd } from "@/components/evidence";
 import { backendFetch } from "@/lib/session";
 
 function debounce(func, wait) {
@@ -71,7 +72,7 @@ export default function SystemInformationForm({
       systemDescription: revision.system_description,
       numEndUsers: revision.num_end_users,
       numAdminUsers: revision.num_admin_users,
-      informationDescription: revision.information_description,
+      hardSoftMain: revision.hardsoft_main,
     },
   });
 
@@ -112,7 +113,7 @@ export default function SystemInformationForm({
           system_description: values.systemDescription,
           num_end_users: values.numEndUsers,
           num_admin_users: values.numAdminUsers,
-          information_description: values.informationDescription,
+          hardsoft_main: values.hardSoftMain,
         }),
       }).then((res) => {
         if (!res) {
@@ -310,33 +311,33 @@ export default function SystemInformationForm({
             key={(form.getInputProps("numAdminUsers") as any).key}
           />
         </Group>
-        <Textarea
-          label="General Description of Information"
-          description="Document the CUI information types processed, stored, or transmitted by the system. For more information, see the CUI Registry at https://www.archives.gov/cui/registry/category-list."
-          {...form.getInputProps("informationDescription")}
-          key={(form.getInputProps("informationDescription") as any).key}
+        <Divider my={32} />
+        <EvidenceAdd
+          evidenceListId={revision.information_description}
+          sectionName="General Description of Information"
+          sectionDescription="Document the CUI information types processed, stored, or transmitted by the system. For more information, see the CUI Registry at https://www.archives.gov/cui/registry/category-list."
         />
         <Title my={64} order={2} align="center">
           Section 2: System Environment
         </Title>
-        <Textarea
-          label="Detailed System Topology"
-          description="Include a detailed topology narrative and graphic that clearly depicts the system boundaries, system interconnections, and key devices.  (Note: this does not require depicting every workstation or desktop, but include an instance for each operating system in use, an instance for portable components (if applicable), all virtual and physical servers (e.g., file, print, web, database, application), as well as any networked workstations (e.g., Unix, Windows, Mac, Linux), firewalls, routers, switches, copiers, printers, lab equipment, handhelds).  If components of other systems that interconnect/interface with this system need to be shown on the diagram, denote the system boundaries by referencing the security plans or names and owners of the other system(s) in the diagram."
-          {...form.getInputProps("systemTopology")}
-          key={(form.getInputProps("systemTopology") as any).key}
+        <EvidenceAdd
+          evidenceListId={revision.system_top_evi}
+          sectionName="Detailed System Topology"
+          sectionDescription="Include a detailed topology narrative and graphic that clearly depicts the system boundaries, system interconnections, and key devices.  (Note: this does not require depicting every workstation or desktop, but include an instance for each operating system in use, an instance for portable components (if applicable), all virtual and physical servers (e.g., file, print, web, database, application), as well as any networked workstations (e.g., Unix, Windows, Mac, Linux), firewalls, routers, switches, copiers, printers, lab equipment, handhelds).  If components of other systems that interconnect/interface with this system need to be shown on the diagram, denote the system boundaries by referencing the security plans or names and owners of the other system(s) in the diagram."
         />
-        <Textarea
-          label="Hardware Listing"
-          description="Include or reference a complete and accurate listing of all hardware (a reference to the organizational component inventory database is acceptable) and software (system software and application software) components, including make/OEM, model, version, service packs, and person or role responsible for the component. "
-          {...form.getInputProps("hardwareListing")}
-          key={(form.getInputProps("hardwareListing") as any).key}
+        <Divider my={32} />
+        <EvidenceAdd
+          evidenceListId={revision.hardware_listing}
+          sectionName="Hardware Listing"
+          sectionDescription="Include or reference a complete and accurate listing of all hardware (a reference to the organizational component inventory database is acceptable) and software (system software and application software) components, including make/OEM, model, version, service packs, and person or role responsible for the component."
         />
-        <Textarea
-          label="Software Listing"
-          description="List all software components installed on the system. "
-          {...form.getInputProps("softwareListing")}
-          key={(form.getInputProps("softwareListing") as any).key}
+        <Divider my={32} />
+        <EvidenceAdd
+          evidenceListId={revision.software_listing}
+          sectionName="Software Listing"
+          sectionDescription="List all software components installed on the system."
         />
+        <Divider my={32} />
         <Textarea
           label="Hardware and Software Maintenance and Ownership"
           description="Hardware and Software Maintenance and Ownership - Is all hardware and software maintained and owned by the organization?"

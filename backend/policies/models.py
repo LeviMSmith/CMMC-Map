@@ -61,7 +61,12 @@ class Revision(models.Model):
     system_description = models.TextField(null=True, blank=True)
     num_end_users = models.PositiveIntegerField(null=True, blank=True)
     num_admin_users = models.PositiveIntegerField(null=True, blank=True)
-    information_description = models.TextField(null=True, blank=True)
+    information_description = models.ForeignKey(
+        EvidenceList,
+        on_delete=models.CASCADE,
+        related_name="revisions_for_information_description",
+        null=True,
+    )
     system_top_evi = models.ForeignKey(
         EvidenceList,
         on_delete=models.CASCADE,
@@ -80,12 +85,7 @@ class Revision(models.Model):
         related_name="revisions_for_software_listing",
         null=True,
     )
-    hardsoft_main = models.ForeignKey(
-        EvidenceList,
-        on_delete=models.CASCADE,
-        related_name="revisions_for_hardsoft_main",
-        null=True,
-    )
+    hardsoft_main = models.TextField(null=True, blank=True)
 
 
 class Policy(models.Model):

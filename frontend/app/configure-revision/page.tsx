@@ -59,6 +59,10 @@ export default function ConfigureRevision() {
             num_end_users: revision.num_end_users,
             num_admin_users: revision.num_admin_users,
             information_description: revision.information_description,
+            system_top_evi: revision.system_top_evi,
+            hardware_listing: revision.hardware_listing,
+            software_listing: revision.software_listing,
+            hardsoft_main: revision.hardsoft_main,
           };
         });
 

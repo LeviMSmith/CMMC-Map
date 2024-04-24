@@ -48,7 +48,7 @@ class RevisionSerializer(serializers.ModelSerializer):
             "system_top_evi",
             "hardware_listing",
             "software_listing",
-            "hardsoft_main",
+            "information_description",
         ]
 
 
