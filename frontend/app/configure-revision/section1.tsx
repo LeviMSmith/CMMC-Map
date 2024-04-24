@@ -1,6 +1,8 @@
 "use client";
 
 import {
+  ActionIcon,
+  Affix,
   Box,
   Button,
   Divider,
@@ -11,10 +13,24 @@ import {
   Title,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { useState, useContext } from "react";
+import { notifications } from "@mantine/notifications";
+import { IconDeviceFloppy } from "@tabler/icons-react";
+import { useState, useEffect, useContext } from "react";
 
 import { StateContextType, StateContext } from "@/components/state-provider";
 import { backendFetch } from "@/lib/session";
+
+function debounce(func, wait) {
+  let timeout;
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+}
 
 export default function SystemInformationForm({
   revision,
@@ -23,16 +39,16 @@ export default function SystemInformationForm({
 }) {
   const { sharedState, setSharedState } =
     useContext<StateContextType>(StateContext);
-  const [isSaved, setIsSaved] = useState<boolean>(true);
 
   // Ideally we'd validate these, but that's for projects with more than one dev
+  // Plus the backend won't accept bad values, so at least the fetch will fail.
   const form = useForm({
     mode: "uncontrolled",
     initialValues: {
       systemName: revision.system_name,
       systemCategory: revision.system_category,
       systemUniqueId: revision.system_unique_id,
-      responsibleOrgName: revision.responsible_org,
+      responsibleOrgName: revision.responsible_org_name,
       responsibleOrgAddr: revision.responsible_org_addr,
       responsibleOrgPhone: revision.responsible_org_phone,
       infoOwnerName: revision.info_owner_name,
@@ -73,7 +89,7 @@ export default function SystemInformationForm({
           system_name: values.systemName,
           system_category: values.systemCategory,
           system_unique_id: values.systemUniqueId,
-          responsible_org: values.responsibleOrgName,
+          responsible_org_name: values.responsibleOrgName,
           responsible_org_addr: values.responsibleOrgAddr,
           responsible_org_phone: values.responsibleOrgPhone,
           info_owner_name: values.infoOwnerName,
@@ -106,9 +122,19 @@ export default function SystemInformationForm({
             `Failed to save revision config. Response: ${res.status}`,
           );
         }
+
+        notifications.show({
+          title: "Saved!",
+          message: null,
+        });
       });
     } catch (error) {
       console.error("Failed to save revision config: ", error);
+      notifications.show({
+        title: "Failed to save.",
+        message: "Try again later.",
+        color: "red",
+      });
     }
   };
 
@@ -118,7 +144,20 @@ export default function SystemInformationForm({
         Section 1: System Information
       </Title>
       <Divider label="System Information" mt={32} mb={16} />
-      <form onSubmit={form.onSubmit((values) => handleSubmit(values))}>
+      <form
+        onSubmit={form.onSubmit((values) => {
+          handleSubmit(values);
+        })}
+      >
+        <Affix position={{ bottom: 20, right: 20 }}>
+          <ActionIcon
+            onClick={() => handleSubmit(form.getValues())}
+            type="submit"
+            size="xl"
+          >
+            <IconDeviceFloppy />
+          </ActionIcon>
+        </Affix>
         <TextInput
           label="System Name/Title"
           {...form.getInputProps("systemName")}
@@ -139,17 +178,17 @@ export default function SystemInformationForm({
         <Divider label="Responsible Organization" mt={32} mb={16} />
         <TextInput
           label="Responsible Organization Name"
-          {...form.getInputProps("reponsibleOrgName")}
+          {...form.getInputProps("responsibleOrgName")}
           key={(form.getInputProps("responsibleOrgName") as any).key}
         />
         <TextInput
           label="Address"
-          {...form.getInputProps("reponsibleOrgAddr")}
+          {...form.getInputProps("responsibleOrgAddr")}
           key={(form.getInputProps("responsibleOrgAddr") as any).key}
         />
         <TextInput
           label="Phone"
-          {...form.getInputProps("reponsibleOrgPhone")}
+          {...form.getInputProps("responsibleOrgPhone")}
           key={(form.getInputProps("responsibleOrgPhone") as any).key}
         />
 
@@ -246,11 +285,15 @@ export default function SystemInformationForm({
         <Group grow>
           <NumberInput
             label="Number of end users"
+            min={1}
+            max={1000000}
             {...form.getInputProps("numEndUsers")}
             key={(form.getInputProps("numEndUsers") as any).key}
           />
           <NumberInput
             label="Number of privileged users"
+            min={1}
+            max={1000000}
             {...form.getInputProps("numAdminUsers")}
             key={(form.getInputProps("numAdminUsers") as any).key}
           />
@@ -260,9 +303,6 @@ export default function SystemInformationForm({
           {...form.getInputProps("informationDescription")}
           key={(form.getInputProps("informationDescription") as any).key}
         />
-        <Group justify="flex-end" mt="md">
-          <Button type="submit">Submit</Button>
-        </Group>
       </form>
     </Box>
   );

@@ -37,7 +37,7 @@ export default function ConfigureRevision() {
             system_name: revision.system_name,
             system_category: revision.system_category,
             system_unique_id: revision.system_unique_id,
-            responsible_org: revision.responsible_org,
+            responsible_org_name: revision.responsible_org_name,
             responsible_org_addr: revision.responsible_org_addr,
             responsible_org_phone: revision.responsible_org_phone,
             info_owner_name: revision.info_owner_name,
