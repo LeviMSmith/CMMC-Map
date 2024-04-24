@@ -1,6 +1,5 @@
 "use client";
 
-import { FormEvent, useState } from "react";
 import {
   Box,
   Button,
@@ -11,250 +10,164 @@ import {
   TextInput,
   Title,
 } from "@mantine/core";
+import { useForm } from "@mantine/form";
 
 export default function SystemInformationForm() {
-  const [formData, setFormData] = useState({
-    systemName: "",
-    systemCategorization: "",
-    systemUniqueId: "",
-    responsibleOrgName: "",
-    responsibleOrgAddress: "",
-    responsibleOrgPhone: "",
-    infoOwnerName: "",
-    infoOwnerTitle: "",
-    infoOwnerAddress: "",
-    infoOwnerPhone: "",
-    infoOwnerEmail: "",
-    systemOwnerName: "",
-    systemOwnerTitle: "",
-    systemOwnerAddress: "",
-    systemOwnerPhone: "",
-    systemOwnerEmail: "",
-    systemSecurityOfficerName: "",
-    systemSecurityOfficerTitle: "",
-    systemSecurityOfficerAddress: "",
-    systemSecurityOfficerPhone: "",
-    systemSecurityOfficerEmail: "",
-    systemDescription: "",
-    endUsers: 0,
-    privilegedUsers: 0,
-    informationDescription: "",
+  const form = useForm({
+    mode: "uncontrolled",
+    initialValues: {
+      systemName: "",
+    },
   });
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevState) => ({ ...prevState, [name]: value }));
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("Form Data:", formData);
-    // Here you would typically handle form submission, like sending data to a server
-  };
 
   return (
     <Box sx={{ maxWidth: 500 }} mx="auto">
-      <Title align="center">Section 1: System Information</Title>
-      <form onSubmit={handleSubmit}>
+      <Title order={2} align="center">
+        Section 1: System Information
+      </Title>
+      <Divider label="System Information" mt={32} mb={16} />
+      <form onSubmit={form.onSubmit((values) => console.log(values))}>
         <TextInput
           label="System Name/Title"
-          name="systemName"
-          value={formData.systemName}
-          onChange={handleChange}
-          required
+          {...form.getInputProps("systemName")}
+          key={(form.getInputProps("systemName") as any).key}
         />
         <TextInput
           label="System Categorization"
-          name="systemCategorization"
-          value={formData.systemCategorization}
-          onChange={handleChange}
-          required
+          {...form.getInputProps("systemCategory")}
+          key={(form.getInputProps("systemCategory") as any).key}
         />
         <TextInput
           label="System Unique Identifier"
-          name="systemUniqueId"
-          value={formData.systemUniqueId}
-          onChange={handleChange}
-          required
+          {...form.getInputProps("systemUniqueId")}
+          key={(form.getInputProps("systemUniqueId") as any).key}
         />
 
         {/* Responsible Organization */}
         <Divider label="Responsible Organization" mt={32} mb={16} />
         <TextInput
           label="Responsible Organization Name"
-          name="responsibleOrgName"
-          value={formData.responsibleOrgName}
-          onChange={handleChange}
-          required
+          {...form.getInputProps("reponsibleOrgName")}
+          key={(form.getInputProps("responsibleOrgName") as any).key}
         />
         <TextInput
           label="Address"
-          name="responsibleOrgAddress"
-          value={formData.responsibleOrgAddress}
-          onChange={handleChange}
-          required
+          {...form.getInputProps("reponsibleOrgAddr")}
+          key={(form.getInputProps("responsibleOrgAddr") as any).key}
         />
         <TextInput
           label="Phone"
-          name="responsibleOrgPhone"
-          value={formData.responsibleOrgPhone}
-          onChange={handleChange}
-          required
+          {...form.getInputProps("reponsibleOrgPhone")}
+          key={(form.getInputProps("responsibleOrgPhone") as any).key}
         />
 
         {/* Information Owner */}
         <Divider label="Information Owner" mt={32} mb={16} />
         <TextInput
           label="Information Owner Name"
-          name="infoOwnerName"
-          value={formData.infoOwnerName}
-          onChange={handleChange}
-          required
+          {...form.getInputProps("infoOwnerName")}
+          key={(form.getInputProps("infoOwnerName") as any).key}
         />
         <TextInput
           label="Title"
-          name="infoOwnerTitle"
-          value={formData.infoOwnerTitle}
-          onChange={handleChange}
-          required
+          {...form.getInputProps("infoOwnerTitle")}
+          key={(form.getInputProps("infoOwnerTitle") as any).key}
         />
         <TextInput
           label="Office Address"
-          name="infoOwnerAddress"
-          value={formData.infoOwnerAddress}
-          onChange={handleChange}
-          required
+          {...form.getInputProps("infoOwnerAddr")}
+          key={(form.getInputProps("infoOwnerAddr") as any).key}
         />
         <TextInput
           label="Work Phone"
-          name="infoOwnerPhone"
-          value={formData.infoOwnerPhone}
-          onChange={handleChange}
-          required
+          {...form.getInputProps("infoOwnerPhone")}
+          key={(form.getInputProps("infoOwnerPhone") as any).key}
         />
         <TextInput
           label="e-Mail Address"
-          name="infoOwnerEmail"
-          value={formData.infoOwnerEmail}
-          onChange={handleChange}
-          required
+          {...form.getInputProps("infoOwnerEmail")}
+          key={(form.getInputProps("infoOwnerEmail") as any).key}
         />
 
         {/* System Owner */}
         <Divider label="System Owner" mt={32} mb={16} />
         <TextInput
           label="System Owner Name"
-          name="systemOwnerName"
-          value={formData.systemOwnerName}
-          onChange={handleChange}
-          required
+          {...form.getInputProps("sysOwnerName")}
+          key={(form.getInputProps("sysOwnerName") as any).key}
         />
         <TextInput
           label="Title"
-          name="systemOwnerTitle"
-          value={formData.systemOwnerTitle}
-          onChange={handleChange}
-          required
+          {...form.getInputProps("sysOwnerTitle")}
+          key={(form.getInputProps("sysOwnerTitle") as any).key}
         />
         <TextInput
           label="Office Address"
-          name="systemOwnerAddress"
-          value={formData.systemOwnerAddress}
-          onChange={handleChange}
-          required
+          {...form.getInputProps("sysOwnerAddr")}
+          key={(form.getInputProps("sysOwnerAddr") as any).key}
         />
         <TextInput
           label="Work Phone"
-          name="systemOwnerPhone"
-          value={formData.systemOwnerPhone}
-          onChange={handleChange}
-          required
+          {...form.getInputProps("sysOwnerPhone")}
+          key={(form.getInputProps("sysOwnerPhone") as any).key}
         />
         <TextInput
           label="e-Mail Address"
-          name="systemOwnerEmail"
-          value={formData.systemOwnerEmail}
-          onChange={handleChange}
-          required
+          {...form.getInputProps("sysOwnerEmail")}
+          key={(form.getInputProps("sysOwnerEmail") as any).key}
         />
 
         {/* System Security Officer */}
         <Divider label="System Security Officer" mt={32} mb={16} />
         <TextInput
           label="System Security Officer Name"
-          name="systemSecurityOfficerName"
-          value={formData.systemSecurityOfficerName}
-          onChange={handleChange}
-          required
+          {...form.getInputProps("sysSecName")}
+          key={(form.getInputProps("sysSecName") as any).key}
         />
         <TextInput
           label="Title"
-          name="systemSecurityOfficerTitle"
-          value={formData.systemSecurityOfficerTitle}
-          onChange={handleChange}
-          required
+          {...form.getInputProps("sysSecTitle")}
+          key={(form.getInputProps("sysSecTitle") as any).key}
         />
         <TextInput
           label="Office Address"
-          name="systemSecurityOfficerAddress"
-          value={formData.systemSecurityOfficerAddress}
-          onChange={handleChange}
-          required
+          {...form.getInputProps("sysSecAddr")}
+          key={(form.getInputProps("sysSecAddr") as any).key}
         />
         <TextInput
           label="Work Phone"
-          name="systemSecurityOfficerPhone"
-          value={formData.systemSecurityOfficerPhone}
-          onChange={handleChange}
-          required
+          {...form.getInputProps("sysSecPhone")}
+          key={(form.getInputProps("sysSecPhone") as any).key}
         />
         <TextInput
           label="e-Mail Address"
-          name="systemSecurityOfficerEmail"
-          value={formData.systemSecurityOfficerEmail}
-          onChange={handleChange}
-          required
+          {...form.getInputProps("sysSecEmail")}
+          key={(form.getInputProps("sysSecEmail") as any).key}
         />
 
         <Divider label="General System Information" mt={32} mb={16} />
         <Textarea
           label="General Description/Purpose of System"
-          name="systemDescription"
-          value={formData.systemDescription}
-          onChange={handleChange}
-          required
+          {...form.getInputProps("systemDescription")}
+          key={(form.getInputProps("systemDescription") as any).key}
         />
         <Group grow>
           <NumberInput
             label="Number of end users"
-            name="endUsers"
-            value={formData.endUsers}
-            onChange={(value) =>
-              setFormData((prev) => ({ ...prev, endUsers: value || 0 }))
-            }
-            required
+            {...form.getInputProps("numEndUsers")}
+            key={(form.getInputProps("numEndUsers") as any).key}
           />
           <NumberInput
             label="Number of privileged users"
-            name="privilegedUsers"
-            value={formData.privilegedUsers}
-            onChange={(value) =>
-              setFormData((prev) => ({ ...prev, privilegedUsers: value || 0 }))
-            }
-            required
+            {...form.getInputProps("numAdminUsers")}
+            key={(form.getInputProps("numAdminUsers") as any).key}
           />
         </Group>
         <Textarea
           label="General Description of Information"
-          name="informationDescription"
-          value={formData.informationDescription}
-          onChange={handleChange}
-          required
+          {...form.getInputProps("informationDescription")}
+          key={(form.getInputProps("informationDescription") as any).key}
         />
-
-        <Group position="right" mt="md">
-          <Button type="submit">Submit</Button>
-        </Group>
       </form>
     </Box>
   );
