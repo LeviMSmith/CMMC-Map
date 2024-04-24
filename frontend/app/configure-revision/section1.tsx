@@ -11,14 +11,106 @@ import {
   Title,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
+import { useState, useContext } from "react";
 
-export default function SystemInformationForm() {
+import { StateContextType, StateContext } from "@/components/state-provider";
+import { backendFetch } from "@/lib/session";
+
+export default function SystemInformationForm({
+  revision,
+}: {
+  revision: Revision;
+}) {
+  const { sharedState, setSharedState } =
+    useContext<StateContextType>(StateContext);
+  const [isSaved, setIsSaved] = useState<boolean>(true);
+
+  // Ideally we'd validate these, but that's for projects with more than one dev
   const form = useForm({
     mode: "uncontrolled",
     initialValues: {
-      systemName: "",
+      systemName: revision.system_name,
+      systemCategory: revision.system_category,
+      systemUniqueId: revision.system_unique_id,
+      responsibleOrgName: revision.responsible_org,
+      responsibleOrgAddr: revision.responsible_org_addr,
+      responsibleOrgPhone: revision.responsible_org_phone,
+      infoOwnerName: revision.info_owner_name,
+      infoOwnerTitle: revision.info_owner_title,
+      infoOwnerAddr: revision.info_owner_addr,
+      infoOwnerPhone: revision.info_owner_phone,
+      infoOwnerEmail: revision.info_owner_email,
+      sysOwnerName: revision.sys_owner_name,
+      sysOwnerTitle: revision.sys_owner_title,
+      sysOwnerAddr: revision.sys_owner_addr,
+      sysOwnerPhone: revision.sys_owner_phone,
+      sysOwnerEmail: revision.sys_owner_email,
+      sysSecName: revision.sys_sec_name,
+      sysSecTitle: revision.sys_sec_title,
+      sysSecAddr: revision.sys_sec_addr,
+      sysSecPhone: revision.sys_sec_phone,
+      sysSecEmail: revision.sys_sec_email,
+      systemDescription: revision.system_description,
+      numEndUsers: revision.num_end_users,
+      numAdminUsers: revision.num_admin_users,
+      informationDescription: revision.information_description,
     },
   });
+
+  const handleSubmit = (values: any) => {
+    try {
+      if (!sharedState.revision_id) {
+        throw new Error("Revision id not set! Can't update it.");
+      }
+      backendFetch(`/api/revisions/${sharedState.revision_id}/`, {
+        method: "PUT",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          version: revision.version,
+          system_name: values.systemName,
+          system_category: values.systemCategory,
+          system_unique_id: values.systemUniqueId,
+          responsible_org: values.responsibleOrgName,
+          responsible_org_addr: values.responsibleOrgAddr,
+          responsible_org_phone: values.responsibleOrgPhone,
+          info_owner_name: values.infoOwnerName,
+          info_owner_title: values.infoOwnerTitle,
+          info_owner_addr: values.infoOwnerAddr,
+          info_owner_phone: values.infoOwnerPhone,
+          info_owner_email: values.infoOwnerEmail,
+          sys_owner_name: values.sysOwnerName,
+          sys_owner_title: values.sysOwnerTitle,
+          sys_owner_addr: values.sysOwnerAddr,
+          sys_owner_phone: values.sysOwnerPhone,
+          sys_owner_email: values.sysOwnerEmail,
+          sys_sec_name: values.sysSecName,
+          sys_sec_title: values.sysSecTitle,
+          sys_sec_addr: values.sysSecAddr,
+          sys_sec_phone: values.sysSecPhone,
+          sys_sec_email: values.sysSecEmail,
+          system_description: values.systemDescription,
+          num_end_users: values.numEndUsers,
+          num_admin_users: values.numAdminUsers,
+          information_description: values.informationDescription,
+        }),
+      }).then((res) => {
+        if (!res) {
+          throw new Error("Didn't get a response on our save.");
+        }
+
+        if (!res.ok) {
+          throw new Error(
+            `Failed to save revision config. Response: ${res.status}`,
+          );
+        }
+      });
+    } catch (error) {
+      console.error("Failed to save revision config: ", error);
+    }
+  };
 
   return (
     <Box sx={{ maxWidth: 500 }} mx="auto">
@@ -26,7 +118,7 @@ export default function SystemInformationForm() {
         Section 1: System Information
       </Title>
       <Divider label="System Information" mt={32} mb={16} />
-      <form onSubmit={form.onSubmit((values) => console.log(values))}>
+      <form onSubmit={form.onSubmit((values) => handleSubmit(values))}>
         <TextInput
           label="System Name/Title"
           {...form.getInputProps("systemName")}
@@ -168,6 +260,9 @@ export default function SystemInformationForm() {
           {...form.getInputProps("informationDescription")}
           key={(form.getInputProps("informationDescription") as any).key}
         />
+        <Group justify="flex-end" mt="md">
+          <Button type="submit">Submit</Button>
+        </Group>
       </form>
     </Box>
   );
