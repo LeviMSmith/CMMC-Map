@@ -4,6 +4,7 @@ from .models import (
     Assessment,
     Assessment_Objective,
     Assessment_Objective_Form,
+    EvidenceList,
     Revision,
     Control,
     Policy,
@@ -20,9 +21,23 @@ def create_assessment_objective_forms(sender, instance, created, **kwargs):
             )
 
 
+@receiver(post_save, sender=Policy)
+def create_policy_evidencelist(sender, instance, created, **kwargs):
+    if created:
+        # Create a new EvidenceList instance for the ForeignKey
+        instance.evidence_list = EvidenceList.objects.create()
+        instance.save()  # Save the instance again with the new EvidenceList instance
+
+
 @receiver(post_save, sender=Revision)
 def create_default_policies_for_revision(sender, instance, created, **kwargs):
     if created:  # Ensures this happens only upon creation, not update
+        instance.system_top_evi = EvidenceList.objects.create()
+        instance.hardware_listing = EvidenceList.objects.create()
+        instance.software_listing = EvidenceList.objects.create()
+        instance.information_description = EvidenceList.objects.create()
+        instance.save()  # Save the instance again with the new EvidenceList instances
+
         controls = Control.objects.all()
         for control in controls:
             Policy.objects.create(

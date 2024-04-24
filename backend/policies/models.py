@@ -21,12 +21,71 @@ class Control(models.Model):
     )
 
 
+class Evidence(models.Model):
+    file = models.FileField(null=True)
+    link = models.URLField(null=True)
+    description = models.TextField(null=True)
+
+
+class EvidenceList(models.Model):
+    evidences = models.ManyToManyField("Evidence")
+
+
 class Revision(models.Model):
     def __str__(self):
         return f"{self.version}"
 
     version = models.CharField(max_length=36, unique=True)
     date_completed = models.DateTimeField(null=True, blank=True)
+    system_name = models.CharField(max_length=255, null=True, blank=True)
+    system_category = models.CharField(max_length=255, null=True, blank=True)
+    system_unique_id = models.CharField(max_length=255, null=True, blank=True)
+    responsible_org_name = models.CharField(max_length=255, null=True, blank=True)
+    responsible_org_addr = models.CharField(max_length=255, null=True, blank=True)
+    responsible_org_phone = models.CharField(max_length=255, null=True, blank=True)
+    info_owner_name = models.CharField(max_length=255, null=True, blank=True)
+    info_owner_title = models.CharField(max_length=255, null=True, blank=True)
+    info_owner_addr = models.CharField(max_length=255, null=True, blank=True)
+    info_owner_phone = models.CharField(max_length=255, null=True, blank=True)
+    info_owner_email = models.CharField(max_length=255, null=True, blank=True)
+    sys_owner_name = models.CharField(max_length=255, null=True, blank=True)
+    sys_owner_title = models.CharField(max_length=255, null=True, blank=True)
+    sys_owner_addr = models.CharField(max_length=255, null=True, blank=True)
+    sys_owner_phone = models.CharField(max_length=255, null=True, blank=True)
+    sys_owner_email = models.CharField(max_length=255, null=True, blank=True)
+    sys_sec_name = models.CharField(max_length=255, null=True, blank=True)
+    sys_sec_title = models.CharField(max_length=255, null=True, blank=True)
+    sys_sec_addr = models.CharField(max_length=255, null=True, blank=True)
+    sys_sec_phone = models.CharField(max_length=255, null=True, blank=True)
+    sys_sec_email = models.CharField(max_length=255, null=True, blank=True)
+    system_description = models.TextField(null=True, blank=True)
+    num_end_users = models.PositiveIntegerField(null=True, blank=True)
+    num_admin_users = models.PositiveIntegerField(null=True, blank=True)
+    information_description = models.ForeignKey(
+        EvidenceList,
+        on_delete=models.CASCADE,
+        related_name="revisions_for_information_description",
+        null=True,
+    )
+    system_top_evi = models.ForeignKey(
+        EvidenceList,
+        on_delete=models.CASCADE,
+        related_name="revisions_for_system_top_evi",
+        null=True,
+    )
+    hardware_listing = models.ForeignKey(
+        EvidenceList,
+        on_delete=models.CASCADE,
+        related_name="revisions_for_hardware_listing",
+        null=True,
+    )
+    software_listing = models.ForeignKey(
+        EvidenceList,
+        on_delete=models.CASCADE,
+        related_name="revisions_for_software_listing",
+        null=True,
+    )
+    hardsoft_main = models.TextField(null=True, blank=True)
 
 
 class Policy(models.Model):
@@ -39,13 +98,7 @@ class Policy(models.Model):
     implementation_status = models.PositiveSmallIntegerField(default=0)
     control = models.ForeignKey(Control, on_delete=models.CASCADE)
     revision = models.ForeignKey(Revision, on_delete=models.CASCADE)
-
-
-class Evidence(models.Model):
-    file = models.FileField(null=True)
-    link = models.URLField(null=True)
-    description = models.TextField(null=True)
-    policy = models.ManyToManyField(Policy)
+    evidence_list = models.ForeignKey(EvidenceList, on_delete=models.CASCADE, null=True)
 
 
 class Assessment(models.Model):

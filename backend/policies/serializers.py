@@ -19,8 +19,9 @@ class PolicySerializer(serializers.ModelSerializer):
             "na_description",
             "implementation_status",
             "control",
+            "evidence_list",
         ]
-        read_only_fields = ("id", "control")
+        read_only_fields = ("id", "control", "evidence_list")
 
 
 class SectionSerializer(serializers.ModelSerializer):
@@ -41,8 +42,14 @@ class SectionSerializer(serializers.ModelSerializer):
 class RevisionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Revision
-        fields = ["id", "version", "date_completed"]
-        read_only_fields = ["id"]
+        fields = "__all__"
+        read_only_fields = [
+            "id",
+            "system_top_evi",
+            "hardware_listing",
+            "software_listing",
+            "information_description",
+        ]
 
 
 class AssessmentSerializer(serializers.ModelSerializer):

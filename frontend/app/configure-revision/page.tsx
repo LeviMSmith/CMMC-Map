@@ -34,6 +34,35 @@ export default function ConfigureRevision() {
             id: revision.id.toString(),
             version: revision.version,
             date_completed: dateCompleted,
+            system_name: revision.system_name,
+            system_category: revision.system_category,
+            system_unique_id: revision.system_unique_id,
+            responsible_org_name: revision.responsible_org_name,
+            responsible_org_addr: revision.responsible_org_addr,
+            responsible_org_phone: revision.responsible_org_phone,
+            info_owner_name: revision.info_owner_name,
+            info_owner_title: revision.info_owner_title,
+            info_owner_addr: revision.info_owner_addr,
+            info_owner_phone: revision.info_owner_phone,
+            info_owner_email: revision.info_owner_email,
+            sys_owner_name: revision.sys_owner_name,
+            sys_owner_title: revision.sys_owner_title,
+            sys_owner_addr: revision.sys_owner_addr,
+            sys_owner_phone: revision.sys_owner_phone,
+            sys_owner_email: revision.sys_owner_email,
+            sys_sec_name: revision.sys_sec_name,
+            sys_sec_title: revision.sys_sec_title,
+            sys_sec_addr: revision.sys_sec_addr,
+            sys_sec_phone: revision.sys_sec_phone,
+            sys_sec_email: revision.sys_sec_email,
+            system_description: revision.system_description,
+            num_end_users: revision.num_end_users,
+            num_admin_users: revision.num_admin_users,
+            information_description: revision.information_description,
+            system_top_evi: revision.system_top_evi,
+            hardware_listing: revision.hardware_listing,
+            software_listing: revision.software_listing,
+            hardsoft_main: revision.hardsoft_main,
           };
         });
 
@@ -81,7 +110,7 @@ export default function ConfigureRevision() {
       <Text fw={300} mb={64} ta="center">
         Revision {selected_revision.version}
       </Text>
-      <SystemInformationForm />
+      <SystemInformationForm revision={selected_revision} />
     </Container>
   );
 }
