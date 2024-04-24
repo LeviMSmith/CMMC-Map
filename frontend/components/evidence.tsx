@@ -17,7 +17,7 @@ import { useEffect, useState } from "react";
 
 import { backendFetch } from "@/lib/session";
 import { State } from "@/components/state-provider";
-import styles from "./control-client.module.css";
+import styles from "./evidence.module.css";
 
 export interface Evidence {
   id: number;

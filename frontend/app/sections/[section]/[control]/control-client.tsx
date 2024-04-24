@@ -43,8 +43,13 @@ import {
 import { Control } from "@/lib/static-data";
 import { backendFetch } from "@/lib/session";
 
-import { Evidence, EvidenceList, EvidenceDisplay, isImage } from "./evidence";
-import styles from "./control-client.module.css";
+import {
+  Evidence,
+  EvidenceList,
+  EvidenceDisplay,
+  isImage,
+} from "@/components/evidence";
+import styles from "./evidence.css";
 
 const getImplementationStatus = (tab: string) => {
   const mapping: { [key: string]: number } = {
