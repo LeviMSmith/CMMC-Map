@@ -4,7 +4,6 @@ import {
   ActionIcon,
   Button,
   Center,
-  Collapse,
   Container,
   Divider,
   Group,
@@ -17,10 +16,8 @@ import {
   Textarea,
   Title,
   Tooltip,
-  rem,
 } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
-import { Dropzone, DropzoneProps, FileWithPath } from "@mantine/dropzone";
 import {
   IconCheck,
   IconPlus,
@@ -28,10 +25,7 @@ import {
   IconQuestionMark,
   IconListCheck,
   IconX,
-  IconUpload,
-  IconFile,
 } from "@tabler/icons-react";
-import { useScrollIntoView } from "@mantine/hooks";
 import { useState, useEffect, useContext } from "react";
 import NextImage from "next/image";
 
@@ -43,13 +37,8 @@ import {
 import { Control } from "@/lib/static-data";
 import { backendFetch } from "@/lib/session";
 
-import {
-  Evidence,
-  EvidenceList,
-  EvidenceDisplay,
-  isImage,
-} from "@/components/evidence";
-import styles from "./evidence.css";
+import { EvidenceAdd } from "@/components/evidence";
+import styles from "./control-client.module.css";
 
 const getImplementationStatus = (tab: string) => {
   const mapping: { [key: string]: number } = {
@@ -70,15 +59,13 @@ export default function ControlDash({
   const { sharedState, setSharedState } =
     useContext<StateContextType>(StateContext);
 
-  const [evidenceRefresh, setEvidenceRefresh] = useState<boolean>(false);
-  const [evidences, setEvidences] = useState<Evidence[] | undefined>(undefined);
-  const [evidenceAdd, setEvidenceAdd] = useState<boolean>(false);
-  const [files, setFiles] = useState<FileWithPath[]>([]);
-  const [description, setDescription] = useState("");
-
   const currentControlProgress = sharedState.controlProgress?.find(
     (element: ControlProgress) => element.id === control.id,
   );
+
+  const evidenceListId: string | null = currentControlProgress
+    ? currentControlProgress.evidence_list
+    : null;
 
   const implementation_status: number = currentControlProgress
     ? currentControlProgress.implementation_status
@@ -222,137 +209,6 @@ export default function ControlDash({
     );
   }
 
-  useEffect(() => {
-    const fetchEvidences = async () => {
-      if (sharedState.revision_id) {
-        try {
-          const response = await backendFetch(
-            `/api/revisions/${sharedState.revision_id}/policy/${control.id}/evidence/`,
-            {
-              method: "GET",
-              credentials: "include",
-            },
-          );
-          if (!response) {
-            throw new Error("Failed to fetch. No response");
-          }
-          if (!response.ok) {
-            throw new Error(`Error: ${response.status}`);
-          }
-          const data = await response.json();
-          setEvidences(data);
-        } catch (err: any) {
-          console.log(err.message);
-        }
-      }
-    };
-
-    fetchEvidences();
-  }, [sharedState.revision_id, control.id, evidenceRefresh]);
-
-  const handleUpload = async () => {
-    if (!sharedState.revision_id) {
-      console.error("Cannot upload: query info not set");
-      return;
-    }
-
-    if (files.length === 0) {
-      console.error("Cannot upload: no files selected");
-      return;
-    }
-
-    const formData = new FormData();
-
-    files.forEach((file) => {
-      formData.append("file", file);
-    });
-    if (description) {
-      formData.append("description", description);
-    }
-
-    try {
-      const response = await backendFetch(
-        `/api/revisions/${sharedState.revision_id}/policy/${control.id}/evidence/`,
-        {
-          method: "POST",
-          body: formData,
-          credentials: "include",
-        },
-      );
-
-      if (!response) {
-        throw new Error("Failed to fetch. No response");
-      }
-      if (!response.ok) {
-        throw new Error(`Error: ${response.status}`);
-      }
-
-      const result = await response.json();
-      notifications.show({
-        title: "Evidence added!",
-        message: "Good job.",
-      });
-
-      setFiles([]);
-      setDescription("");
-      setEvidenceAdd(false);
-    } catch (error) {
-      console.error(error);
-      notifications.show({
-        title: "Failed to upload evidence!",
-        message: "Try again later.",
-        color: "red",
-      });
-    } finally {
-      setEvidenceRefresh(!evidenceRefresh);
-    }
-  };
-
-  const deleteEvidence = (evidence_id: string) => {
-    if (sharedState.revision_id && control.id) {
-      backendFetch(
-        `/api/revisions/${sharedState.revision_id}/policy/${control.id}/evidence/${evidence_id}/`,
-        {
-          method: "DELETE",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        },
-      )
-        .then((response) => {
-          if (!response) {
-            throw new Error("Failed to fetch. No response");
-          }
-          if (!response.ok) {
-            throw new Error("Network response was not ok");
-          }
-        })
-        .then(() => {
-          console.log("Evidence deleted successfully");
-          notifications.show({
-            title: "Evidence deleted.",
-            message: "May it rest in peace.",
-          });
-        })
-        .catch((error) => {
-          console.error("Error:", error);
-          notifications.show({
-            title: "Failed to delete evidence!",
-            message: "Try again later.",
-            color: "red",
-          });
-        })
-        .finally(() => {
-          setEvidenceRefresh(!evidenceRefresh);
-        });
-    }
-  };
-
-  const { scrollIntoView, targetRef } = useScrollIntoView<HTMLDivElement>({
-    offset: 60,
-  });
-
   return (
     <Container>
       <h2 className="lessbigtitle">{control.section_name}</h2>
@@ -427,149 +283,7 @@ export default function ControlDash({
         </Tabs>
       </Paper>
       <div className="h-16" />
-      <Paper className="min-h-[300px]">
-        <Group>
-          <Text fw={500} size="lg" ref={targetRef}>
-            Evidence
-          </Text>
-          {evidenceAdd ? (
-            <>
-              <Tooltip label="Cancel">
-                <ActionIcon
-                  onClick={() => {
-                    setEvidenceAdd(false);
-                  }}
-                  variant="light"
-                >
-                  <IconX />
-                </ActionIcon>
-              </Tooltip>
-              <Tooltip label="Save evidence">
-                <ActionIcon onClick={handleUpload}>
-                  <IconCheck />
-                </ActionIcon>
-              </Tooltip>
-            </>
-          ) : (
-            <Tooltip label="Add evidence">
-              <ActionIcon
-                variant="light"
-                onClick={() => {
-                  setEvidenceAdd(true);
-                  scrollIntoView();
-                }}
-              >
-                <IconPlus />
-              </ActionIcon>
-            </Tooltip>
-          )}
-        </Group>
-        <Collapse in={evidenceAdd}>
-          <Paper className="mt-8" shadow="lg" p={16}>
-            <Dropzone
-              onDrop={(acceptedFiles) => setFiles([acceptedFiles[0]])}
-              onReject={(files) => console.error("rejected files", files)}
-              mb="16"
-              maxSize={100 * 1024 ** 2}
-              multiple={false}
-            >
-              <Group
-                justify="center"
-                gap="xl"
-                mih={220}
-                style={{ pointerEvents: "none" }}
-              >
-                <Dropzone.Accept>
-                  <IconUpload
-                    style={{
-                      width: rem(52),
-                      height: rem(52),
-                      color: "var(--mantine-color-green-6)",
-                    }}
-                    stroke={1.5}
-                  />
-                </Dropzone.Accept>
-                <Dropzone.Reject>
-                  <IconX
-                    style={{
-                      width: rem(52),
-                      height: rem(52),
-                      color: "var(--mantine-color-red-6)",
-                    }}
-                    stroke={1.5}
-                  />
-                </Dropzone.Reject>
-                <Dropzone.Idle>
-                  <IconFile
-                    style={{
-                      width: rem(52),
-                      height: rem(52),
-                      color: "var(--mantine-color-dimmed)",
-                    }}
-                    stroke={1.5}
-                  />
-                </Dropzone.Idle>
-
-                <div>
-                  <Text ta="center" size="xl">
-                    Drag evidence files here or click to select files
-                  </Text>
-                  <Text ta="center" size="sm" c="dimmed">
-                    Attach a file of any type.
-                  </Text>
-                  {files.length > 0 && (
-                    <Text ta="center" mt={32}>
-                      Successfully uploaded {files.length} file.
-                    </Text>
-                  )}
-                </div>
-              </Group>
-            </Dropzone>
-            <Textarea
-              placeholder="This screenshot shows..."
-              description="Give this file a description"
-              value={description}
-              onChange={(event) => setDescription(event.currentTarget.value)}
-            />
-            <Divider my={32} label="Or pick from existing evidence" />
-            <EvidenceList
-              sharedState={sharedState}
-              controlId={control.id}
-              evidenceRefresh={evidenceRefresh}
-              setEvidenceRefresh={setEvidenceRefresh}
-            />
-          </Paper>
-        </Collapse>
-        {evidences ? (
-          evidences.length > 0 ? (
-            <>
-              <div className="h-8" />
-              <Paper withBorder className="w-full">
-                <SimpleGrid cols={{ base: 1, lg: 3 }} p={32}>
-                  {evidences.map((evidence, index) => (
-                    <EvidenceDisplay
-                      key={`Evidence display ${index}`}
-                      evidence={evidence}
-                      onDelete={() => deleteEvidence(evidence.id.toString())}
-                    />
-                  ))}
-                </SimpleGrid>
-              </Paper>
-            </>
-          ) : !evidenceAdd ? (
-            <Text size="lg" fw={500} ta="center" pt="32">
-              No evidence yet. Press the plus icon above to get started.
-            </Text>
-          ) : null
-        ) : (
-          <>
-            <div className="h-8" />
-            <Center>
-              <Loader />
-            </Center>
-          </>
-        )}
-      </Paper>
+      <EvidenceAdd evidenceListId={evidenceListId} />
     </Container>
   );
 }

@@ -16,7 +16,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
 from rest_framework_simplejwt.backends import TokenBackend
 from rest_framework_simplejwt.settings import api_settings
-from .models import Revision, Assessment, Section, Policy, Evidence
+from .models import Revision, Assessment, Section, Policy, Evidence, EvidenceList
 from .serializers import (
     RevisionSerializer,
     AssessmentSerializer,
@@ -48,7 +48,7 @@ class ServeProtectedMediaView(APIView):
             return Response(status=status.HTTP_404_NOT_FOUND)
 
 
-class EvidenceListView(APIView):
+class EvidenceListView(ListModelMixin, GenericAPIView):
     queryset = Evidence.objects.all()
     serializer_class = EvidenceSerializer
     pagination_class = StandardResultsSetPagination
@@ -60,6 +60,16 @@ class EvidenceListView(APIView):
 class EvidenceCreateView(APIView):
     # Enable support for multipart/form-data requests
     parser_classes = (MultiPartParser, FormParser)
+
+    def get(self, request, evidence_list_id):
+        # Fetch the evidence list
+        evidence_list = get_object_or_404(EvidenceList, id=evidence_list_id)
+        # Get all evidences associated with the evidence list
+        evidences = evidence_list.evidences.all()
+
+        # Serialize the queryset
+        serializer = EvidenceSerializer(evidences, many=True)
+        return Response(serializer.data)
 
     def post(self, request, evidence_list_id):
         # Fetch the evidence list

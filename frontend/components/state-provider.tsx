@@ -50,6 +50,7 @@ export interface ControlProgress {
   na_description?: string;
   implementation_status: number;
   control: number;
+  evidence_list: number;
 }
 
 export interface State {
