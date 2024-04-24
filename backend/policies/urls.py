@@ -12,7 +12,6 @@ from .views import (
     EvidenceListView,
     EvidenceCreateView,
     EvidenceDetailView,
-    AllEvidenceListView,
     ServeProtectedMediaView,
 )
 
@@ -39,8 +38,16 @@ urlpatterns = [
         name="update_policy_api",
     ),
     path("evidence/", EvidenceListView.as_view(), name="evidence-list"),
-    path("evidence/<int:evidence_list_id>/evidence", EvidenceCreateView.as_view(), name="evidence-create"),
-    path("evidence/<int:evidence_list_id>/evidence/<int:evidence_id>", EvidenceDetailView.as_view(), name="evidence-detail")
+    path(
+        "evidence/<int:evidence_list_id>/evidence/",
+        EvidenceCreateView.as_view(),
+        name="evidence-create",
+    ),
+    path(
+        "evidence/<int:evidence_list_id>/evidence/<int:evidence_id>/",
+        EvidenceDetailView.as_view(),
+        name="evidence-detail",
+    ),
     path("token/", CookieTokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("logout/", CookieTokenLogoutView.as_view(), name="token_logout"),
     path("token/refresh/", CookieTokenRefreshView.as_view(), name="token_refresh"),
