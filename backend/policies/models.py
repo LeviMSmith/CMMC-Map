@@ -66,21 +66,25 @@ class Revision(models.Model):
         EvidenceList,
         on_delete=models.CASCADE,
         related_name="revisions_for_system_top_evi",
+        null=True,
     )
     hardware_listing = models.ForeignKey(
         EvidenceList,
         on_delete=models.CASCADE,
         related_name="revisions_for_hardware_listing",
+        null=True,
     )
     software_listing = models.ForeignKey(
         EvidenceList,
         on_delete=models.CASCADE,
         related_name="revisions_for_software_listing",
+        null=True,
     )
     hardsoft_main = models.ForeignKey(
         EvidenceList,
         on_delete=models.CASCADE,
         related_name="revisions_for_hardsoft_main",
+        null=True,
     )
 
 
@@ -94,7 +98,7 @@ class Policy(models.Model):
     implementation_status = models.PositiveSmallIntegerField(default=0)
     control = models.ForeignKey(Control, on_delete=models.CASCADE)
     revision = models.ForeignKey(Revision, on_delete=models.CASCADE)
-    evidence_list = models.ForeignKey(EvidenceList, on_delete=models.CASCADE)
+    evidence_list = models.ForeignKey(EvidenceList, on_delete=models.CASCADE, null=True)
 
 
 class Assessment(models.Model):
