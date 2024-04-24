@@ -21,7 +21,7 @@ class PolicySerializer(serializers.ModelSerializer):
             "control",
             "evidence_list",
         ]
-        read_only_fields = ("id", "control")
+        read_only_fields = ("id", "control", "evidence_list")
 
 
 class SectionSerializer(serializers.ModelSerializer):
@@ -43,7 +43,13 @@ class RevisionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Revision
         fields = "__all__"
-        read_only_fields = ["id"]
+        read_only_fields = [
+            "id",
+            "system_top_evi",
+            "hardware_listing",
+            "software_listing",
+            "hardsoft_main",
+        ]
 
 
 class AssessmentSerializer(serializers.ModelSerializer):

@@ -6,6 +6,7 @@ from rest_framework.views import APIView
 from rest_framework.exceptions import ValidationError, AuthenticationFailed
 from rest_framework.generics import GenericAPIView
 from rest_framework.mixins import ListModelMixin
+from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework import status, generics
 from django.shortcuts import get_object_or_404
 from django.db.models import Count
@@ -47,7 +48,7 @@ class ServeProtectedMediaView(APIView):
             return Response(status=status.HTTP_404_NOT_FOUND)
 
 
-class AllEvidenceListView(GenericAPIView, ListModelMixin):
+class EvidenceListView(APIView):
     queryset = Evidence.objects.all()
     serializer_class = EvidenceSerializer
     pagination_class = StandardResultsSetPagination
@@ -56,88 +57,67 @@ class AllEvidenceListView(GenericAPIView, ListModelMixin):
         return self.list(request, *args, **kwargs)
 
 
-class EvidenceListView(APIView):
-    def get(self, request, revision, control, format=None):
-        policies = Policy.objects.filter(revision__id=revision, control=control)
-        evidence_list = Evidence.objects.filter(policy__in=policies).distinct()
-        # Pass 'context' with 'request' to the serializer
-        serializer = EvidenceSerializer(
-            evidence_list, many=True, context={"request": request}
-        )
-        return Response(serializer.data)
+class EvidenceCreateView(APIView):
+    # Enable support for multipart/form-data requests
+    parser_classes = (MultiPartParser, FormParser)
 
-    def post(self, request, revision, control, format=None):
+    def post(self, request, evidence_list_id):
+        # Fetch the evidence list
+        evidence_list = get_object_or_404(EvidenceList, id=evidence_list_id)
+
+        # Deserialize the incoming data to an Evidence object
         serializer = EvidenceSerializer(data=request.data)
         if serializer.is_valid():
-            self.perform_create(serializer, revision, control)
+            # Save the new Evidence object
+            evidence = serializer.save()
+
+            # Associate the new evidence with the specified evidence list
+            evidence_list.evidences.add(evidence)
+
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def perform_create(self, serializer, revision, control):
-        # Find the policy based on revision and control
-        policy = Policy.objects.filter(revision__id=revision, control=control).first()
-        if not policy:
-            raise ValidationError(
-                f"Policy not found with the provided revision {revision} and control {control}."
-            )
-        evidence = serializer.save()
-        evidence.policy.add(policy)
+        else:
+            # Return error if the data isn't valid
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class EvidenceDeleteView(APIView):
-    def delete(self, request, revision, control, evidence_id, format=None):
-        try:
-            policies = Policy.objects.filter(revision__id=revision, control=control)
-            evidence = Evidence.objects.filter(
-                policy__in=policies, id=evidence_id
-            ).first()
+class EvidenceDetailView(APIView):
+    def delete(self, request, evidence_list_id, evidence_id, format=None):
+        evidence_list = get_object_or_404(EvidenceList, id=evidence_list_id)
+        evidence = get_object_or_404(Evidence, id=evidence_id)
 
-            if evidence:
-                # Check how many policies are associated with this evidence
-                policy_count = evidence.policy.count()
-
-                # If the evidence is linked to more than the current policy
-                if policy_count > 1:
-                    # Remove the link between the evidence and the policy only
-                    evidence.policy.remove(*policies)
-                else:
-                    # If only linked to the current policy, delete the file (if exists) and the evidence record
-                    if evidence.file:
-                        file_path = evidence.file.path
-                        if os.path.isfile(file_path):
-                            os.remove(file_path)
-                    evidence.delete()
-
-                return Response(status=status.HTTP_204_NO_CONTENT)
-            else:
-                return Response(
-                    {"error": "Evidence not found."}, status=status.HTTP_404_NOT_FOUND
-                )
-        except Evidence.DoesNotExist:
-            raise Http404
-
-    def post(self, request, revision, control, evidence_id, format=None):
-        # Find the policy based on revision and control
-        policy = Policy.objects.filter(revision__id=revision, control=control).first()
-        if not policy:
+        # Check how many EvidenceLists reference this Evidence
+        if evidence.evidencelist_set.count() > 1:
+            # Evidence is referenced in multiple lists, so only remove it from the current one
+            evidence_list.evidences.remove(evidence)
             return Response(
-                {"error": "Policy not found."}, status=status.HTTP_404_NOT_FOUND
+                {"message": "Evidence removed from the list"},
+                status=status.HTTP_204_NO_CONTENT,
             )
-
-        # Find the evidence by id
-        try:
-            evidence = Evidence.objects.get(id=evidence_id)
-        except Evidence.DoesNotExist:
+        else:
+            # This is the only list referencing the Evidence, delete Evidence and its associated media
+            if evidence.file:
+                evidence.file.delete()  # Delete the file associated with this evidence
+            evidence.delete()  # Delete the Evidence record itself
             return Response(
-                {"error": "Evidence not found."}, status=status.HTTP_404_NOT_FOUND
+                {"message": "Evidence and associated media deleted"},
+                status=status.HTTP_204_NO_CONTENT,
             )
 
-        # Add the evidence to the policy
-        policy.evidence_set.add(evidence)
+    def post(self, request, evidence_list_id, evidence_id, format=None):
+        evidence_list = get_object_or_404(EvidenceList, id=evidence_list_id)
+        evidence = get_object_or_404(Evidence, id=evidence_id)
 
+        # Check if the evidence is already in the list
+        if evidence in evidence_list.evidences.all():
+            return Response(
+                {"message": "Evidence already in the list"},
+                status=status.HTTP_409_CONFLICT,
+            )
+
+        # Add evidence to the list
+        evidence_list.evidences.add(evidence)
         return Response(
-            {"success": "Evidence associated with the policy successfully."},
-            status=status.HTTP_200_OK,
+            {"message": "Evidence added to the list"}, status=status.HTTP_201_CREATED
         )
 
 
