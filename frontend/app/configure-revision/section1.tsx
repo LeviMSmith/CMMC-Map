@@ -8,6 +8,8 @@ import {
   Divider,
   Group,
   NumberInput,
+  Space,
+  Text,
   Textarea,
   TextInput,
   Title,
@@ -160,16 +162,19 @@ export default function SystemInformationForm({
         </Affix>
         <TextInput
           label="System Name/Title"
+          description="State the name of the system.  Spell out acronyms."
           {...form.getInputProps("systemName")}
           key={(form.getInputProps("systemName") as any).key}
         />
         <TextInput
           label="System Categorization"
+          description='Usually "Moderate Impact for Confidentiality"'
           {...form.getInputProps("systemCategory")}
           key={(form.getInputProps("systemCategory") as any).key}
         />
         <TextInput
           label="System Unique Identifier"
+          description="Usually a CAGE code or something like it."
           {...form.getInputProps("systemUniqueId")}
           key={(form.getInputProps("systemUniqueId") as any).key}
         />
@@ -196,6 +201,7 @@ export default function SystemInformationForm({
         <Divider label="Information Owner" mt={32} mb={16} />
         <TextInput
           label="Information Owner Name"
+          description="Government point of contact responsible for providing and/or receiving CUI"
           {...form.getInputProps("infoOwnerName")}
           key={(form.getInputProps("infoOwnerName") as any).key}
         />
@@ -224,6 +230,7 @@ export default function SystemInformationForm({
         <Divider label="System Owner" mt={32} mb={16} />
         <TextInput
           label="System Owner Name"
+          description="Assignment of security responsibility"
           {...form.getInputProps("sysOwnerName")}
           key={(form.getInputProps("sysOwnerName") as any).key}
         />
@@ -252,6 +259,7 @@ export default function SystemInformationForm({
         <Divider label="System Security Officer" mt={32} mb={16} />
         <TextInput
           label="System Security Officer Name"
+          description="The person likely selected in your incident response plan"
           {...form.getInputProps("sysSecName")}
           key={(form.getInputProps("sysSecName") as any).key}
         />
@@ -279,12 +287,15 @@ export default function SystemInformationForm({
         <Divider label="General System Information" mt={32} mb={16} />
         <Textarea
           label="General Description/Purpose of System"
+          description="Provide a short, high-level description of the function/purpose of the system."
+          placeholder="What is the function/purpose of the system?"
           {...form.getInputProps("systemDescription")}
           key={(form.getInputProps("systemDescription") as any).key}
         />
         <Group grow>
           <NumberInput
             label="Number of end users"
+            description="Provide the approximate number of end users"
             min={1}
             max={1000000}
             {...form.getInputProps("numEndUsers")}
@@ -292,6 +303,7 @@ export default function SystemInformationForm({
           />
           <NumberInput
             label="Number of privileged users"
+            description="Provide the approximate number of administrators. Include all those with privileged access such as system administrators, database administrators, application administrators, etc."
             min={1}
             max={1000000}
             {...form.getInputProps("numAdminUsers")}
@@ -300,8 +312,36 @@ export default function SystemInformationForm({
         </Group>
         <Textarea
           label="General Description of Information"
+          description="Document the CUI information types processed, stored, or transmitted by the system. For more information, see the CUI Registry at https://www.archives.gov/cui/registry/category-list."
           {...form.getInputProps("informationDescription")}
           key={(form.getInputProps("informationDescription") as any).key}
+        />
+        <Title my={64} order={2} align="center">
+          Section 2: System Environment
+        </Title>
+        <Textarea
+          label="Detailed System Topology"
+          description="Include a detailed topology narrative and graphic that clearly depicts the system boundaries, system interconnections, and key devices.  (Note: this does not require depicting every workstation or desktop, but include an instance for each operating system in use, an instance for portable components (if applicable), all virtual and physical servers (e.g., file, print, web, database, application), as well as any networked workstations (e.g., Unix, Windows, Mac, Linux), firewalls, routers, switches, copiers, printers, lab equipment, handhelds).  If components of other systems that interconnect/interface with this system need to be shown on the diagram, denote the system boundaries by referencing the security plans or names and owners of the other system(s) in the diagram."
+          {...form.getInputProps("systemTopology")}
+          key={(form.getInputProps("systemTopology") as any).key}
+        />
+        <Textarea
+          label="Hardware Listing"
+          description="Include or reference a complete and accurate listing of all hardware (a reference to the organizational component inventory database is acceptable) and software (system software and application software) components, including make/OEM, model, version, service packs, and person or role responsible for the component. "
+          {...form.getInputProps("hardwareListing")}
+          key={(form.getInputProps("hardwareListing") as any).key}
+        />
+        <Textarea
+          label="Software Listing"
+          description="List all software components installed on the system. "
+          {...form.getInputProps("softwareListing")}
+          key={(form.getInputProps("softwareListing") as any).key}
+        />
+        <Textarea
+          label="Hardware and Software Maintenance and Ownership"
+          description="Hardware and Software Maintenance and Ownership - Is all hardware and software maintained and owned by the organization?"
+          {...form.getInputProps("hardSoftMain")}
+          key={(form.getInputProps("hardSoftMain") as any).key}
         />
       </form>
     </Box>
