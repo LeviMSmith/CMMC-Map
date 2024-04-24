@@ -160,6 +160,31 @@ def policy_status_by_section(request, revision):
     return Response(serializer.data)
 
 
+class RevisionDetailView(APIView):
+    """
+    Retrieve, update, or delete a revision instance.
+    """
+
+    def get(self, request, revision_id, format=None):
+        revision = get_object_or_404(Revision, pk=revision_id)
+        serializer = RevisionSerializer(revision)
+        return Response(serializer.data)
+
+    def put(self, request, revision_id, format=None):
+        revision = get_object_or_404(Revision, pk=revision_id)
+        serializer = RevisionSerializer(revision, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        print(request.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, revision_id, format=None):
+        revision = get_object_or_404(Revision, pk=revision_id)
+        revision.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
 class RevisionView(APIView):
     """
     List all revisions, or create a new revision.

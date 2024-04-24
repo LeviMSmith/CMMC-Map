@@ -41,7 +41,7 @@ class SectionSerializer(serializers.ModelSerializer):
 class RevisionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Revision
-        fields = ["id", "version", "date_completed"]
+        fields = "__all__"
         read_only_fields = ["id"]
 
 

@@ -5,6 +5,7 @@ from .views import (
     CookieTokenLogoutView,
     CookieTokenRefreshView,
     RevisionView,
+    RevisionDetailView,
     AssessmentView,
     policy_status_by_section,
     PolicyUpdateAPIView,
@@ -16,6 +17,11 @@ from .views import (
 
 urlpatterns = [
     path("revisions/", RevisionView.as_view(), name="revision-list"),
+    path(
+        "revisions/<int:revision_id>/",
+        RevisionDetailView.as_view(),
+        name="revision-detail",
+    ),
     path(
         "revisions/<int:revision_id>/assessments/",
         AssessmentView.as_view(),
