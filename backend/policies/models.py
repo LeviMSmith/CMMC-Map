@@ -21,6 +21,16 @@ class Control(models.Model):
     )
 
 
+class Evidence(models.Model):
+    file = models.FileField(null=True)
+    link = models.URLField(null=True)
+    description = models.TextField(null=True)
+
+
+class EvidenceList(models.Model):
+    evidences = models.ManyToManyField("Evidence")
+
+
 class Revision(models.Model):
     def __str__(self):
         return f"{self.version}"
@@ -52,6 +62,10 @@ class Revision(models.Model):
     num_end_users = models.PositiveIntegerField(null=True, blank=True)
     num_admin_users = models.PositiveIntegerField(null=True, blank=True)
     information_description = models.TextField(null=True, blank=True)
+    system_top_evi = models.ForeignKey(EvidenceList, on_delete=models.CASCADE)
+    hardware_listing = models.ForeignKey(EvidenceList, on_delete=models.CASCADE)
+    software_listing = models.ForeignKey(EvidenceList, on_delete=models.CASCADE)
+    hardsoft_main = models.ForeignKey(EvidenceList, on_delete=models.CASCADE)
 
 
 class Policy(models.Model):
@@ -64,13 +78,7 @@ class Policy(models.Model):
     implementation_status = models.PositiveSmallIntegerField(default=0)
     control = models.ForeignKey(Control, on_delete=models.CASCADE)
     revision = models.ForeignKey(Revision, on_delete=models.CASCADE)
-
-
-class Evidence(models.Model):
-    file = models.FileField(null=True)
-    link = models.URLField(null=True)
-    description = models.TextField(null=True)
-    policy = models.ManyToManyField(Policy)
+    evidence_list = models.ForeignKey(EvidenceList, on_delete=models.CASCADE)
 
 
 class Assessment(models.Model):

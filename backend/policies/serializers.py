@@ -19,6 +19,7 @@ class PolicySerializer(serializers.ModelSerializer):
             "na_description",
             "implementation_status",
             "control",
+            "evidence_list",
         ]
         read_only_fields = ("id", "control")
 

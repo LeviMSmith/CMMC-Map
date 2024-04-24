@@ -37,17 +37,8 @@ urlpatterns = [
         PolicyUpdateAPIView.as_view(),
         name="update_policy_api",
     ),
-    path(
-        "revisions/<int:revision>/policy/<int:control>/evidence/",
-        EvidenceListView.as_view(),
-        name="evidence-list",
-    ),
-    path(
-        "revisions/<int:revision>/policy/<int:control>/evidence/<int:evidence_id>/",
-        EvidenceDeleteView.as_view(),
-        name="evidence-delete",
-    ),
-    path("evidence/", AllEvidenceListView.as_view(), name="all-evidence"),
+    path("evidence/", EvidenceListView.as_view(), name="evidence-list"),
+    path("evidence/<int:evidence_id>/", EvidenceDetailView.as_view(), name="evidence-detail")
     path("token/", CookieTokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("logout/", CookieTokenLogoutView.as_view(), name="token_logout"),
     path("token/refresh/", CookieTokenRefreshView.as_view(), name="token_refresh"),
