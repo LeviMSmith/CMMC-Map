@@ -47,7 +47,7 @@ export const isImage = (fileName: string): boolean => {
 };
 
 function associateEvidenceToPolicy(
-  evidenceListId: number,
+  evidenceListId: string,
   evidenceId: number,
   evidenceRefresh: any,
   setEvidenceRefresh: any,
@@ -174,6 +174,10 @@ export function EvidenceList({
   evidenceListId,
   evidenceRefresh,
   setEvidenceRefresh,
+}: {
+  evidenceListId: string;
+  evidenceRefresh: any;
+  setEvidenceRefresh: any;
 }) {
   const [evidences, setEvidences] = useState(new Map());
   const [page, setPage] = useState(1);
@@ -193,7 +197,7 @@ export function EvidenceList({
           response.json().then((data) => {
             if (data.results.length > 0) {
               const newEvidences = new Map(evidences);
-              data.results.forEach((evidence) => {
+              data.results.forEach((evidence: Evidence) => {
                 newEvidences.set(evidence.id, evidence);
               });
               setEvidences(newEvidences);

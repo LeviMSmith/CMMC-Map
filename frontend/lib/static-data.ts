@@ -2,6 +2,35 @@ export interface Revision {
   id: string;
   version: string;
   date_completed?: Date;
+  system_name: string;
+  system_category: string;
+  system_unique_id: string;
+  responsible_org_name: string;
+  responsible_org_addr: string;
+  responsible_org_phone: string;
+  info_owner_name: string;
+  info_owner_title: string;
+  info_owner_addr: string;
+  info_owner_phone: string;
+  info_owner_email: string;
+  sys_owner_name: string;
+  sys_owner_title: string;
+  sys_owner_addr: string;
+  sys_owner_phone: string;
+  sys_owner_email: string;
+  sys_sec_name: string;
+  sys_sec_title: string;
+  sys_sec_addr: string;
+  sys_sec_phone: string;
+  sys_sec_email: string;
+  system_description: string;
+  num_end_users: number;
+  num_admin_users: number;
+  information_description: string;
+  system_top_evi: string;
+  hardware_listing: string;
+  software_listing: string;
+  hardsoft_main: string;
 }
 
 export interface Assessment {

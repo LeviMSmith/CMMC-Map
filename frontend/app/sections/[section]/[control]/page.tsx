@@ -14,7 +14,7 @@ export async function generateStaticParams() {
   });
 }
 
-export default async function Control({
+export default async function ControlPage({
   params,
 }: {
   params: { control: string };

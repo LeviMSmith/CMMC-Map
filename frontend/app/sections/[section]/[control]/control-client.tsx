@@ -64,7 +64,7 @@ export default function ControlDash({
   );
 
   const evidenceListId: string | null = currentControlProgress
-    ? currentControlProgress.evidence_list
+    ? currentControlProgress.evidence_list.toString()
     : null;
 
   const implementation_status: number = currentControlProgress
@@ -283,7 +283,11 @@ export default function ControlDash({
         </Tabs>
       </Paper>
       <div className="h-16" />
-      <EvidenceAdd evidenceListId={evidenceListId} />
+      {evidenceListId ? (
+        <EvidenceAdd evidenceListId={evidenceListId} />
+      ) : (
+        <Text>Failed to load evidence for this policy!</Text>
+      )}
     </Container>
   );
 }
