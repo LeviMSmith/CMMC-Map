@@ -43,7 +43,7 @@ export interface Evidence {
 }
 
 export const isImage = (fileName: string): boolean => {
-  return /\.(jpg|jpeg|png|gif)$/i.test(fileName);
+  return /\.(jpg|jpeg|png|gif|bmp)$/i.test(fileName);
 };
 
 function associateEvidenceToPolicy(
@@ -240,7 +240,7 @@ export function EvidenceList({
             }
           }}
         >
-          <SimpleGrid cols={5}>
+          <SimpleGrid cols={3}>
             {Array.from(evidences.values()).map((evidence) => (
               <EvidenceDisplay
                 key={evidence.id}
