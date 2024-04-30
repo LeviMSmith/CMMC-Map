@@ -300,7 +300,7 @@ export default function SSP() {
                 implementation_status =
                   currentControlProgress.implementation_status;
 
-                const policy =
+                policy =
                   implementation_status === 1
                     ? currentControlProgress.policy_description
                     : implementation_status === 2
