@@ -275,6 +275,9 @@ export default function SystemInformationForm({ revision }) {
           placeholder="What is the function/purpose of the system?"
           {...form.getInputProps("systemDescription")}
           key={form.getInputProps("systemDescription").key}
+          autosize
+          minRows={3}
+          maxRows={6}
         />
         <Group grow>
           <NumberInput
@@ -326,6 +329,9 @@ export default function SystemInformationForm({ revision }) {
           description="Hardware and Software Maintenance and Ownership - Is all hardware and software maintained and owned by the organization?"
           {...form.getInputProps("hardSoftMain")}
           key={form.getInputProps("hardSoftMain").key}
+          autosize
+          minRows={3}
+          maxRows={6}
         />
       </form>
     </Container>
