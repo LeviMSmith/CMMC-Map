@@ -1,18 +1,21 @@
 #!/bin/bash
 
 # Configuration
-DB_HOST=db
-DB_PORT=3306
-MAX_ATTEMPTS=10
+MAX_ATTEMPTS=12
 ATTEMPT_INTERVAL=5
 
-# Function to wait for the database to be ready
 wait_for_db() {
-    echo "Waiting for MariaDB database to be ready..."
+    # Parse database host and port from DJANGO_DATABASE_URL
+    DB_HOST=$(echo $DJANGO_DATABASE_URL | sed -e 's/mysql:\/\/[^@]*@//' -e 's/:.*//')
+    DB_PORT=$(echo $DJANGO_DATABASE_URL | sed -e 's/.*://' -e 's/\/.*//')
+
+    echo "Waiting for MariaDB database at $DB_HOST:$DB_PORT to be ready..."
+    MAX_ATTEMPTS=12
+    ATTEMPT_INTERVAL=5
     attempt=1
     while [ $attempt -le $MAX_ATTEMPTS ]; do
         echo "Attempt $attempt of $MAX_ATTEMPTS: Checking database status..."
-        if mysqladmin ping -h"$DB_HOST" -P"$DB_PORT" --silent; then
+        if timeout 5s mysqladmin ping -h"$DB_HOST" -P"$DB_PORT" --silent; then
             echo "Database is ready!"
             return 0
         else
