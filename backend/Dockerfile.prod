@@ -21,6 +21,7 @@ EXPOSE 8000
 # Define environment variable
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
+ENV DJANGO_DEBUG False
 
 COPY docker-entrypoint.prod.sh /app/docker-entrypoint.prod.sh
 RUN chmod +x /app/docker-entrypoint.prod.sh

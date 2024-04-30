@@ -6,8 +6,8 @@ ATTEMPT_INTERVAL=5
 
 wait_for_db() {
     # Parse database host and port from DJANGO_DATABASE_URL
-    DB_HOST=$(echo $DJANGO_DATABASE_URL | sed -e 's/mysql:\/\/[^@]*@//' -e 's/:.*//')
-    DB_PORT=$(echo $DJANGO_DATABASE_URL | sed -e 's/.*://' -e 's/\/.*//')
+    DB_HOST=$(echo $DJANGO_DATABASE_URL | sed -e 's/mysql:\/\/.*@//' -e 's/:.*//g' -e 's/\/.*//g')
+    DB_PORT=$(echo $DJANGO_DATABASE_URL | grep -oP '(?<=:)\d+(?=\/)' || echo "3306")
 
     echo "Waiting for MariaDB database at $DB_HOST:$DB_PORT to be ready..."
     MAX_ATTEMPTS=12

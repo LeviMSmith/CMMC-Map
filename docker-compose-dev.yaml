@@ -35,10 +35,7 @@ services:
       - ./backend:/app
       - ./backend/media:/app/media
     environment:
-      - PYTHONDONTWRITEBYTECODE=1
-      - PYTHONUNBUFFERED=1
       - DJANGO_DATABASE_URL=mysql://cmmcmapdev:${MARIADB_PASSWORD}@db/cmmcmap
-      - DJANGO_DEBUG=True
       - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
       - DJANGO_ROOT_PASSWORD=${DJANGO_ROOT_PASSWORD}
       - DJANGO_ALLOWED_HOSTS=*
@@ -55,8 +52,6 @@ services:
       - /app/node_modules
     ports:
       - "3000:3000"
-    environment:
-      - NODE_ENV=development
   db:
     container_name: cmmc-dev-db
     image: mariadb
