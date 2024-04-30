@@ -291,10 +291,9 @@ export default function SSP() {
                 (element: ControlProgress) => element.control === control.id,
               );
 
-              var policy =
+              let policy =
                 "No policy has been implemented for this control yet.";
-
-              var implementation_status = 0;
+              let implementation_status = 0;
 
               if (currentControlProgress) {
                 implementation_status =
@@ -302,11 +301,14 @@ export default function SSP() {
 
                 policy =
                   implementation_status === 1
-                    ? currentControlProgress.policy_description
+                    ? currentControlProgress.policy_description ??
+                      "No specific policy description."
                     : implementation_status === 2
-                      ? currentControlProgress.plan_description
+                      ? currentControlProgress.plan_description ??
+                        "No specific plan description."
                       : implementation_status === 3
-                        ? currentControlProgress.na_description
+                        ? currentControlProgress.na_description ??
+                          "Not applicable. Description not given."
                         : "No policy has been implemented for this control yet.";
               }
 
