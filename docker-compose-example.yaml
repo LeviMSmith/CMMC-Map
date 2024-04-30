@@ -1,0 +1,59 @@
+services:
+  certgen:
+    image: nginx:latest
+    volumes:
+      - ./certs:/etc/ssl/certs
+    command: >
+      /bin/sh -c "
+        if [ ! -f /etc/ssl/certs/localhost.crt ]; then
+          openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/certs/localhost.key -out /etc/ssl/certs/localhost.crt -subj '/CN=localhost/O=Localhost/C=US' && echo 'Certificates ready.' || echo 'Error making certificate request';
+        else
+          echo 'Certificates already exist.';
+        fi"
+  nginx:
+    container_name: cmmcmap-nginx
+    image: nginx:latest
+    ports:
+      - "443:443"
+      - "80:80"
+    volumes:
+      - ./nginx:/etc/nginx/conf.d
+      - ./certs:/etc/ssl/certs:ro
+      - ./nginx/docker-entrypoint.sh:/docker-entrypoint.sh
+    command: ["/docker-entrypoint.sh"]
+    environment:
+      - PROJECT_URL=${PROJECT_URL}
+    depends_on:
+      - certgen
+      - backend
+      - frontend
+  backend:
+    container_name: cmmcmap-backend
+    image: levimsmith089/cmmcmap-backend:latest
+    volumes:
+      - cmmcmap_backend_media:/app/media
+    environment:
+      - DJANGO_DATABASE_URL=mysql://cmmcmapprod:${MARIADB_PASSWORD}@db/cmmcmap
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
+      - DJANGO_ROOT_PASSWORD=${DJANGO_ROOT_PASSWORD}
+      - DJANGO_ALLOWED_HOSTS=*
+      - PROJECT_URL=${PROJECT_URL}
+    depends_on:
+      - db
+  frontend:
+    container_name: cmmcmap-frontend
+    image: levimsmith089/cmmcmap-frontend:latest
+  db:
+    container_name: cmmcmap-db
+    image: mariadb
+    volumes:
+      - cmmcmap_mariadb_data:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
+      - MYSQL_DATABASE=cmmcmap
+      - MYSQL_USER=cmmcmap
+      - MYSQL_PASSWORD=${MARIADB_PASSWORD}
+
+volumes:
+  cmmcmap_mariadb_data:
+  cmmcmap_backend_media:
