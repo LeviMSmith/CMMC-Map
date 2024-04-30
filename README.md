@@ -1,6 +1,8 @@
 # CMMC-Map
 
-This is a work in progress project to handle CMMC (Cybersecurity Maturation Model Certification) policy with a web app. Version 0.1.0 comming soon!
+This is a web app to handle CMMC (Cybersecurity Maturation Model Certification) policy with a web app.
+
+Version 0.1.0 out now!
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
 
@@ -11,7 +13,9 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 
 ## Running
 
-Prebuilt docker containers are a work in progress, but for now containers can be built with the Dockerfile.prod scripts in backend and frontend each.
+Grabbing the latest release and running the docker compose is the simplest option.
+
+Alternativly, running and building locally can be done with the Dockerfile.prod scripts in backend and frontend each.
 
 Or a single node stack can be run with
 
@@ -40,13 +44,13 @@ The compose files simplify a lot, but if you'd like the specific environment var
 
 ### Backend Docker
 
-| Environment Variable | Description                                                                                                                                                                                                                                                                                  | Default/Required |
-| -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------- |
-| PROJECT_URL          | The origin you are serving the whole application from. For example: https://example.com                                                                                                                                                                                                      | Required         |
-| DJANGO_ROOT_PASSWORD | The backend creates a root user by default to access the admin interface to create more users.                                                                                                                                                                                                 | Required         |
-| DJANGO_SECRET_KEY    | The [secret key Django uses for signing things](https://docs.djangoproject.com/en/5.0/topics/signing/)                                                                                                                                                                                       | Required         |
-| DJANGO_DEBUG         | Whether to run Django in debug mode or production                                                                                                                                                                                                                                            | False            |
-| DJANGO_ALLOWED_HOSTS | Essentially a firewall of all sources Django will allow. For most cases all ('\*') is what you'll want.                                                                                                                                                                                      | Required         |
+| Environment Variable | Description                                                                                                                                                                                                                                                                                 | Default/Required |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------- |
+| PROJECT_URL          | The origin you are serving the whole application from. For example: https://example.com                                                                                                                                                                                                     | Required         |
+| DJANGO_ROOT_PASSWORD | The backend creates a root user by default to access the admin interface to create more users.                                                                                                                                                                                              | Required         |
+| DJANGO_SECRET_KEY    | The [secret key Django uses for signing things](https://docs.djangoproject.com/en/5.0/topics/signing/)                                                                                                                                                                                      | Required         |
+| DJANGO_DEBUG         | Whether to run Django in debug mode or production                                                                                                                                                                                                                                           | False            |
+| DJANGO_ALLOWED_HOSTS | Essentially a firewall of all sources Django will allow. For most cases all ('\*') is what you'll want.                                                                                                                                                                                     | Required         |
 | DJANGO_DATABASE_URL  | This uses [dj-database-url](https://pypi.org/project/dj-database-url/) to tell Django how to connect to the database. In theory it could really be any database Django supports, but it's only tested with MariaDB and that's what the docker entrypoint tries to connect to when starting. | Required         |
 
 ### Frontend Docker

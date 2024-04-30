@@ -3,8 +3,8 @@
 import {
   ActionIcon,
   Affix,
-  Box,
   Button,
+  Container,
   Divider,
   Group,
   NumberInput,
@@ -19,29 +19,12 @@ import { notifications } from "@mantine/notifications";
 import { IconDeviceFloppy } from "@tabler/icons-react";
 import { useState, useEffect, useContext } from "react";
 
-import { StateContextType, StateContext } from "@/components/state-provider";
+import { StateContext } from "@/components/state-provider";
 import { EvidenceAdd } from "@/components/evidence";
 import { backendFetch } from "@/lib/session";
 
-function debounce(func, wait) {
-  let timeout;
-  return function executedFunction(...args) {
-    const later = () => {
-      clearTimeout(timeout);
-      func(...args);
-    };
-    clearTimeout(timeout);
-    timeout = setTimeout(later, wait);
-  };
-}
-
-export default function SystemInformationForm({
-  revision,
-}: {
-  revision: Revision;
-}) {
-  const { sharedState, setSharedState } =
-    useContext<StateContextType>(StateContext);
+export default function SystemInformationForm({ revision }) {
+  const { sharedState, setSharedState } = useContext(StateContext);
 
   // Ideally we'd validate these, but that's for projects with more than one dev
   // Plus the backend won't accept bad values, so at least the fetch will fail.
@@ -76,7 +59,7 @@ export default function SystemInformationForm({
     },
   });
 
-  const handleSubmit = (values: any) => {
+  const handleSubmit = (values) => {
     try {
       if (!sharedState.revision_id) {
         throw new Error("Revision id not set! Can't update it.");
@@ -142,8 +125,8 @@ export default function SystemInformationForm({
   };
 
   return (
-    <Box sx={{ maxWidth: 500 }} mx="auto">
-      <Title order={2} align="center">
+    <Container>
+      <Title order={2} ta="center">
         Section 1: System Information
       </Title>
       <Divider label="System Information" mt={32} mb={16} />
@@ -165,19 +148,19 @@ export default function SystemInformationForm({
           label="System Name/Title"
           description="State the name of the system.  Spell out acronyms."
           {...form.getInputProps("systemName")}
-          key={(form.getInputProps("systemName") as any).key}
+          key={form.getInputProps("systemName").key}
         />
         <TextInput
           label="System Categorization"
           description='Usually "Moderate Impact for Confidentiality"'
           {...form.getInputProps("systemCategory")}
-          key={(form.getInputProps("systemCategory") as any).key}
+          key={form.getInputProps("systemCategory").key}
         />
         <TextInput
           label="System Unique Identifier"
           description="Usually a CAGE code or something like it."
           {...form.getInputProps("systemUniqueId")}
-          key={(form.getInputProps("systemUniqueId") as any).key}
+          key={form.getInputProps("systemUniqueId").key}
         />
 
         {/* Responsible Organization */}
@@ -185,17 +168,17 @@ export default function SystemInformationForm({
         <TextInput
           label="Responsible Organization Name"
           {...form.getInputProps("responsibleOrgName")}
-          key={(form.getInputProps("responsibleOrgName") as any).key}
+          key={form.getInputProps("responsibleOrgName").key}
         />
         <TextInput
           label="Address"
           {...form.getInputProps("responsibleOrgAddr")}
-          key={(form.getInputProps("responsibleOrgAddr") as any).key}
+          key={form.getInputProps("responsibleOrgAddr").key}
         />
         <TextInput
           label="Phone"
           {...form.getInputProps("responsibleOrgPhone")}
-          key={(form.getInputProps("responsibleOrgPhone") as any).key}
+          key={form.getInputProps("responsibleOrgPhone").key}
         />
 
         {/* Information Owner */}
@@ -204,27 +187,27 @@ export default function SystemInformationForm({
           label="Information Owner Name"
           description="Government point of contact responsible for providing and/or receiving CUI"
           {...form.getInputProps("infoOwnerName")}
-          key={(form.getInputProps("infoOwnerName") as any).key}
+          key={form.getInputProps("infoOwnerName").key}
         />
         <TextInput
           label="Title"
           {...form.getInputProps("infoOwnerTitle")}
-          key={(form.getInputProps("infoOwnerTitle") as any).key}
+          key={form.getInputProps("infoOwnerTitle").key}
         />
         <TextInput
           label="Office Address"
           {...form.getInputProps("infoOwnerAddr")}
-          key={(form.getInputProps("infoOwnerAddr") as any).key}
+          key={form.getInputProps("infoOwnerAddr").key}
         />
         <TextInput
           label="Work Phone"
           {...form.getInputProps("infoOwnerPhone")}
-          key={(form.getInputProps("infoOwnerPhone") as any).key}
+          key={form.getInputProps("infoOwnerPhone").key}
         />
         <TextInput
           label="e-Mail Address"
           {...form.getInputProps("infoOwnerEmail")}
-          key={(form.getInputProps("infoOwnerEmail") as any).key}
+          key={form.getInputProps("infoOwnerEmail").key}
         />
 
         {/* System Owner */}
@@ -233,27 +216,27 @@ export default function SystemInformationForm({
           label="System Owner Name"
           description="Assignment of security responsibility"
           {...form.getInputProps("sysOwnerName")}
-          key={(form.getInputProps("sysOwnerName") as any).key}
+          key={form.getInputProps("sysOwnerName").key}
         />
         <TextInput
           label="Title"
           {...form.getInputProps("sysOwnerTitle")}
-          key={(form.getInputProps("sysOwnerTitle") as any).key}
+          key={form.getInputProps("sysOwnerTitle").key}
         />
         <TextInput
           label="Office Address"
           {...form.getInputProps("sysOwnerAddr")}
-          key={(form.getInputProps("sysOwnerAddr") as any).key}
+          key={form.getInputProps("sysOwnerAddr").key}
         />
         <TextInput
           label="Work Phone"
           {...form.getInputProps("sysOwnerPhone")}
-          key={(form.getInputProps("sysOwnerPhone") as any).key}
+          key={form.getInputProps("sysOwnerPhone").key}
         />
         <TextInput
           label="e-Mail Address"
           {...form.getInputProps("sysOwnerEmail")}
-          key={(form.getInputProps("sysOwnerEmail") as any).key}
+          key={form.getInputProps("sysOwnerEmail").key}
         />
 
         {/* System Security Officer */}
@@ -262,27 +245,27 @@ export default function SystemInformationForm({
           label="System Security Officer Name"
           description="The person likely selected in your incident response plan"
           {...form.getInputProps("sysSecName")}
-          key={(form.getInputProps("sysSecName") as any).key}
+          key={form.getInputProps("sysSecName").key}
         />
         <TextInput
           label="Title"
           {...form.getInputProps("sysSecTitle")}
-          key={(form.getInputProps("sysSecTitle") as any).key}
+          key={form.getInputProps("sysSecTitle").key}
         />
         <TextInput
           label="Office Address"
           {...form.getInputProps("sysSecAddr")}
-          key={(form.getInputProps("sysSecAddr") as any).key}
+          key={form.getInputProps("sysSecAddr").key}
         />
         <TextInput
           label="Work Phone"
           {...form.getInputProps("sysSecPhone")}
-          key={(form.getInputProps("sysSecPhone") as any).key}
+          key={form.getInputProps("sysSecPhone").key}
         />
         <TextInput
           label="e-Mail Address"
           {...form.getInputProps("sysSecEmail")}
-          key={(form.getInputProps("sysSecEmail") as any).key}
+          key={form.getInputProps("sysSecEmail").key}
         />
 
         <Divider label="General System Information" mt={32} mb={16} />
@@ -291,7 +274,7 @@ export default function SystemInformationForm({
           description="Provide a short, high-level description of the function/purpose of the system."
           placeholder="What is the function/purpose of the system?"
           {...form.getInputProps("systemDescription")}
-          key={(form.getInputProps("systemDescription") as any).key}
+          key={form.getInputProps("systemDescription").key}
         />
         <Group grow>
           <NumberInput
@@ -300,7 +283,7 @@ export default function SystemInformationForm({
             min={1}
             max={1000000}
             {...form.getInputProps("numEndUsers")}
-            key={(form.getInputProps("numEndUsers") as any).key}
+            key={form.getInputProps("numEndUsers").key}
           />
           <NumberInput
             label="Number of privileged users"
@@ -308,7 +291,7 @@ export default function SystemInformationForm({
             min={1}
             max={1000000}
             {...form.getInputProps("numAdminUsers")}
-            key={(form.getInputProps("numAdminUsers") as any).key}
+            key={form.getInputProps("numAdminUsers").key}
           />
         </Group>
         <Divider my={32} />
@@ -342,9 +325,9 @@ export default function SystemInformationForm({
           label="Hardware and Software Maintenance and Ownership"
           description="Hardware and Software Maintenance and Ownership - Is all hardware and software maintained and owned by the organization?"
           {...form.getInputProps("hardSoftMain")}
-          key={(form.getInputProps("hardSoftMain") as any).key}
+          key={form.getInputProps("hardSoftMain").key}
         />
       </form>
-    </Box>
+    </Container>
   );
 }

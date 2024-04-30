@@ -5,6 +5,7 @@ import { useContext, useState, useEffect } from "react";
 
 import SystemInformationForm from "./section1";
 import { StateContextType, StateContext } from "@/components/state-provider";
+import { Revision } from "@/lib/static-data";
 import { backendFetch } from "@/lib/session";
 
 export default function ConfigureRevision() {

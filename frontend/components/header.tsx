@@ -224,6 +224,7 @@ const RevisionSelect = ({
   sharedState: State;
   setSharedState: (newState: State) => void;
 }) => {
+  const router = useRouter();
   // Scenario 1: revisionOptions is undefined
   if (revisionOptions === undefined) {
     return <Loader type="dots" />;
@@ -246,8 +247,6 @@ const RevisionSelect = ({
       </Group>
     );
   }
-
-  const router = useRouter();
 
   const RevisionButtons = () => {
     return (
