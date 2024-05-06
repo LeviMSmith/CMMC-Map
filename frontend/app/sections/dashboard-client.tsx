@@ -11,6 +11,7 @@ import {
   Text,
   TextInput,
   Title,
+  Tooltip,
   SimpleGrid,
   Space,
   Stack,
@@ -36,6 +37,7 @@ import { useRouter } from "next/navigation";
 import { useContext } from "react";
 
 import {
+  ControlProgress,
   StateContextType,
   StateContext,
   SectionProgress,
@@ -125,25 +127,30 @@ export default function Dashboard() {
                           }
 
                           return (
-                            <ActionIcon
-                              color={
-                                implementation_status === 1
-                                  ? "green"
-                                  : implementation_status === 2
-                                    ? "yellow"
-                                    : implementation_status === 3
-                                      ? "teal"
-                                      : "gray"
-                              }
-                              m={2}
-                              size="xs"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                router.push(
-                                  `/sections/${section.section}/${control.section}`,
-                                );
-                              }}
-                            ></ActionIcon>
+                            <Tooltip
+                              label={control.section}
+                              key={`heatmap ${control.section}`}
+                            >
+                              <ActionIcon
+                                color={
+                                  implementation_status === 1
+                                    ? "green"
+                                    : implementation_status === 2
+                                      ? "yellow"
+                                      : implementation_status === 3
+                                        ? "teal"
+                                        : "gray"
+                                }
+                                m={2}
+                                size="xs"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  router.push(
+                                    `/sections/${section.section}/${control.section}`,
+                                  );
+                                }}
+                              ></ActionIcon>
+                            </Tooltip>
                           );
                         })
                     ) : (
