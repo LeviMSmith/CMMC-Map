@@ -51,6 +51,7 @@ export interface ControlProgress {
   implementation_status: number;
   control: number;
   evidence_list: number;
+  num_evidence?: number | null;
 }
 
 export interface State {
