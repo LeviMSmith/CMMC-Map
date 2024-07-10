@@ -68,13 +68,6 @@ export default function Dashboard() {
   const { sharedState, setSharedState } =
     useContext<StateContextType>(StateContext);
 
-  useEffect(() => {
-    setSharedState((prevState) => ({
-      ...prevState,
-      refreshControlProgress: !prevState.refreshControlProgress,
-    }));
-  }, []);
-
   const computedColorScheme = useComputedColorScheme();
 
   const router = useRouter();
@@ -168,7 +161,7 @@ export default function Dashboard() {
                                     : { color: "black" }
                                 }
                               >
-                                {currentControlProgress.num_evidence
+                                {currentControlProgress?.num_evidence
                                   ? currentControlProgress.num_evidence
                                   : null}
                               </ActionIcon>
