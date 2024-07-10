@@ -15,6 +15,7 @@ import {
   SimpleGrid,
   Space,
   Stack,
+  useComputedColorScheme,
 } from "@mantine/core";
 import {
   IconLockAccess,
@@ -34,7 +35,7 @@ import {
 } from "@tabler/icons-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 
 import {
   ControlProgress,
@@ -66,6 +67,8 @@ const sectionIcons = [
 export default function Dashboard() {
   const { sharedState, setSharedState } =
     useContext<StateContextType>(StateContext);
+
+  const computedColorScheme = useComputedColorScheme();
 
   const router = useRouter();
 
@@ -99,7 +102,7 @@ export default function Dashboard() {
                     {section.abreviation})
                   </Text>
                 </Group>
-                <div className="mb-4">
+                <div className="mb-4 flex flex-wrap justify-start">
                   {sharedState.sectionProgress &&
                     (isKeyOfSectionProgress(section.section) ? (
                       controls
@@ -139,17 +142,29 @@ export default function Dashboard() {
                                       ? "yellow"
                                       : implementation_status === 3
                                         ? "teal"
-                                        : "gray"
+                                        : computedColorScheme === "dark"
+                                          ? "gray"
+                                          : "gray.3"
                                 }
                                 m={2}
-                                size="xs"
+                                size="sm"
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   router.push(
                                     `/sections/${section.section}/${control.section}`,
                                   );
                                 }}
-                              ></ActionIcon>
+                                className="font-bold"
+                                style={
+                                  computedColorScheme === "dark"
+                                    ? { color: "white" }
+                                    : { color: "black" }
+                                }
+                              >
+                                {currentControlProgress?.num_evidence
+                                  ? currentControlProgress.num_evidence
+                                  : null}
+                              </ActionIcon>
                             </Tooltip>
                           );
                         })

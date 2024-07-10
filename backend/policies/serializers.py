@@ -10,6 +10,8 @@ class EvidenceSerializer(serializers.ModelSerializer):
 
 
 class PolicySerializer(serializers.ModelSerializer):
+    num_evidence = serializers.SerializerMethodField()
+
     class Meta:
         model = Policy
         fields = [
@@ -20,8 +22,14 @@ class PolicySerializer(serializers.ModelSerializer):
             "implementation_status",
             "control",
             "evidence_list",
+            "num_evidence",
         ]
-        read_only_fields = ("id", "control", "evidence_list")
+        read_only_fields = ("id", "control", "evidence_list", "num_evidence")
+
+    def get_num_evidence(self, obj):
+        if obj.evidence_list:
+            return obj.evidence_list.evidences.count()
+        return 0
 
 
 class SectionSerializer(serializers.ModelSerializer):
