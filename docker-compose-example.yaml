@@ -33,7 +33,7 @@ services:
     volumes:
       - cmmcmap_backend_media:/app/media
     environment:
-      - DJANGO_DATABASE_URL=mysql://cmmcmapprod:${MARIADB_PASSWORD}@db/cmmcmap
+      - DJANGO_DATABASE_URL=mysql://cmmcmap:${MARIADB_PASSWORD}@db/cmmcmap
       - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
       - DJANGO_ROOT_PASSWORD=${DJANGO_ROOT_PASSWORD}
       - DJANGO_ALLOWED_HOSTS=*

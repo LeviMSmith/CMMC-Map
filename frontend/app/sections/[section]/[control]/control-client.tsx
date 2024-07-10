@@ -20,6 +20,8 @@ import {
 import { notifications } from "@mantine/notifications";
 import {
   IconCheck,
+  IconChevronCompactLeft,
+  IconChevronCompactRight,
   IconPlus,
   IconMinus,
   IconQuestionMark,
@@ -28,6 +30,7 @@ import {
 } from "@tabler/icons-react";
 import { useState, useEffect, useContext } from "react";
 import NextImage from "next/image";
+import NextLink from "next/link";
 
 import {
   StateContextType,
@@ -209,85 +212,124 @@ export default function ControlDash({
     );
   }
 
+  const prev_control = controls.find((item) => item.id === control.id - 1);
+  const next_control = controls.find((item) => item.id === control.id + 1);
+
+  const major_pattern = /3\.\d{1,2}/;
+
+  let prev_control_major: null | string = null;
+  if (prev_control) {
+    const match = prev_control.section.match(major_pattern);
+    prev_control_major = match ? match[0] : null;
+  }
+
+  let next_control_major: null | string = null;
+  if (next_control) {
+    const match = next_control.section.match(major_pattern);
+    next_control_major = match ? match[0] : null;
+  }
+
   return (
-    <Container>
-      <h2 className="lessbigtitle">{control.section_name}</h2>
-      <Text>{control.brief_description}</Text>
-      <Divider className="my-4" label="Policy" />
-      <Paper className="min-h-[250px]">
-        <Tabs
-          variant="outline"
-          className="w-full"
-          value={activeTab}
-          onChange={(value) => setActiveTab(value)}
-          defaultValue="n"
-          color="gray"
+    <>
+      {prev_control && prev_control_major ? (
+        <NextLink
+          href={`/sections/${prev_control_major}/${prev_control.section}`}
+          className="text-inherit"
         >
-          <Center>
-            <Tabs.List>
-              <Tabs.Tab value="policy">
-                <div className="flex items-center justify-center gap-2">
-                  <IconCheck
-                    className={`${activeTab === "policy" ? "text-green-500" : "default-color-class"}`}
-                  />
-                  <Text ta="center">Implemented</Text>
-                </div>
-              </Tabs.Tab>
-              <Tabs.Tab value="plan">
-                <div className="flex items-center justify-center gap-2">
-                  <IconListCheck
-                    className={`${activeTab === "plan" ? "text-yellow-400" : "default-color-class"}`}
-                  />
-                  <Text ta="center">Planned to be Implemented</Text>
-                </div>
-              </Tabs.Tab>
-              <Tabs.Tab value="na">
-                <div className="flex items-center justify-center gap-2">
-                  <IconMinus
-                    className={`${activeTab === "na" ? "text-teal-400" : "default-color-class"}`}
-                  />
-                  <Text ta="center">Not Applicable</Text>
-                </div>
-              </Tabs.Tab>
-              <Tabs.Tab value="n">
-                <div className="flex items-center justify-center gap-2">
-                  <IconX
-                    className={`${activeTab === "n" ? "text-red-500" : "default-color-class"}`}
-                  />
-                  <Text ta="center">Unset</Text>
-                </div>
-              </Tabs.Tab>
-            </Tabs.List>
-          </Center>
-          <TabPanel
-            value="policy"
-            label="Policy"
-            placeholder="What is the policy?"
-          />
-          <TabPanel
-            value="plan"
-            label="Plan"
-            placeholder="What's the plan? What will be the policy?"
-          />
-          <TabPanel
-            value="na"
-            label="Explanation"
-            placeholder="Why is this control not applicable?"
-          />
-          <Tabs.Panel value="n">
-            <div className="flex justify-center items-center h-[250px]">
-              <IconX />
-              <Text fw={300}>Unset! Choose another tab to get started.</Text>
-            </div>
-          </Tabs.Panel>
-        </Tabs>
-      </Paper>
-      <div className="h-16" />
-      {evidenceListId ? (
-        <EvidenceAdd evidenceListId={evidenceListId} />
-      ) : (
-        <Text>Failed to load evidence for this policy!</Text>
-      )}
-    </Container>
+          <div className={`${styles.arrowleft} ${styles.arrow}`}>
+            <IconChevronCompactLeft size={50} />
+          </div>
+        </NextLink>
+      ) : null}
+      {next_control && next_control_major ? (
+        <NextLink
+          href={`/sections/${next_control_major}/${next_control.section}`}
+          className="text-inherit"
+        >
+          <div className={`${styles.arrowright} ${styles.arrow}`}>
+            <IconChevronCompactRight size={50} />
+          </div>
+        </NextLink>
+      ) : null}
+      <Container>
+        <h2 className="lessbigtitle">{control.section_name}</h2>
+        <Text>{control.brief_description}</Text>
+        <Divider className="my-4" label="Policy" />
+        <Paper className="min-h-[250px]">
+          <Tabs
+            variant="outline"
+            className="w-full"
+            value={activeTab}
+            onChange={(value) => setActiveTab(value)}
+            defaultValue="n"
+            color="gray"
+          >
+            <Center>
+              <Tabs.List>
+                <Tabs.Tab value="policy">
+                  <div className="flex items-center justify-center gap-2">
+                    <IconCheck
+                      className={`${activeTab === "policy" ? "text-green-500" : "default-color-class"}`}
+                    />
+                    <Text ta="center">Implemented</Text>
+                  </div>
+                </Tabs.Tab>
+                <Tabs.Tab value="plan">
+                  <div className="flex items-center justify-center gap-2">
+                    <IconListCheck
+                      className={`${activeTab === "plan" ? "text-yellow-400" : "default-color-class"}`}
+                    />
+                    <Text ta="center">Planned to be Implemented</Text>
+                  </div>
+                </Tabs.Tab>
+                <Tabs.Tab value="na">
+                  <div className="flex items-center justify-center gap-2">
+                    <IconMinus
+                      className={`${activeTab === "na" ? "text-teal-400" : "default-color-class"}`}
+                    />
+                    <Text ta="center">Not Applicable</Text>
+                  </div>
+                </Tabs.Tab>
+                <Tabs.Tab value="n">
+                  <div className="flex items-center justify-center gap-2">
+                    <IconX
+                      className={`${activeTab === "n" ? "text-red-500" : "default-color-class"}`}
+                    />
+                    <Text ta="center">Unset</Text>
+                  </div>
+                </Tabs.Tab>
+              </Tabs.List>
+            </Center>
+            <TabPanel
+              value="policy"
+              label="Policy"
+              placeholder="What is the policy?"
+            />
+            <TabPanel
+              value="plan"
+              label="Plan"
+              placeholder="What's the plan? What will be the policy?"
+            />
+            <TabPanel
+              value="na"
+              label="Explanation"
+              placeholder="Why is this control not applicable?"
+            />
+            <Tabs.Panel value="n">
+              <div className="flex justify-center items-center h-[250px]">
+                <IconX />
+                <Text fw={300}>Unset! Choose another tab to get started.</Text>
+              </div>
+            </Tabs.Panel>
+          </Tabs>
+        </Paper>
+        <div className="h-16" />
+        {evidenceListId ? (
+          <EvidenceAdd evidenceListId={evidenceListId} />
+        ) : (
+          <Text>Failed to load evidence for this policy!</Text>
+        )}
+      </Container>
+    </>
   );
 }

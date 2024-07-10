@@ -48,3 +48,27 @@
 .icon {
   transition: transform 200ms ease-in-out;
 }
+
+.arrow {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 50px; /* Adjust width as needed */
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.leftarrow {
+  left: 0;
+}
+
+.arrowright {
+  right: 0;
+}
+
+.arrow:hover {
+  background-color: rgba(0, 0, 0, 0.1); /* Optional hover effect */
+}
