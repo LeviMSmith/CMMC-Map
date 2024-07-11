@@ -268,7 +268,7 @@ export default function ControlDash({
         <Stack>
           {Object.entries(control.assessment_objectives).map(
             ([letter, objective], index) => (
-              <Text>
+              <Text key={index}>
                 <strong>{letter.toUpperCase()}: </strong>
                 {objective}
               </Text>
@@ -283,7 +283,7 @@ export default function ControlDash({
         <Stack>
           {Object.entries(control.fd_examples).map(
             ([title, example], index) => (
-              <Text>
+              <Text key={index}>
                 {title.toUpperCase()}: {example}
               </Text>
             ),
@@ -292,7 +292,7 @@ export default function ControlDash({
         <Divider my="md" label="Potential Assessment Considerations" />
         <Stack>
           {control.fd_pac.map((pac, index) => (
-            <Text>{pac}</Text>
+            <Text key={index}>{pac}</Text>
           ))}
         </Stack>
         <Divider my="md" label="Assessment Guides" />
@@ -313,7 +313,7 @@ export default function ControlDash({
         <Divider my="md" label="Key References" />
         <Stack>
           {control.key_references.map((reference, index) => (
-            <Text>{reference}</Text>
+            <Text key={index}>{reference}</Text>
           ))}
         </Stack>
       </Drawer>
