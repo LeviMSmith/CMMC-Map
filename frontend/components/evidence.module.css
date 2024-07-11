@@ -48,3 +48,13 @@
 .icon {
   transition: transform 200ms ease-in-out;
 }
+
+.collapsedText {
+  max-height: 200px; /* This allows up to 3 lines of text */
+  overflow: hidden;
+  white-space: normal;
+}
+
+.expandedText {
+  max-height: none;
+}

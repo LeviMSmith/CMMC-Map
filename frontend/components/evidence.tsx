@@ -101,6 +101,7 @@ export function EvidenceDisplay({
   onDelete?: () => void;
   onAdd?: () => void;
 }) {
+  const [isExpanded, setIsExpanded] = useState(false);
   const openInNewTab = (url: string) => {
     window.open(url, "_blank", "noopener,noreferrer");
   };
@@ -108,6 +109,36 @@ export function EvidenceDisplay({
   const dontMessWithMyUrlDagummitLoader = ({ src }: { src: string }) => {
     return src;
   };
+
+  if (!evidence.description && !evidence.file) {
+    return null;
+  }
+
+  if (!evidence.file) {
+    return (
+      <div className="text-center m-4">
+        <Group wrap="nowrap" justify="center">
+          <div
+            className={isExpanded ? styles.expandedText : styles.collapsedText}
+            onClick={() => setIsExpanded(!isExpanded)}
+            style={{ cursor: "pointer", maxWidth: "80%" }}
+          >
+            {evidence.description || "No description available"}
+          </div>
+          {onDelete && (
+            <ActionIcon variant="subtle" onClick={onDelete}>
+              <IconX />
+            </ActionIcon>
+          )}
+          {onAdd && (
+            <ActionIcon variant="subtle" onClick={onAdd}>
+              <IconPlus />
+            </ActionIcon>
+          )}
+        </Group>
+      </div>
+    );
+  }
 
   return (
     <div className="text-center m-4">
@@ -318,16 +349,18 @@ export function EvidenceAdd({
       return;
     }
 
-    if (files.length === 0) {
-      console.error("Cannot upload: no files selected");
+    if (files.length === 0 && !description) {
+      console.error("Cannot upload: no evidence given");
       return;
     }
 
     const formData = new FormData();
 
-    files.forEach((file) => {
-      formData.append("file", file);
-    });
+    if (files) {
+      files.forEach((file) => {
+        formData.append("file", file);
+      });
+    }
     if (description) {
       formData.append("description", description);
     }
@@ -512,7 +545,7 @@ export function EvidenceAdd({
           </Dropzone>
           <Textarea
             placeholder="This screenshot shows..."
-            description="Give this file a description"
+            description="Give the file a description or just write out some evidence"
             value={description}
             onChange={(event) => setDescription(event.currentTarget.value)}
           />
