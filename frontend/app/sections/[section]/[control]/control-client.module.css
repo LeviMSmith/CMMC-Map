@@ -83,3 +83,12 @@
   padding: 20px;
   margin-bottom: 20px;
 }
+
+.headersection {
+  padding-bottom: rem(16px);
+  padding-top: rem(16px);
+  border-bottom: rem(1px) solid
+    light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
+  border-top: rem(1px) solid
+    light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
+}

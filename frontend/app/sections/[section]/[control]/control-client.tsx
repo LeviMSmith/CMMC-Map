@@ -2,15 +2,18 @@
 
 import {
   ActionIcon,
+  Affix,
   Button,
   Center,
   Container,
   Divider,
+  Drawer,
   Group,
   Loader,
   Notification,
   Paper,
   SimpleGrid,
+  Stack,
   Tabs,
   Text,
   Textarea,
@@ -22,6 +25,8 @@ import {
   IconCheck,
   IconChevronCompactLeft,
   IconChevronCompactRight,
+  IconExternalLink,
+  IconHelp,
   IconPlus,
   IconMinus,
   IconQuestionMark,
@@ -41,6 +46,7 @@ import { Control } from "@/lib/static-data";
 import { backendFetch } from "@/lib/session";
 
 import { EvidenceAdd } from "@/components/evidence";
+import { renderTextWithLineBreaks } from "@/components/helper";
 import styles from "./control-client.module.css";
 
 const getImplementationStatus = (tab: string) => {
@@ -61,6 +67,7 @@ export default function ControlDash({
 }) {
   const { sharedState, setSharedState } =
     useContext<StateContextType>(StateContext);
+  const [assessOpen, setAssessOpen] = useState<boolean>(false);
 
   const currentControlProgress = sharedState.controlProgress?.find(
     (element: ControlProgress) => element.id === control.id,
@@ -231,6 +238,90 @@ export default function ControlDash({
 
   return (
     <>
+      <Drawer
+        opened={assessOpen}
+        onClose={() => setAssessOpen(false)}
+        title="Assessment Guide Reference"
+        position="right"
+        size="xl"
+      >
+        <div className="flex items-start gap-2">
+          <Text>From the DoD CMMC Level 2 Assessment Guide</Text>
+          <NextLink href="https://dodcio.defense.gov/Portals/0/Documents/CMMC/AG_Level2_MasterV2.0_FINAL_202112016_508.pdf">
+            <ActionIcon size="sm" variant="subtle">
+              <IconExternalLink />
+            </ActionIcon>
+          </NextLink>
+        </div>
+        <Divider my="md" />
+        <Stack>
+          <Group justify="space-between" p="sm">
+            <Text fw={700}>{control.section_name}</Text>
+            <Group>
+              <Text fw={700}>Level:</Text>
+              <Text mr="lg">{control.level}</Text>
+            </Group>
+          </Group>
+          <Text my="md">{control.brief_description}</Text>
+        </Stack>
+        <Divider my="md" label="Assessment Objectives" />
+        <Stack>
+          {Object.entries(control.assessment_objectives).map(
+            ([letter, objective], index) => (
+              <Text key={index}>
+                <strong>{letter.toUpperCase()}: </strong>
+                {objective}
+              </Text>
+            ),
+          )}
+        </Stack>
+        <Divider my="md" label="Discussion" />
+        <Text>{renderTextWithLineBreaks(control.discussion)}</Text>
+        <Divider my="md" label="Further Discussion" />
+        <Text>{renderTextWithLineBreaks(control.further_discussion)}</Text>
+        <Divider my="md" label="Examples" />
+        <Stack>
+          {Object.entries(control.fd_examples).map(
+            ([title, example], index) => (
+              <Text key={index}>
+                {title.toUpperCase()}: {example}
+              </Text>
+            ),
+          )}
+        </Stack>
+        <Divider my="md" label="Potential Assessment Considerations" />
+        <Stack>
+          {control.fd_pac.map((pac, index) => (
+            <Text key={index}>{pac}</Text>
+          ))}
+        </Stack>
+        <Divider my="md" label="Assessment Guides" />
+        <Stack>
+          <Group>
+            <Text fw={700}>Examine:</Text>
+            <Text>{control.examine}</Text>
+          </Group>
+          <Group>
+            <Text fw={700}>Interview:</Text>
+            <Text>{control.interview}</Text>
+          </Group>
+          <Group>
+            <Text fw={700}>Test:</Text>
+            <Text>{control.test}</Text>
+          </Group>
+        </Stack>
+        <Divider my="md" label="Key References" />
+        <Stack>
+          {control.key_references.map((reference, index) => (
+            <Text key={index}>{reference}</Text>
+          ))}
+        </Stack>
+      </Drawer>
+      <Affix position={{ bottom: 20, right: 20 }}>
+        <ActionIcon type="submit" size="xl">
+          <IconHelp size={30} onClick={() => setAssessOpen(!assessOpen)} />
+        </ActionIcon>
+      </Affix>
       {prev_control && prev_control_major ? (
         <NextLink
           href={`/sections/${prev_control_major}/${prev_control.section}`}
