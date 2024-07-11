@@ -155,6 +155,7 @@ export default function AddRevision() {
       </Title>
       <Paper radius="lg" className={styles.revisiontable} p="md">
         <Select
+          size="md"
           label="Base Revision"
           placeholder="None"
           data={revisions.map((revision) => ({
@@ -164,10 +165,12 @@ export default function AddRevision() {
           m="lg"
         />
         <Group m="lg" justify="space-between">
-          <TextInput label="New revision name" placeholder="1.1" />
-          <ActionIcon variant="light" size="xl">
-            <IconFilePlus />
-          </ActionIcon>
+          <TextInput size="md" label="New revision name" placeholder="1.1" />
+          <Tooltip label="Create new revision">
+            <ActionIcon variant="light" size="xl">
+              <IconFilePlus />
+            </ActionIcon>
+          </Tooltip>
         </Group>
       </Paper>
     </Container>

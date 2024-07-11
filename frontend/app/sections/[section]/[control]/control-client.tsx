@@ -70,8 +70,14 @@ export default function ControlDash({
   const [assessOpen, setAssessOpen] = useState<boolean>(false);
 
   const currentControlProgress = sharedState.controlProgress?.find(
-    (element: ControlProgress) => element.id === control.id,
+    (element: ControlProgress) => element.control === control.id,
   );
+
+  if (!currentControlProgress && sharedState.revision_id) {
+    console.warn(
+      `Can't find policy id for control id ${control.id} in revision ${sharedState.revision_id}`,
+    );
+  }
 
   const evidenceListId: string | null = currentControlProgress
     ? currentControlProgress.evidence_list.toString()
