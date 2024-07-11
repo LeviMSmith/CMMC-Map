@@ -58,7 +58,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 0;
 }
 
 .leftarrow {
@@ -71,4 +71,15 @@
 
 .arrow:hover {
   background-color: rgba(0, 0, 0, 0.1); /* Optional hover effect */
+}
+
+.card {
+  background-color: light-dark(
+    var(--mantine-color-gray-1),
+    var(--mantine-color-dark-6)
+  );
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  margin-bottom: 20px;
 }

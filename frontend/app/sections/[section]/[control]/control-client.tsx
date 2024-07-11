@@ -252,10 +252,12 @@ export default function ControlDash({
         </NextLink>
       ) : null}
       <Container>
-        <h2 className="lessbigtitle">{control.section_name}</h2>
-        <Text>{control.brief_description}</Text>
+        <Paper className={styles.card}>
+          <h2 className="lessbigtitle">{control.section_name}</h2>
+          <Text>{control.brief_description}</Text>
+        </Paper>
         <Divider className="my-4" label="Policy" />
-        <Paper className="min-h-[250px]">
+        <Paper className={styles.card}>
           <Tabs
             variant="outline"
             className="w-full"
@@ -323,12 +325,14 @@ export default function ControlDash({
             </Tabs.Panel>
           </Tabs>
         </Paper>
-        <div className="h-16" />
-        {evidenceListId ? (
-          <EvidenceAdd evidenceListId={evidenceListId} />
-        ) : (
-          <Text>Failed to load evidence for this policy!</Text>
-        )}
+        <Divider className="my-4" label="Evidence" />
+        <Paper className={styles.card}>
+          {evidenceListId ? (
+            <EvidenceAdd evidenceListId={evidenceListId} />
+          ) : (
+            <Text>Failed to load evidence for this policy!</Text>
+          )}
+        </Paper>
       </Container>
     </>
   );

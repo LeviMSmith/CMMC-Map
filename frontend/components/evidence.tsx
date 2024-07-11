@@ -411,7 +411,7 @@ export function EvidenceAdd({
   });
 
   return (
-    <Paper className="min-h-[300px]">
+    <div className="min-h-[300px]">
       <Group>
         <Text fw={500} size="lg" ref={targetRef}>
           {sectionName || "Evidence"}
@@ -450,7 +450,7 @@ export function EvidenceAdd({
       </Group>
       {sectionDescription && <Text size="sm">{sectionDescription}</Text>}
       <Collapse in={evidenceAdd}>
-        <Paper className="mt-8" shadow="lg" p={16}>
+        <Paper className="mt-8" p={16}>
           <Dropzone
             onDrop={(acceptedFiles) => setFiles([acceptedFiles[0]])}
             onReject={(files) => console.error("rejected files", files)}
@@ -555,6 +555,6 @@ export function EvidenceAdd({
           </Center>
         </>
       )}
-    </Paper>
+    </div>
   );
 }
