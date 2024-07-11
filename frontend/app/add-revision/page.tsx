@@ -1,14 +1,28 @@
 "use client";
 
-import { Container, Loader, Group, Title, Text } from "@mantine/core";
+import {
+  ActionIcon,
+  Center,
+  Container,
+  Group,
+  Loader,
+  Paper,
+  Select,
+  Text,
+  TextInput,
+  Title,
+  Tooltip,
+} from "@mantine/core";
+import { IconCheck, IconFilePlus } from "@tabler/icons-react";
 import { useContext, useState, useEffect } from "react";
 
-import SystemInformationForm from "./section1";
 import { StateContextType, StateContext } from "@/components/state-provider";
 import { Revision } from "@/lib/static-data";
 import { backendFetch } from "@/lib/session";
 
-export default function ConfigureRevision() {
+import styles from "./page.module.css";
+
+export default function AddRevision() {
   const { sharedState, setSharedState } =
     useContext<StateContextType>(StateContext);
   const [revisions, setRevisions] = useState<Revision[] | undefined>();
@@ -78,41 +92,84 @@ export default function ConfigureRevision() {
     fetchData();
   }, [sharedState.refreshRevisions]);
 
-  if (!sharedState.revision_id || !revisions) {
+  if (!revisions) {
     return (
-      <Container>
-        <Text ta="center" size="lg" fw={500}>
-          Failed to fetch revisions!
-        </Text>
-        <Text ta="center">Try again later.</Text>
-      </Container>
-    );
-  }
-
-  const selected_revision = revisions.find(
-    (rev: Revision) => rev.id === sharedState.revision_id,
-  );
-
-  if (!selected_revision) {
-    return (
-      <Container>
-        <Text ta="center" size="lg" fw={500}>
-          No revision Selected!
-        </Text>
-        <Text ta="center">
-          Please select or create one to begin configuring it.
-        </Text>
-      </Container>
+      <Center>
+        <Loader />
+      </Center>
     );
   }
 
   return (
     <Container>
-      <Title ta="center">Revision Configuration</Title>
-      <Text fw={300} mb={64} ta="center">
-        Revision {selected_revision.version}
-      </Text>
-      <SystemInformationForm revision={selected_revision} />
+      <Title p="sm">Current Revisions</Title>
+      <Paper radius="lg" className={styles.revisiontable}>
+        {revisions.map((revision, index) => {
+          const formattedDate = revision.date_completed
+            ? new Date(revision.date_completed).toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })
+            : null;
+          return (
+            <Group
+              key={index} // Adding a key to avoid React warnings
+              p="md"
+              className={
+                index == 0 ? styles.firstrevisionrecord : styles.revisionrecord
+              }
+              justify="space-between"
+              onClick={() => {
+                setSharedState({ ...sharedState, revision_id: revision.id });
+              }}
+            >
+              <Group>
+                <Text fw={700}>{revision.version}</Text>
+                {revision.based_on && (
+                  <Text>
+                    Based on{" "}
+                    {
+                      revisions.find(
+                        (orevision) => orevision.id == revision.based_on,
+                      )?.version
+                    }
+                  </Text>
+                )}
+              </Group>
+              {formattedDate ? (
+                <Text>Completed {formattedDate}</Text>
+              ) : (
+                <Tooltip label={`Complete revision ${revision.version}`}>
+                  <ActionIcon variant="light">
+                    <IconCheck />
+                  </ActionIcon>
+                </Tooltip>
+              )}
+            </Group>
+          );
+        })}
+      </Paper>
+      <Title p="sm" mt="xl">
+        Create a New Revision
+      </Title>
+      <Paper radius="lg" className={styles.revisiontable} p="md">
+        <Select
+          label="Base Revision"
+          placeholder="None"
+          data={revisions.map((revision) => ({
+            value: revision.id,
+            label: revision.version,
+          }))}
+          m="lg"
+        />
+        <Group m="lg" justify="space-between">
+          <TextInput label="New revision name" placeholder="1.1" />
+          <ActionIcon variant="light" size="xl">
+            <IconFilePlus />
+          </ActionIcon>
+        </Group>
+      </Paper>
     </Container>
   );
 }
