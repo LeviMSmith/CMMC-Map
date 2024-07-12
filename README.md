@@ -1,8 +1,8 @@
 # CMMC-Map
 
-This is a web app to handle CMMC (Cybersecurity Maturation Model Certification) policy with a web app.
+This is a web app to handle CMMC (Cybersecurity Maturation Model Certification) policy.
 
-Version 0.1.0 out now!
+Version 0.2.0 out soon!
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
 
@@ -11,28 +11,24 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 ![](screenshots/SectionsLightDark.png)
 ![](screenshots/ControlLightDark.png)
 
+## Features
+
+- Built in DoD assessment guide reference
+- SSP revision management
+- SSP policy and evidence handling
+- At a glance overview of implemented policy
+- Good looking and responsive interface
+
 ## Running
 
-Grabbing the latest release and running the docker compose is the simplest option.
-
-Alternativly, running and building locally can be done with the Dockerfile.prod scripts in backend and frontend each.
-
-Or a single node stack can be run with
-
-`docker compose -f docker-compose-prod.yaml up --build`
-
-which will build the necessary containers and network them behind an nginx ingress handler with auto generated self signed certificates and a dedicated MariaDB container.
-
-### Running without the docker compose
-
-The only things strictly necessary are that the backend and frontend be served from the same origin and over https.
-See the current [nginx config files](nginx/dev/localhost.conf) for which urls need to be forewarded to which service and with which headers.
+The project is split into a frontend and backend. Both of these are run in docker containers
+Running them together is best done through the [docker-compose-example.yaml](docker-compose-example.yaml)
+which will do all the heavy lifting of networking everything and running a mariadb instance
+with it.
 
 ## Configuration
 
-The compose files simplify a lot, but if you'd like the specific environment variables for each container for more complex deployments, see [below](#backend-docker)
-
-### Compose Files
+### Example docker compose
 
 | Environment Variable  | Description                                                                                            | Default/Required |
 | --------------------- | ------------------------------------------------------------------------------------------------------ | ---------------- |
