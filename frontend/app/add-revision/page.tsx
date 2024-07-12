@@ -26,7 +26,12 @@ import styles from "./page.module.css";
 export default function AddRevision() {
   const { sharedState, setSharedState } =
     useContext<StateContextType>(StateContext);
+
   const [revisions, setRevisions] = useState<Revision[] | undefined>();
+  const [newBaseRev, setNewBaseRev] = useState<number | null>(null);
+  const [newRevName, setNewRevName] = useState<string>("");
+  const [newRevNameError, setNewRevNameError] = useState<string>("");
+  const [newRevLoading, setNewRevLoading] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -137,6 +142,58 @@ export default function AddRevision() {
     }
   };
 
+  const onCreateRev = () => {
+    if (!newRevName) {
+      setNewRevNameError("New revision needs a unique name");
+      return;
+    }
+
+    setNewRevLoading(true);
+    try {
+      backendFetch(`/api/revisions/`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          version: newRevName,
+          based_on: newBaseRev ? newBaseRev : null,
+        }),
+      }).then((res) => {
+        if (!res) {
+          setNewRevLoading(false);
+          throw new Error("No response");
+        }
+        if (!res.ok) {
+          console.error(`Network error ${res.status}`);
+          notifications.show({
+            title: "Failed to create new revision.",
+            message: "Try again later.",
+            color: "red",
+          });
+          setNewRevLoading(false);
+          return;
+        }
+
+        console.log(`Created new revision ${newRevName} successfully`);
+        setSharedState({
+          ...sharedState,
+          refreshRevisions: !sharedState.refreshRevisions,
+        });
+        setNewRevLoading(false);
+      });
+    } catch (error) {
+      console.error(`Failed to create new revision: ${error}`);
+      notifications.show({
+        title: "Failed to create new revision.",
+        message: "Try again later.",
+        color: "red",
+      });
+      setNewRevLoading(false);
+    }
+  };
+
   if (!revisions) {
     return (
       <Center>
@@ -211,14 +268,31 @@ export default function AddRevision() {
             label: revision.version,
           }))}
           m="lg"
+          value={newBaseRev}
+          onChange={setNewBaseRev}
         />
         <Group m="lg" justify="space-between">
-          <TextInput size="md" label="New revision name" placeholder="1.1" />
-          <Tooltip label="Create new revision">
-            <ActionIcon variant="light" size="xl">
-              <IconFilePlus />
-            </ActionIcon>
-          </Tooltip>
+          <TextInput
+            size="md"
+            label="New revision name"
+            placeholder="1.1"
+            value={newRevName}
+            onChange={(event) => setNewRevName(event.currentTarget.value)}
+            error={newRevNameError}
+          />
+          {newRevLoading ? (
+            <Loader />
+          ) : (
+            <Tooltip label="Create new revision">
+              <ActionIcon
+                variant="light"
+                size="xl"
+                onClick={() => onCreateRev()}
+              >
+                <IconFilePlus />
+              </ActionIcon>
+            </Tooltip>
+          )}
         </Group>
       </Paper>
     </Container>
