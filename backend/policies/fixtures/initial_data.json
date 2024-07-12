@@ -1,4 +1,5 @@
 [
+  { "model": "policies.revision", "pk": 1, "fields": { "version": "1.0" } },
   { "model": "policies.section", "pk": 1, "fields": {} },
   { "model": "policies.section", "pk": 2, "fields": {} },
   { "model": "policies.section", "pk": 3, "fields": {} },

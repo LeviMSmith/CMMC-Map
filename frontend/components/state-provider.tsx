@@ -61,7 +61,7 @@ export interface State {
   controlProgress?: ControlProgress[] | undefined | null;
   refreshControlProgress: boolean;
   refreshRevisions: boolean;
-  revComplete: boolean;
+  revCompleted: boolean;
 }
 
 export interface StateContextType {
@@ -73,7 +73,7 @@ const defaultState: StateContextType = {
   sharedState: {
     refreshControlProgress: false,
     refreshRevisions: false,
-    revComplete: false,
+    revCompleted: false,
   },
   setSharedState: () => {},
 };

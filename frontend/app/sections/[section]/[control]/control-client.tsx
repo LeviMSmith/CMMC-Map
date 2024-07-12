@@ -101,7 +101,6 @@ export default function ControlDash({
     value,
     label,
     placeholder,
-    locked,
   }: {
     value: string;
     label: string;

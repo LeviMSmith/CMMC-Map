@@ -28,7 +28,7 @@ export default function AddRevision() {
     useContext<StateContextType>(StateContext);
 
   const [revisions, setRevisions] = useState<Revision[] | undefined>();
-  const [newBaseRev, setNewBaseRev] = useState<number | null>(null);
+  const [newBaseRev, setNewBaseRev] = useState<string | null>(null);
   const [newRevName, setNewRevName] = useState<string>("");
   const [newRevNameError, setNewRevNameError] = useState<string>("");
   const [newRevLoading, setNewRevLoading] = useState<boolean>(false);
@@ -149,6 +149,11 @@ export default function AddRevision() {
     }
 
     setNewRevLoading(true);
+
+    let baseRev: number | null = null;
+    if (newBaseRev) {
+      baseRev = parseInt(newBaseRev, 10);
+    }
     try {
       backendFetch(`/api/revisions/`, {
         method: "POST",
@@ -158,7 +163,7 @@ export default function AddRevision() {
         },
         body: JSON.stringify({
           version: newRevName,
-          based_on: newBaseRev ? newBaseRev : null,
+          based_on: newBaseRev,
         }),
       }).then((res) => {
         if (!res) {
@@ -228,12 +233,13 @@ export default function AddRevision() {
             >
               <Group>
                 <Text fw={700}>{revision.version}</Text>
-                {revision.based_on && (
+                {revision.based_on != null && (
                   <Text>
                     Based on{" "}
                     {
                       revisions.find(
-                        (orevision) => orevision.id == revision.based_on,
+                        (orevision) =>
+                          orevision.id === revision.based_on?.toString(),
                       )?.version
                     }
                   </Text>
