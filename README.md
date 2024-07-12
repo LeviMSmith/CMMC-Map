@@ -2,7 +2,7 @@
 
 This is a web app to handle CMMC (Cybersecurity Maturation Model Certification) policy.
 
-Version 0.2.0 out soon!
+Version 0.2.0 out now!
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
 
