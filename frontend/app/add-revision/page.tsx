@@ -13,6 +13,7 @@ import {
   Title,
   Tooltip,
 } from "@mantine/core";
+import { notifications } from "@mantine/notifications";
 import { IconCheck, IconFilePlus } from "@tabler/icons-react";
 import { useContext, useState, useEffect } from "react";
 
@@ -92,6 +93,50 @@ export default function AddRevision() {
     fetchData();
   }, [sharedState.refreshRevisions]);
 
+  const completeRevision = (revision: Revision) => {
+    try {
+      const currentDate = new Date().toISOString();
+
+      backendFetch(`/api/revisions/${revision.id}/`, {
+        method: "PUT",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          version: revision.version,
+          date_completed: currentDate,
+        }),
+      }).then((res) => {
+        if (!res) {
+          throw new Error("Didn't get a response on our complete.");
+        }
+
+        if (!res.ok) {
+          console.error(`Failed to complete revision. Response: ${res.status}`);
+          notifications.show({
+            title: "Failed to complete revision.",
+            message: "Try again later.",
+            color: "red",
+          });
+        }
+
+        console.log(`Revision marked completed as of ${currentDate}`);
+        setSharedState({
+          ...sharedState,
+          refreshRevisions: !sharedState.refreshRevisions,
+        });
+      });
+    } catch (error) {
+      console.error("Failed to complete revision: ", error);
+      notifications.show({
+        title: "Failed to complete revision.",
+        message: "Try again later.",
+        color: "red",
+      });
+    }
+  };
+
   if (!revisions) {
     return (
       <Center>
@@ -141,7 +186,10 @@ export default function AddRevision() {
                 <Text>Completed {formattedDate}</Text>
               ) : (
                 <Tooltip label={`Complete revision ${revision.version}`}>
-                  <ActionIcon variant="light">
+                  <ActionIcon
+                    variant="light"
+                    onClick={() => completeRevision(revision)}
+                  >
                     <IconCheck />
                   </ActionIcon>
                 </Tooltip>

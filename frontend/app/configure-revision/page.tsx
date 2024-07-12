@@ -1,7 +1,17 @@
 "use client";
 
-import { Container, Loader, Group, Title, Text } from "@mantine/core";
+import {
+  Button,
+  Center,
+  Container,
+  Loader,
+  Group,
+  Stack,
+  Title,
+  Text,
+} from "@mantine/core";
 import { useContext, useState, useEffect } from "react";
+import NextLink from "next/link";
 
 import SystemInformationForm from "./section1";
 import { StateContextType, StateContext } from "@/components/state-provider";
@@ -102,6 +112,29 @@ export default function ConfigureRevision() {
         <Text ta="center">
           Please select or create one to begin configuring it.
         </Text>
+      </Container>
+    );
+  }
+
+  if (selected_revision.date_completed) {
+    return (
+      <Container>
+        <Title ta="center">Revision {selected_revision.version}</Title>
+        <Title order={2} ta="center">
+          Completed {selected_revision.date_completed.toLocaleString()}
+        </Title>
+        <div className="my-10" />
+        <Text ta="center">
+          This revision is completed and can not be modified.
+        </Text>
+        <Stack mt="lg">
+          <NextLink href="/ssp">
+            <Button className="!w-full">System Security Plan</Button>
+          </NextLink>
+          <NextLink href="/">
+            <Button className="!w-full">Revision Map</Button>
+          </NextLink>
+        </Stack>
       </Container>
     );
   }

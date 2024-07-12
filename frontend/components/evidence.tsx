@@ -101,6 +101,9 @@ export function EvidenceDisplay({
   onDelete?: () => void;
   onAdd?: () => void;
 }) {
+  const { sharedState, setSharedState } =
+    useContext<StateContextType>(StateContext);
+
   const [isExpanded, setIsExpanded] = useState(false);
   const openInNewTab = (url: string) => {
     window.open(url, "_blank", "noopener,noreferrer");
@@ -186,15 +189,19 @@ export function EvidenceDisplay({
             evidence.file.split("/").pop() ||
             "Unknown evidence name"}
         </Text>
-        {onDelete && (
-          <ActionIcon variant="subtle" onClick={onDelete}>
-            <IconX />
-          </ActionIcon>
-        )}
-        {onAdd && (
-          <ActionIcon variant="subtle" onClick={onAdd}>
-            <IconPlus />
-          </ActionIcon>
+        {!sharedState.revCompleted && (
+          <>
+            {onDelete && (
+              <ActionIcon variant="subtle" onClick={onDelete}>
+                <IconX />
+              </ActionIcon>
+            )}
+            {onAdd && (
+              <ActionIcon variant="subtle" onClick={onAdd}>
+                <IconPlus />
+              </ActionIcon>
+            )}
+          </>
         )}
       </Group>
     </div>
@@ -449,37 +456,38 @@ export function EvidenceAdd({
         <Text fw={500} size="lg" ref={targetRef}>
           {sectionName || "Evidence"}
         </Text>
-        {evidenceAdd ? (
-          <>
-            <Tooltip label="Cancel">
+        {!sharedState.revCompleted &&
+          (evidenceAdd ? (
+            <>
+              <Tooltip label="Cancel">
+                <ActionIcon
+                  onClick={() => {
+                    setEvidenceAdd(false);
+                  }}
+                  variant="light"
+                >
+                  <IconX />
+                </ActionIcon>
+              </Tooltip>
+              <Tooltip label="Save evidence">
+                <ActionIcon onClick={() => handleUpload(evidenceListId)}>
+                  <IconCheck />
+                </ActionIcon>
+              </Tooltip>
+            </>
+          ) : (
+            <Tooltip label="Add evidence">
               <ActionIcon
-                onClick={() => {
-                  setEvidenceAdd(false);
-                }}
                 variant="light"
+                onClick={() => {
+                  setEvidenceAdd(true);
+                  scrollIntoView();
+                }}
               >
-                <IconX />
+                <IconPlus />
               </ActionIcon>
             </Tooltip>
-            <Tooltip label="Save evidence">
-              <ActionIcon onClick={() => handleUpload(evidenceListId)}>
-                <IconCheck />
-              </ActionIcon>
-            </Tooltip>
-          </>
-        ) : (
-          <Tooltip label="Add evidence">
-            <ActionIcon
-              variant="light"
-              onClick={() => {
-                setEvidenceAdd(true);
-                scrollIntoView();
-              }}
-            >
-              <IconPlus />
-            </ActionIcon>
-          </Tooltip>
-        )}
+          ))}
       </Group>
       {sectionDescription && <Text size="sm">{sectionDescription}</Text>}
       <Collapse in={evidenceAdd}>
@@ -577,7 +585,9 @@ export function EvidenceAdd({
           </>
         ) : !evidenceAdd ? (
           <Text size="lg" fw={500} ta="center" pt="32">
-            No evidence yet. Press the plus icon above to get started.
+            {sharedState.revCompleted
+              ? "This control was never assigned evidence"
+              : "No evidence yet. Press the plus icon above to get started."}
           </Text>
         ) : null
       ) : (

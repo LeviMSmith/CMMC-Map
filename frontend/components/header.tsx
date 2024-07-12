@@ -431,6 +431,16 @@ export default function Header() {
   }, [sharedState.refreshRevisions]);
 
   useEffect(() => {
+    if (revisions) {
+      const revision = revisions.find(
+        (orevision) => orevision.id === sharedState.revision_id,
+      );
+      const revCompleted = revision?.date_completed ? true : false;
+      setSharedState({ ...sharedState, revCompleted });
+    }
+  }, [sharedState.revision_id, revisions]);
+
+  useEffect(() => {
     const fetchAssessments = async (revisionId: string) => {
       try {
         const res = await backendFetch(
@@ -495,7 +505,9 @@ export default function Header() {
     revisionOptions = revisions.map((revision: Revision) => {
       return {
         value: revision.id,
-        label: revision.version,
+        label: revision.date_completed
+          ? revision.version
+          : `${revision.version} (Draft)`,
       };
     });
   } else if (revisions !== undefined && revisions.length === 0) {
