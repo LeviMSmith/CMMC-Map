@@ -1,0 +1,21 @@
+.revisiontable {
+  background-color: light-dark(
+    var(--mantine-color-gray-1),
+    var(--mantine-color-dark-6)
+  );
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 0px;
+  margin-bottom: 0px;
+}
+
+.revisionrecord {
+  border-top: 2px solid
+    light-dark(var(--mantine-color-gray-2), var(--mantine-color-dark-4));
+}
+
+.firstrevisionrecord:hover,
+.revisionrecord:hover {
+  background-color: rgba(0, 0, 0, 0.1); /* Optional hover effect */
+  cursor: pointer;
+}

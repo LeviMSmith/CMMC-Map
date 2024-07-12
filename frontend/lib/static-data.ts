@@ -35,6 +35,7 @@ export interface Revision {
   hardware_listing: string;
   software_listing: string;
   hardsoft_main: string;
+  based_on?: number;
 }
 
 export interface Assessment {

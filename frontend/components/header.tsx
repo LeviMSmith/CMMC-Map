@@ -28,6 +28,7 @@ import {
   IconLogout,
   IconHome,
   IconTool,
+  IconFileText,
 } from "@tabler/icons-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -215,6 +216,18 @@ interface SelectOption {
   label: string;
 }
 
+const RevisionAddIcon = () => {
+  return (
+    <Link href="/add-revision">
+      <Tooltip label="Manage revisions">
+        <ActionIcon variant="subtle">
+          <IconTool />
+        </ActionIcon>
+      </Tooltip>
+    </Link>
+  );
+};
+
 const RevisionSelect = ({
   revisionOptions,
   sharedState,
@@ -243,7 +256,7 @@ const RevisionSelect = ({
     return (
       <Group>
         <Text>Add revision</Text>
-        <AddIcon addUrl="/api/revisions/" refresh={refresh} />
+        <RevisionAddIcon />
       </Group>
     );
   }
@@ -258,10 +271,10 @@ const RevisionSelect = ({
               router.push("/configure-revision");
             }}
           >
-            <IconTool />
+            <IconFileText />
           </ActionIcon>
         </Tooltip>
-        <AddIcon addUrl="/api/revisions/" refresh={refresh} />
+        <RevisionAddIcon />
       </Group>
     );
   };
@@ -418,6 +431,16 @@ export default function Header() {
   }, [sharedState.refreshRevisions]);
 
   useEffect(() => {
+    if (revisions) {
+      const revision = revisions.find(
+        (orevision) => orevision.id === sharedState.revision_id,
+      );
+      const revCompleted = revision?.date_completed ? true : false;
+      setSharedState({ ...sharedState, revCompleted });
+    }
+  }, [sharedState.revision_id, revisions]);
+
+  useEffect(() => {
     const fetchAssessments = async (revisionId: string) => {
       try {
         const res = await backendFetch(
@@ -447,11 +470,13 @@ export default function Header() {
           };
         });
 
-        setAssessments(assessments);
-        setSharedState({
-          ...sharedState,
-          assessment_id: assessments[assessments.length - 1].id,
-        });
+        if (assessments.length > 0) {
+          setAssessments(assessments);
+          setSharedState({
+            ...sharedState,
+            assessment_id: assessments[assessments.length - 1].id,
+          });
+        }
       } catch (error) {
         console.error(
           `Failed to fetch assessments for revision ${revisionId}`,
@@ -480,7 +505,9 @@ export default function Header() {
     revisionOptions = revisions.map((revision: Revision) => {
       return {
         value: revision.id,
-        label: revision.version,
+        label: revision.date_completed
+          ? revision.version
+          : `${revision.version} (Draft)`,
       };
     });
   } else if (revisions !== undefined && revisions.length === 0) {
@@ -585,11 +612,6 @@ export default function Header() {
         <div className="flex justify-end items-end my-2 gap-4">
           <RevisionSelect
             revisionOptions={revisionOptions}
-            sharedState={sharedState}
-            setSharedState={setSharedState}
-          />
-          <AssessmentSelect
-            assessmentOptions={assessmentOptions}
             sharedState={sharedState}
             setSharedState={setSharedState}
           />

@@ -70,8 +70,14 @@ export default function ControlDash({
   const [assessOpen, setAssessOpen] = useState<boolean>(false);
 
   const currentControlProgress = sharedState.controlProgress?.find(
-    (element: ControlProgress) => element.id === control.id,
+    (element: ControlProgress) => element.control === control.id,
   );
+
+  if (!currentControlProgress && sharedState.revision_id) {
+    console.warn(
+      `Can't find policy id for control id ${control.id} in revision ${sharedState.revision_id}`,
+    );
+  }
 
   const evidenceListId: string | null = currentControlProgress
     ? currentControlProgress.evidence_list.toString()
@@ -198,24 +204,23 @@ export default function ControlDash({
     };
 
     return (
-      <>
-        <Tabs.Panel value={value}>
-          <Textarea
-            pt="16"
-            description={label}
-            placeholder={placeholder}
-            autosize
-            minRows={6}
-            maxRows={16}
-            value={description}
-            onChange={(event) => setDescription(event.currentTarget.value)}
-            size="lg"
-            rightSectionPointerEvents="auto"
-            rightSection={<SubmitButton />}
-          />
-          <div className="h-8" />
-        </Tabs.Panel>
-      </>
+      <Tabs.Panel value={value}>
+        <Textarea
+          pt="16"
+          description={label}
+          placeholder={placeholder}
+          autosize
+          minRows={6}
+          maxRows={16}
+          value={description}
+          onChange={(event) => setDescription(event.currentTarget.value)}
+          size="lg"
+          rightSectionPointerEvents="auto"
+          rightSection={!sharedState.revCompleted && <SubmitButton />}
+          {...(sharedState.revCompleted && { disabled: true })}
+        />
+        <div className="h-8" />
+      </Tabs.Panel>
     );
   }
 

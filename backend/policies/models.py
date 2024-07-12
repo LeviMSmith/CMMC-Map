@@ -66,26 +66,33 @@ class Revision(models.Model):
         on_delete=models.CASCADE,
         related_name="revisions_for_information_description",
         null=True,
+        blank=True,
     )
     system_top_evi = models.ForeignKey(
         EvidenceList,
         on_delete=models.CASCADE,
         related_name="revisions_for_system_top_evi",
         null=True,
+        blank=True,
     )
     hardware_listing = models.ForeignKey(
         EvidenceList,
         on_delete=models.CASCADE,
         related_name="revisions_for_hardware_listing",
         null=True,
+        blank=True,
     )
     software_listing = models.ForeignKey(
         EvidenceList,
         on_delete=models.CASCADE,
         related_name="revisions_for_software_listing",
         null=True,
+        blank=True,
     )
     hardsoft_main = models.TextField(null=True, blank=True)
+    based_on = models.ForeignKey(
+        "self", null=True, blank=True, on_delete=models.CASCADE
+    )
 
 
 class Policy(models.Model):

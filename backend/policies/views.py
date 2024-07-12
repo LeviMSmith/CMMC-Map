@@ -186,7 +186,122 @@ class RevisionView(APIView):
         return Response(serializer.data)
 
     def post(self, request, format=None):
-        serializer = RevisionSerializer(data=request.data)
+        data = request.data
+        based_on_id = data.get("based_on")
+
+        if based_on_id:
+            try:
+                based_on_revision = Revision.objects.get(id=based_on_id)
+
+                # Create new EvidenceLists with the same Evidence objects
+                def clone_evidence_list(evidence_list):
+                    if not evidence_list:
+                        return None
+                    new_evidence_list = EvidenceList.objects.create()
+                    new_evidence_list.evidences.set(evidence_list.evidences.all())
+                    new_evidence_list.save()
+                    return new_evidence_list
+
+                # Create a copy of the based_on_revision excluding certain fields
+                new_revision_data = {
+                    "version": data.get("version"),
+                    "system_name": based_on_revision.system_name,
+                    "system_category": based_on_revision.system_category,
+                    "system_unique_id": based_on_revision.system_unique_id,
+                    "responsible_org_name": based_on_revision.responsible_org_name,
+                    "responsible_org_addr": based_on_revision.responsible_org_addr,
+                    "responsible_org_phone": based_on_revision.responsible_org_phone,
+                    "info_owner_name": based_on_revision.info_owner_name,
+                    "info_owner_title": based_on_revision.info_owner_title,
+                    "info_owner_addr": based_on_revision.info_owner_addr,
+                    "info_owner_phone": based_on_revision.info_owner_phone,
+                    "info_owner_email": based_on_revision.info_owner_email,
+                    "sys_owner_name": based_on_revision.sys_owner_name,
+                    "sys_owner_title": based_on_revision.sys_owner_title,
+                    "sys_owner_addr": based_on_revision.sys_owner_addr,
+                    "sys_owner_phone": based_on_revision.sys_owner_phone,
+                    "sys_owner_email": based_on_revision.sys_owner_email,
+                    "sys_sec_name": based_on_revision.sys_sec_name,
+                    "sys_sec_title": based_on_revision.sys_sec_title,
+                    "sys_sec_addr": based_on_revision.sys_sec_addr,
+                    "sys_sec_phone": based_on_revision.sys_sec_phone,
+                    "sys_sec_email": based_on_revision.sys_sec_email,
+                    "system_description": based_on_revision.system_description,
+                    "num_end_users": based_on_revision.num_end_users,
+                    "num_admin_users": based_on_revision.num_admin_users,
+                    "hardsoft_main": based_on_revision.hardsoft_main,
+                    "based_on": based_on_revision.id,
+                }
+                # Merge the copied data with the new data
+                new_revision_data.update(
+                    {
+                        k: v
+                        for k, v in data.items()
+                        if k
+                        not in [
+                            "version",
+                            "id",
+                            "date_completed",
+                            "information_description",
+                            "system_top_evi",
+                            "hardware_listing",
+                            "software_listing",
+                        ]
+                    }
+                )
+                serializer = RevisionSerializer(data=new_revision_data)
+
+                if serializer.is_valid():
+                    new_revision = serializer.save()
+
+                    # Use the EvidenceLists created by the signal handler
+                    new_revision.information_description = clone_evidence_list(
+                        based_on_revision.information_description
+                    )
+                    new_revision.system_top_evi = clone_evidence_list(
+                        based_on_revision.system_top_evi
+                    )
+                    new_revision.hardware_listing = clone_evidence_list(
+                        based_on_revision.hardware_listing
+                    )
+                    new_revision.software_listing = clone_evidence_list(
+                        based_on_revision.software_listing
+                    )
+                    new_revision.save()
+
+                    # Fetch the policies created by the signal handler
+                    new_policies = Policy.objects.filter(revision=new_revision)
+
+                    # Update the evidence_list of each new policy
+                    based_on_policies = Policy.objects.filter(
+                        revision=based_on_revision
+                    )
+                    for new_policy, based_on_policy in zip(
+                        new_policies, based_on_policies
+                    ):
+                        new_policy.policy_description = (
+                            based_on_policy.policy_description
+                        )
+                        new_policy.plan_description = based_on_policy.plan_description
+                        new_policy.na_description = based_on_policy.na_description
+                        new_policy.implementation_status = (
+                            based_on_policy.implementation_status
+                        )
+                        new_policy.evidence_list = clone_evidence_list(
+                            based_on_policy.evidence_list
+                        )
+                        new_policy.save()
+
+                    return Response(serializer.data, status=status.HTTP_201_CREATED)
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            except Revision.DoesNotExist:
+                return Response(
+                    {"error": "Based on revision not found"},
+                    status=status.HTTP_404_NOT_FOUND,
+                )
+        else:
+            serializer = RevisionSerializer(data=data)
+
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
