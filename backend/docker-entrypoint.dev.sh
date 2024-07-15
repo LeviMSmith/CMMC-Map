@@ -37,6 +37,7 @@ python manage.py migrate
 
 # Load initial data fixtures
 python manage.py loaddata initial_data.json
+python manage.py add_revision
 
 # Create Django superuser if it doesn't exist
 SUPERUSER_NAME=root
