@@ -33,6 +33,7 @@ import {
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useEffect, useContext } from "react";
+import { signIn } from "next-auth/react";
 
 import {
   StateContext,
@@ -630,6 +631,7 @@ export default function Header() {
               <IconMoon className={cx(styles.icon, styles.dark)} stroke={1.5} />
             </ActionIcon>
           </Group>
+          <Button variant="light" onClick={() => signIn("azure-ad")} />
         </div>
       </Group>
     </header>

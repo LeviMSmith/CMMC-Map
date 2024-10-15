@@ -30,6 +30,6 @@ Thumbs.db
 
 # Others
 README.md
-Dockerfile
+Dockerfile*
 docker-compose.yml
 *.md

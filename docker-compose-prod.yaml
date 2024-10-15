@@ -10,6 +10,7 @@ services:
       - cmmc-prod-data:/data
     environment:
       - CM_DATA:/data
+      - AUTH_SECRET:${AUTH_SECRET}
 
 volumes:
   cmmc-prod-data:

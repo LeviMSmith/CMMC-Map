@@ -11,7 +11,11 @@ services:
     ports:
       - "3000:3000"
     environment:
-      CM_DATA:/data
+      - CM_DATA:/data
+      - AUTH_SECRET:${AUTH_SECRET}
+      - AUTH_AZURE_AD_ID:${AUTH_AZURE_AD_ID}
+      - AUTH_AZURE_AD_SECRET:${AUTH_AZURE_AD_SECRET}
+      - AUTH_AZURE_AD_TENANT_ID:${AUTH_AZURE_AD_TENANT_ID}
 
 volumes:
   cmmc-dev-data:
