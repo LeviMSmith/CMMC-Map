@@ -33,7 +33,7 @@ import {
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useEffect, useContext } from "react";
-import { signIn, signOut } from "next-auth/react";
+import { signIn, signOut, useSession } from "next-auth/react";
 
 import {
   StateContext,
@@ -383,6 +383,8 @@ export default function Header() {
     getInitialValueInEffect: true,
   });
 
+  const { data: session } = useSession();
+
   const router = useRouter();
 
   useEffect(() => {
@@ -631,9 +633,15 @@ export default function Header() {
               <IconMoon className={cx(styles.icon, styles.dark)} stroke={1.5} />
             </ActionIcon>
           </Group>
-          <Button variant="light" onClick={() => signIn("azure-ad")}>
-            Sign In
-          </Button>
+          {session?.user ? (
+            <Button variant="light" onClick={() => signOut()}>
+              {session.user.name}
+            </Button>
+          ) : (
+            <Button variant="light" onClick={() => signIn()}>
+              Sign In
+            </Button>
+          )}
         </div>
       </Group>
     </header>

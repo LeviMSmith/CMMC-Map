@@ -8,10 +8,14 @@ CREATE TABLE evidence (
 );
 
 CREATE TABLE evidence_list (
+  id INTEGER PRIMARY KEY
+);
+
+CREATE TABLE evidence_list_evidence (
   id INTEGER PRIMARY KEY,
-  list INTEGER NOT NULL,
+  evidence_list_id INTEGER NOT NULL REFERENCES evidence_list (id),
   evidence_id INTEGER NOT NULL REFERENCES evidence (id),
-  UNIQUE (list, evidence_id)
+  UNIQUE (evidence_list_id, evidence_id)
 );
 
 CREATE TABLE revision (
@@ -19,11 +23,11 @@ CREATE TABLE revision (
   version TEXT NOT NULL UNIQUE,
   date_competed DATETIME,
   system_info TEXT, -- JSON text with all the info for the system for this revision except evidence
-  information_description INTEGER REFERENCES evidence_list (id),
-  system_top_evi INTEGER REFERENCES evidence_list (id),
-  hardware_listing INTEGER REFERENCES evidence_list (id),
-  software_listing INTEGER REFERENCES evidence_list (id),
-  based_on INTEGER REFERENCES revision (id)
+  information_description INTEGER NOT NULL REFERENCES evidence_list (id),
+  system_top_evi INTEGER  NOT NULL REFERENCES evidence_list (id),
+  hardware_listing INTEGER NOT NULL REFERENCES evidence_list (id),
+  software_listing INTEGER NOT NULL REFERENCES evidence_list (id),
+  based_on INTEGER NOT NULL REFERENCES revision (id)
 );
 
 CREATE TABLE policy (
@@ -35,7 +39,7 @@ CREATE TABLE policy (
   implementation_status TEXT NOT NULL DEFAULT 0,
   control INTEGER NOT NULL,
   section INTEGER NOT NULL,
-  evidence_list_id INTEGER NOT NULL REFERENCES evidence_list (id),
+  evidence_list INTEGER NOT NULL REFERENCES evidence_list (id),
   UNIQUE (revision_id, control)
 );
 
@@ -79,3 +83,24 @@ CREATE INDEX idx_cron_entity_revision_id ON cron_entity(revision_id);
 CREATE INDEX idx_cron_revision_id ON cron(revision_id);
 CREATE INDEX idx_cron_cron_entity_id ON cron(cron_entity_id);
 CREATE INDEX idx_cron_description_ev ON cron(description_ev);
+
+
+-- Create new evidence lists for first revision
+INSERT INTO evidence_list DEFAULT VALUES; -- for information_description
+INSERT INTO evidence_list DEFAULT VALUES; -- for system_top_evi
+INSERT INTO evidence_list DEFAULT VALUES; -- for hardware_listing
+INSERT INTO evidence_list DEFAULT VALUES; -- for software_listing
+
+-- Capture the last inserted IDs for the new evidence lists
+WITH evidence_lists AS (
+  SELECT 
+    (SELECT id FROM evidence_list ORDER BY id DESC LIMIT 1) AS software_listing,
+    (SELECT id FROM evidence_list ORDER BY id DESC LIMIT 1 OFFSET 1) AS hardware_listing,
+    (SELECT id FROM evidence_list ORDER BY id DESC LIMIT 1 OFFSET 2) AS system_top_evi,
+    (SELECT id FROM evidence_list ORDER BY id DESC LIMIT 1 OFFSET 3) AS information_description
+)
+-- Insert the new revision and associate the evidence lists
+INSERT INTO revision (version, information_description, system_top_evi, hardware_listing, software_listing)
+SELECT '1.0', information_description, system_top_evi, hardware_listing, software_listing
+FROM evidence_lists;
+

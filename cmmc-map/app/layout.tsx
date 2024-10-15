@@ -1,10 +1,12 @@
-import type { Metadata } from "next";
 import "./globals.css";
 import { theme } from "../theme";
+
+import type { Metadata } from "next";
+import { SessionProvider } from "next-auth/react";
+
 import "@mantine/core/styles.css";
 import "@mantine/notifications/styles.css";
 import "@mantine/dropzone/styles.css";
-
 import { ColorSchemeScript, MantineProvider } from "@mantine/core";
 import { Notifications } from "@mantine/notifications";
 
@@ -29,12 +31,14 @@ export default function RootLayout({
       </head>
       <body>
         <MantineProvider theme={theme} defaultColorScheme="auto">
-          <StateProvider>
-            <Header />
-            {children}
-            <div className="h-16" />
-          </StateProvider>
-          <Notifications position="bottom-right" />
+          <SessionProvider>
+            <StateProvider>
+              <Header />
+              {children}
+              <div className="h-16" />
+            </StateProvider>
+            <Notifications position="bottom-right" />
+          </SessionProvider>
         </MantineProvider>
       </body>
     </html>
