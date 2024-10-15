@@ -2,10 +2,10 @@ services:
   cmmc-dev:
     container_name: cmmc-dev
     build:
-      context: ./frontend
+      context: ./cmmc-map
       dockerfile: Dockerfile.dev
     volumes:
-      - ./frontend:/app
+      - ./cmmc-map:/app
       - /app/node_modules
       - cmmc-dev-data:/data
     ports:

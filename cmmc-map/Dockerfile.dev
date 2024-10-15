@@ -16,5 +16,8 @@ COPY . .
 # Expose the port on which your app will run
 EXPOSE 3000
 
+ENV NODE_ENV=development
+ENV WATCHPACK_POLLING=true
+
 CMD ["yarn", "dev"]
 

@@ -2,7 +2,7 @@ services:
   cmmc-prod:
     container_name: cmmc-prod
     build:
-      context: ./frontend
+      context: ./cmmc-mao
       dockerfile: Dockerfile.prod
     ports:
       - "3000:3000"
