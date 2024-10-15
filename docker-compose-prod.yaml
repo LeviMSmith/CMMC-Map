@@ -8,6 +8,8 @@ services:
       - "3000:3000"
     volumes:
       - cmmc-prod-data:/data
+    environment:
+      - CM_DATA:/data
 
 volumes:
   cmmc-prod-data:

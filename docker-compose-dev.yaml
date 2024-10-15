@@ -10,6 +10,8 @@ services:
       - cmmc-dev-data:/data
     ports:
       - "3000:3000"
+    environment:
+      CM_DATA:/data
 
 volumes:
   cmmc-dev-data:
